@@ -1,4 +1,4 @@
-# 🌟 Timmy's Portfolio - 啟動指南
+# 🌟 Timmy's Portfolio - Modern Full-Stack Web Application
 
 <div align="center">
 
@@ -11,117 +11,117 @@
 </div>
 
 <p align="center">
-這份文檔提供了如何在開發環境和生產環境中啟動前後端應用的詳細說明。
+A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment.
 </p>
 
 ---
 
-## 📋 目錄
+## 📋 Table of Contents
 
-- [💻 系統需求](#-系統需求)
-- [🏗️ 專案結構](#️-專案結構)
-- [🚀 開發環境設置](#-開發環境設置)
-  - [🖥️ 前端開發環境](#️-前端開發環境)
-  - [⚙️ 後端開發環境](#️-後端開發環境)
-  - [🐳 使用 Docker 進行開發](#-使用-docker-進行開發)
-- [🌐 生產環境部署](#-生產環境部署)
-  - [📜 使用部署腳本](#-使用部署腳本)
-  - [🛠️ 手動部署](#️-手動部署)
-  - [⚙️ 環境變數配置](#️-環境變數配置)
-- [❓ 常見問題解答](#-常見問題解答)
+- [💻 System Requirements](#-system-requirements)
+- [🏗️ Project Structure](#️-project-structure)
+- [🚀 Development Setup](#-development-setup)
+  - [🖥️ Frontend Development](#️-frontend-development)
+  - [⚙️ Backend Development](#️-backend-development)
+  - [🐳 Docker Development](#-docker-development)
+- [🌐 Production Deployment](#-production-deployment)
+  - [📜 Using Deployment Scripts](#-using-deployment-scripts)
+  - [🛠️ Manual Deployment](#️-manual-deployment)
+  - [⚙️ Environment Configuration](#️-environment-configuration)
+- [❓ FAQ](#-faq)
 
 ---
 
-## 💻 系統需求
+## 💻 System Requirements
 
 <table>
   <tr>
-    <td>✅ Node.js 18.x 或更高版本</td>
-    <td>✅ npm 9.x 或更高版本</td>
+    <td>✅ Node.js 18.x or higher</td>
+    <td>✅ npm 9.x or higher</td>
   </tr>
   <tr>
-    <td>✅ PostgreSQL 16.x (如果不使用 Docker)</td>
-    <td>✅ Docker 和 Docker Compose (推薦)</td>
+    <td>✅ PostgreSQL 16.x (if not using Docker)</td>
+    <td>✅ Docker and Docker Compose (recommended)</td>
   </tr>
 </table>
 
 ---
 
-## 🏗️ 專案結構
+## 🏗️ Project Structure
 
 ```
 timmy-portfolio/
-├── client/                 # 前端 Vue.js 應用
-│   ├── public/             # 靜態資源
-│   ├── src/                # 源代碼
-│   └── package.json        # 前端依賴
-├── server/                 # 後端 Node.js 應用
-│   ├── prisma/             # 數據庫模型和遷移
-│   ├── routes/             # API 路由
-│   ├── scripts/            # 腳本文件
-│   └── package.json        # 後端依賴
-├── docker-compose.yml      # Docker 配置
-├── Dockerfile.frontend     # 前端 Docker 配置
-├── Dockerfile.backend      # 後端 Docker 配置
-├── deploy.sh               # Linux/macOS 部署腳本
-└── deploy.ps1              # Windows 部署腳本
+├── client/                 # Vue.js Frontend Application
+│   ├── public/             # Static Assets
+│   ├── src/                # Source Code
+│   └── package.json        # Frontend Dependencies
+├── server/                 # Node.js Backend Application
+│   ├── prisma/             # Database Models & Migrations
+│   ├── routes/             # API Routes
+│   ├── scripts/            # Script Files
+│   └── package.json        # Backend Dependencies
+├── docker-compose.yml      # Docker Configuration
+├── Dockerfile.frontend     # Frontend Docker Configuration
+├── Dockerfile.backend      # Backend Docker Configuration
+├── deploy.sh               # Linux/macOS Deployment Script
+└── deploy.ps1              # Windows Deployment Script
 ```
 
 ---
 
-## 🚀 開發環境設置
+## 🚀 Development Setup
 
-### 🖥️ 前端開發環境
+### 🖥️ Frontend Development
 
 <details>
-<summary><b>展開查看詳細步驟</b></summary>
+<summary><b>Click to expand detailed steps</b></summary>
 
-1. 進入前端目錄：
+1. Navigate to frontend directory:
 
 ```bash
 cd client
 ```
 
-2. 安裝依賴：
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. 創建 `.env` 文件並設置 API URL：
+3. Create `.env` file and set API URL:
 
 ```
 VITE_API_URL=http://localhost:5000
 ```
 
-4. 啟動開發服務器：
+4. Start development server:
 
 ```bash
 npm run dev
 ```
 
-前端應用將在 http://localhost:3000 運行。
+The frontend application will run at http://localhost:3000.
 
 </details>
 
-### ⚙️ 後端開發環境
+### ⚙️ Backend Development
 
 <details>
-<summary><b>展開查看詳細步驟</b></summary>
+<summary><b>Click to expand detailed steps</b></summary>
 
-1. 進入後端目錄：
+1. Navigate to backend directory:
 
 ```bash
 cd server
 ```
 
-2. 安裝依賴：
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. 創建 `.env` 文件並設置環境變數：
+3. Create `.env` file and set environment variables:
 
 ```
 PORT=5000
@@ -137,36 +137,36 @@ EMAIL_PASS=your-app-password
 EMAIL_RECIPIENT=your-email@gmail.com
 ```
 
-4. 設置數據庫：
+4. Set up database:
 
 ```bash
 npx prisma migrate dev
 ```
 
-5. 初始化數據庫：
+5. Initialize database:
 
 ```bash
 node scripts/init-db.js
 ```
 
-6. 啟動開發服務器：
+6. Start development server:
 
 ```bash
 npm run dev
 ```
 
-後端 API 將在 http://localhost:5000 運行。
+The backend API will run at http://localhost:5000.
 
 </details>
 
-### 🐳 使用 Docker 進行開發
+### 🐳 Docker Development
 
 <details>
-<summary><b>展開查看詳細步驟</b></summary>
+<summary><b>Click to expand detailed steps</b></summary>
 
-使用 Docker 是最簡單的開發方式，可以避免環境配置問題。
+Using Docker is the simplest way to develop, avoiding environment configuration issues.
 
-1. 在項目根目錄下運行：
+1. Run in the project root directory:
 
 ```bash
 # Linux/macOS
@@ -176,32 +176,32 @@ npm run dev
 .\deploy.ps1
 ```
 
-或者手動運行 Docker Compose：
+Or manually run Docker Compose:
 
 ```bash
 docker-compose up -d
 ```
 
-這將啟動前端、後端和數據庫服務。前端將在 http://localhost:3000 運行，後端 API 將在 http://localhost:5000 運行。
+This will start the frontend, backend, and database services. The frontend will run at http://localhost:3000, and the backend API at http://localhost:5000.
 
 </details>
 
 ---
 
-## 🌐 生產環境部署
+## 🌐 Production Deployment
 
-### 📜 使用部署腳本
+### 📜 Using Deployment Scripts
 
 <details>
-<summary><b>展開查看詳細步驟</b></summary>
+<summary><b>Click to expand detailed steps</b></summary>
 
-1. 確保已安裝 Docker 和 Docker Compose。
+1. Ensure Docker and Docker Compose are installed.
 
-2. 修改環境變數文件以適應生產環境：
-   - `server/.env`：設置生產環境的數據庫連接、郵件配置等
-   - `client/.env`：設置正確的 API URL
+2. Modify environment files for production:
+   - `server/.env`: Set production database connection, email configuration, etc.
+   - `client/.env`: Set correct API URL
 
-3. 運行部署腳本：
+3. Run deployment script:
 
 ```bash
 # Linux/macOS
@@ -213,67 +213,61 @@ docker-compose up -d
 
 </details>
 
-### 🛠️ 手動部署
+### 🛠️ Manual Deployment
 
 <details>
-<summary><b>展開查看前端部署步驟</b></summary>
+<summary><b>Click to expand frontend deployment steps</b></summary>
 
-#### 前端部署
+#### Frontend Deployment
 
-1. 進入前端目錄：
+1. Navigate to frontend directory:
 
 ```bash
 cd client
 ```
 
-2. 安裝依賴：
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. 構建生產版本：
+3. Build production version:
 
 ```bash
 npm run build
 ```
 
-4. 將 `dist` 目錄中的文件部署到您的 Web 服務器。
+4. Deploy the files from the `dist` directory to your web server.
 
 </details>
 
 <details>
-<summary><b>展開查看後端部署步驟</b></summary>
+<summary><b>Click to expand backend deployment steps</b></summary>
 
-#### 後端部署
+#### Backend Deployment
 
-1. 進入後端目錄：
+1. Navigate to backend directory:
 
 ```bash
 cd server
 ```
 
-2. 安裝依賴（僅生產依賴）：
+2. Install dependencies:
 
 ```bash
-npm install --production
+npm install
 ```
 
-3. 設置環境變數（參見環境變數配置部分）。
+3. Set up environment variables in `.env` file.
 
-4. 運行數據庫遷移：
+4. Run database migrations:
 
 ```bash
 npx prisma migrate deploy
 ```
 
-5. 初始化數據庫：
-
-```bash
-node scripts/init-db.js
-```
-
-6. 啟動服務器：
+5. Start the server:
 
 ```bash
 npm start
@@ -281,90 +275,38 @@ npm start
 
 </details>
 
-### ⚙️ 環境變數配置
+---
+
+## ❓ FAQ
 
 <details>
-<summary><b>展開查看前端環境變數</b></summary>
+<summary><b>Common Issues and Solutions</b></summary>
 
-#### 前端環境變數 (client/.env)
+1. **Database Connection Issues**
+   - Ensure PostgreSQL is running
+   - Check DATABASE_URL in .env file
+   - Verify database credentials
 
-| 變數名 | 說明 | 示例 |
-|:--------|:------|:------|
-| `VITE_API_URL` | 後端 API 的 URL | http://api.example.com |
+2. **Docker Container Issues**
+   - Check container logs: `docker-compose logs [service]`
+   - Ensure all required ports are available
+   - Verify network connectivity between containers
 
-</details>
-
-<details>
-<summary><b>展開查看後端環境變數</b></summary>
-
-#### 後端環境變數 (server/.env)
-
-| 變數名 | 說明 | 示例 |
-|:--------|:------|:------|
-| `PORT` | 服務器端口 | 5000 |
-| `NODE_ENV` | 環境模式 | production |
-| `DATABASE_URL` | PostgreSQL 連接字符串 | postgresql://user:pass@host:5432/db |
-| `CORS_ORIGIN` | 允許的跨域來源 | https://example.com |
-| `JWT_SECRET` | JWT 令牌密鑰 | your_secret_key |
-| `EMAIL_HOST` | SMTP 服務器 | smtp.gmail.com |
-| `EMAIL_PORT` | SMTP 端口 | 587 |
-| `EMAIL_SECURE` | 是否使用 SSL/TLS | false |
-| `EMAIL_USER` | 郵箱用戶名 | your-email@gmail.com |
-| `EMAIL_PASS` | 郵箱密碼或應用密碼 | your-app-password |
-| `EMAIL_RECIPIENT` | 接收郵件的地址 | your-email@gmail.com |
-| `ADMIN_EMAIL` | 管理員郵箱 | admin@example.com |
-| `ADMIN_PASSWORD` | 管理員密碼 | secure_password |
+3. **Prisma Migration Issues**
+   - Run `npx prisma generate` after schema changes
+   - Check migration history: `npx prisma migrate status`
+   - Reset database if needed: `npx prisma migrate reset`
 
 </details>
 
 ---
 
-## ❓ 常見問題解答
+## 📝 License
 
-<details>
-<summary><b>數據庫連接問題</b></summary>
-
-如果遇到數據庫連接問題，請檢查：
-- DATABASE_URL 環境變數是否正確
-- PostgreSQL 服務是否運行
-- 數據庫用戶是否有正確的權限
-
-</details>
-
-<details>
-<summary><b>郵件發送失敗</b></summary>
-
-如果聯繫表單郵件發送失敗，請檢查：
-- EMAIL_* 環境變數是否正確配置
-- 如果使用 Gmail，確保已設置應用密碼
-- 檢查郵件服務器的防火牆設置
-
-</details>
-
-<details>
-<summary><b>Docker 容器無法啟動</b></summary>
-
-如果 Docker 容器無法啟動，請嘗試：
-- 檢查 Docker 和 Docker Compose 是否正確安裝
-- 運行 `docker-compose down` 然後重新啟動
-- 檢查日誌 `docker-compose logs`
-
-</details>
-
-<details>
-<summary><b>前端無法連接到後端 API</b></summary>
-
-如果前端無法連接到後端 API，請檢查：
-- VITE_API_URL 是否正確設置
-- 後端服務是否正在運行
-- CORS 設置是否正確
-
-</details>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
-
-**Made with ❤️ by Timmy**
-
+Made with ❤️ by Timmy
 </div>

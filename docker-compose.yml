@@ -13,7 +13,8 @@ services:
     environment:
       - NODE_ENV=development
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     networks:
       - app-network
 
@@ -31,8 +32,11 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://root:root@postgres:5432/timmy_portfolio?schema=public
       - CORS_ORIGIN=http://localhost:3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -49,6 +53,11 @@ services:
       - POSTGRES_DB=timmy_portfolio
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d timmy_portfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   app-network:

@@ -2,33 +2,44 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# 安裝依賴和必要的工具
 COPY server/package*.json ./
-
+RUN apk add --no-cache netcat-openbsd
 RUN npm install
 RUN npm install -g nodemon
 
-# Don't copy source code for development - we'll use volume mount instead
-# COPY server/ .
-
-# Add script to run migrations and initialize database
-COPY server/scripts/init-db.js ./scripts/
+# 複製 Prisma schema
 COPY server/prisma ./prisma/
 
-# Create entrypoint script
+# 生成 Prisma Client
+RUN npx prisma generate
+
+# 複製初始化腳本
+COPY server/scripts/init-db.js ./scripts/
+
+# 複製源代碼
+COPY server/ .
+
+# 創建入口腳本
 RUN echo '#!/bin/sh\n\
-echo "Running database migrations..."\n\
-npx prisma migrate deploy\n\
+echo "Waiting for PostgreSQL to be ready..."\n\
+while ! nc -z $DB_HOST $DB_PORT; do\n\
+  echo "Waiting for PostgreSQL..."\n\
+  sleep 2\n\
+done\n\
+\n\
+echo "Setting up database..."\n\
+npx prisma db push\n\
 \n\
 echo "Initializing database..."\n\
 node scripts/init-db.js\n\
 \n\
 echo "Starting server..."\n\
-exec nodemon server.js\n\
-' > /app/entrypoint.sh
-
-RUN chmod +x /app/entrypoint.sh
+exec /usr/local/bin/nodemon server.js\n\
+' > /app/entrypoint.sh && \
+chmod +x /app/entrypoint.sh
 
 EXPOSE 5000
 
-# Use entrypoint script to run migrations, init-db, and start server
-CMD ["/app/entrypoint.sh"]
+# 使用 sh 執行入口腳本
+CMD ["/bin/sh", "/app/entrypoint.sh"]

@@ -1,9 +1,12 @@
-const express = require('express');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import upload from '../middleware/upload.js';
+import auth from '../middleware/auth.js';
+import fs from 'fs';
+
 const router = express.Router();
-const upload = require('../middleware/upload');
-const fs = require('fs');
-const path = require('path');
-const auth = require('../middleware/auth');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // @route   POST api/uploads
 // @desc    Upload a file
@@ -55,4 +58,4 @@ router.delete('/:filename', auth, (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

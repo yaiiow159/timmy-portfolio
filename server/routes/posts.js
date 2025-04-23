@@ -1,7 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const prisma = require('../prisma/client');
-const auth = require('../middleware/auth');
+const prisma = new PrismaClient();
 
 // @route   GET api/posts
 // @desc    Get all posts with pagination
@@ -199,4 +201,4 @@ router.post('/:id/comments', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

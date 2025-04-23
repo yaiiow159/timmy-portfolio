@@ -1,6 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const prisma = require('../prisma/client');
+const prisma = new PrismaClient();
 
 // @route   GET api/projects
 // @desc    Get all projects
@@ -120,4 +123,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,7 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import nodemailer from 'nodemailer';
+
 const router = express.Router();
-const prisma = require('../prisma/client');
-const nodemailer = require('nodemailer');
+const prisma = new PrismaClient();
 
 // @route   POST api/contact
 // @desc    Send contact message
@@ -28,19 +30,86 @@ router.post('/', async (req, res) => {
       }
     });
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_RECIPIENT || process.env.EMAIL_USER,
-      subject: `New Contact Message from ${name}`,
-      html: `
-        <h3>New Contact Message</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message}</p>
-      `
-    });
-
+await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: process.env.EMAIL_RECIPIENT || process.env.EMAIL_USER,
+  subject: `新的聯絡訊息 - 來自 ${name}`,
+  html: `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        .email-container {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+        }
+        .header {
+          background-color: #4169E1;
+          color: white;
+          padding: 20px;
+          border-radius: 8px 8px 0 0;
+          text-align: center;
+        }
+        .content {
+          background-color: white;
+          padding: 20px;
+          border-radius: 0 0 8px 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .field {
+          margin-bottom: 15px;
+        }
+        .label {
+          font-weight: bold;
+          color: #666;
+        }
+        .message-box {
+          background-color: #f5f5f5;
+          padding: 15px;
+          border-radius: 4px;
+          margin-top: 5px;
+        }
+        .timestamp {
+          color: #888;
+          font-size: 0.9em;
+          text-align: right;
+          margin-top: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="header">
+          <h2>📬 新的聯絡訊息</h2>
+        </div>
+        <div class="content">
+          <div class="field">
+            <div class="label">👤 寄件人</div>
+            ${name}
+          </div>
+          <div class="field">
+            <div class="label">📧 電子郵件</div>
+            <a href="mailto:${email}">${email}</a>
+          </div>
+          <div class="field">
+            <div class="label">💌 訊息內容</div>
+            <div class="message-box">
+              ${message.replace(/\n/g, '<br>')}
+            </div>
+          </div>
+          <div class="timestamp">
+            收到時間：${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+});
     res.json({ msg: 'Message sent successfully' });
   } catch (err) {
     console.error(err.message);
@@ -48,4 +117,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -30,12 +30,10 @@ const selectedFiles = ref<File[]>([])
 const previewUrls = ref<string[]>([])
 const error = ref('')
 
-// Default values
 const maxSizeBytes = computed(() => props.maxSize || 5 * 1024 * 1024) // 5MB default
 const maxSizeFormatted = computed(() => formatFileSize(maxSizeBytes.value))
 const maxFilesCount = computed(() => props.multiple ? (props.maxFiles || 10) : 1)
 
-// Handle file selection
 function handleFileSelect(event: Event) {
   const input = event.target as HTMLInputElement
   if (!input.files || input.files.length === 0) return
@@ -43,7 +41,6 @@ function handleFileSelect(event: Event) {
   processFiles(Array.from(input.files))
 }
 
-// Handle drag and drop
 function handleDragEnter(event: DragEvent) {
   event.preventDefault()
   event.stopPropagation()
@@ -192,12 +189,10 @@ function clearFiles() {
       </div>
     </div>
     
-    <!-- Error Message -->
     <div v-if="error" class="mt-2 text-red-500 text-sm">
       {{ error }}
     </div>
     
-    <!-- Selected Files -->
     <div v-if="selectedFiles.length > 0" class="mt-4">
       <div class="flex justify-between items-center mb-2">
         <h4 class="font-medium text-text-primary">Selected Files ({{ selectedFiles.length }})</h4>
@@ -215,7 +210,6 @@ function clearFiles() {
           :key="index"
           class="flex items-center bg-primary rounded-lg p-3"
         >
-          <!-- Preview for images -->
           <div v-if="isImageFile(file) && previewUrls[index]" class="w-12 h-12 mr-3 flex-shrink-0">
             <img 
               :src="previewUrls[index]" 
@@ -224,7 +218,6 @@ function clearFiles() {
             />
           </div>
           
-          <!-- Icon for videos -->
           <div v-else-if="isVideoFile(file)" class="w-12 h-12 mr-3 flex-shrink-0 bg-gray-700 rounded flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -232,7 +225,6 @@ function clearFiles() {
             </svg>
           </div>
           
-          <!-- Icon for other files -->
           <div v-else class="w-12 h-12 mr-3 flex-shrink-0 bg-gray-700 rounded flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

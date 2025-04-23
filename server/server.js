@@ -1,10 +1,22 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const prisma = require('./prisma/client');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { PrismaClient } from '@prisma/client';
+import { config } from 'dotenv';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import authRoutes from './routes/auth.js';
+import postsRoutes from './routes/posts.js';
+import projectsRoutes from './routes/projects.js';
+import contactRoutes from './routes/contact.js';
+import uploadsRoutes from './routes/uploads.js';
+import adminRoutes from './routes/admin.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const prisma = new PrismaClient();
+config();
 
 const app = express();
 
@@ -29,7 +41,6 @@ app.use('/api/', apiLimiter);
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-const fs = require('fs');
 const uploadsDir = path.join(__dirname, '../uploads');
 const imageDir = path.join(uploadsDir, 'images');
 const videoDir = path.join(uploadsDir, 'videos');
@@ -41,12 +52,12 @@ const fileDir = path.join(uploadsDir, 'files');
   }
 });
 
-app.use('/api/auth', require('./routes/'));
-app.use('/api/posts', require('./routes/pauthosts'));
-app.use('/api/projects', require('./routes/projects'));
-app.use('/api/contact', require('./routes/contact'));
-app.use('/api/uploads', require('./routes/uploads'));
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/auth', authRoutes);
+app.use('/api/posts', postsRoutes);
+app.use('/api/projects', projectsRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/uploads', uploadsRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
