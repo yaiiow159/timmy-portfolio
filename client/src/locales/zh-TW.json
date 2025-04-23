@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "首頁",
+    "blog": "部落格",
+    "portfolio": "作品集",
+    "resume": "履歷",
+    "contact": "聯絡我"
+  },
+  "home": {
+    "greeting": "你好，我是",
+    "name": "Timmy",
+    "title": "軟體工程師",
+    "intro": "經驗豐富的全端開發者，專精於 Java、Spring Boot、Vue.js 等技術。",
+    "cta": "查看我的作品"
+  },
+  "blog": {
+    "title": "部落格",
+    "subtitle": "我在科技領域的想法和經驗",
+    "readMore": "閱讀更多",
+    "postedOn": "發表於",
+    "comments": "留言",
+    "leaveComment": "留下評論",
+    "yourName": "您的姓名",
+    "yourEmail": "您的電子郵件",
+    "yourComment": "您的評論",
+    "submit": "提交",
+    "recentPosts": "最新文章",
+    "categories": "分類"
+  },
+  "portfolio": {
+    "title": "作品集",
+    "subtitle": "查看我的最新專案",
+    "viewProject": "查看專案",
+    "technologies": "使用技術",
+    "viewLive": "查看線上版本",
+    "viewCode": "查看原始碼"
+  },
+  "resume": {
+    "title": "履歷",
+    "download": "下載履歷",
+    "downloadChinese": "下載中文版",
+    "downloadEnglish": "下載英文版",
+    "experience": "工作經驗",
+    "education": "教育背景",
+    "skills": "技術技能",
+    "languages": "語言能力",
+    "present": "至今"
+  },
+  "contact": {
+    "title": "聯絡我",
+    "subtitle": "與我取得聯繫",
+    "name": "您的姓名",
+    "email": "您的電子郵件",
+    "message": "您的訊息",
+    "send": "發送訊息",
+    "address": "地址",
+    "phone": "電話",
+    "emailAddress": "電子郵件"
+  },
+  "footer": {
+    "copyright": " 2025 Timmy. 版權所有。",
+    "madeWith": "使用 Vue.js 開發",
+    "developerDescription": "全端開發者，專精於 Java、Spring Boot、Vue.js 等技術。"
+  }
+}

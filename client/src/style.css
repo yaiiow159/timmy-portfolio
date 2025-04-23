@@ -1,0 +1,458 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+/* 暗色主題 (默認) */
+body {
+  background-color: #000000;
+  color: #f3f4f6;
+  margin: 0;
+  min-height: 100vh;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 亮色主題 - 更加生動的背景 */
+html.light body {
+  background-color: #f0f4ff;
+  color: #1f2937;
+  margin: 0;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(circle at 15% 25%, rgba(167, 139, 250, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 85% 25%, rgba(96, 165, 250, 0.08) 0%, transparent 35%),
+    radial-gradient(circle at 50% 60%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, #f0f4ff 0%, #eef2ff 50%, #ede9fe 100%);
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* 亮色主題 - 裝飾元素 */
+html.light body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* 暗色主題顏色 */
+.dark .bg-primary {
+  background-color: #121212;
+}
+
+.dark .bg-secondary {
+  background-color: #1e1e1e;
+}
+
+.dark .text-text-primary {
+  color: #f3f4f6;
+}
+
+.dark .text-text-secondary {
+  color: #9ca3af;
+}
+
+/* 亮色主題顏色 - 更加生動的配色 */
+.light .bg-primary {
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(124, 58, 237, 0.05);
+}
+
+.light .bg-secondary {
+  background-color: #f5f7ff;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(124, 58, 237, 0.03);
+}
+
+.light .text-text-primary {
+  color: #4a4a68;
+}
+
+.light .text-text-secondary {
+  color: #6b7280;
+}
+
+/* 強調色 */
+.text-accent {
+  color: #60a5fa;
+}
+
+.bg-accent {
+  background-color: #60a5fa;
+}
+
+/* 亮色主題下的強調色 - 更加生動的紫色 */
+.light .text-accent {
+  color: #8b5cf6; /* 亮紫色 */
+}
+
+.light .bg-accent {
+  background-color: #8b5cf6; /* 亮紫色 */
+}
+
+.border-accent {
+  border-color: #60a5fa;
+}
+
+.light .border-accent {
+  border-color: #8b5cf6; /* 亮紫色 */
+}
+
+/* 亮色主題下的漸變文字 - 更加生動的漸變 */
+.light .gradient-text {
+  color: transparent;
+  background-clip: text;
+  background-image: linear-gradient(to right, #9333ea, #4338ca);
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Code block styling */
+pre {
+  background-color: #1e1e1e;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.light pre {
+  background-color: #f3f4f6;
+  border: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #1f2937;
+}
+
+.light ::-webkit-scrollbar-track {
+  background-color: #e5e7eb;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #60a5fa;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #3b82f6;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background-color: #8b5cf6;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background-color: #a78bfa;
+}
+
+/* Transitions */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+/* Card and container styles - 更加生動的卡片 */
+.card {
+  background-color: #1e1e1e;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+
+.light .card {
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.04);
+  border: 1px solid rgba(124, 58, 237, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.light .card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, #8b5cf6, #6366f1);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-0.25rem);
+}
+
+.light .card:hover {
+  box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -2px rgba(124, 58, 237, 0.05);
+  border-color: rgba(124, 58, 237, 0.1);
+}
+
+.light .card:hover::after {
+  opacity: 1;
+}
+
+.container-custom {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Button styles - 更加生動的按鈕 */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background-color: #60a5fa;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #3b82f6;
+}
+
+.light .btn-primary {
+  background-color: #8b5cf6;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+.light .btn-primary:hover {
+  background-color: #7c3aed;
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #4b5563;
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: #374151;
+}
+
+.light .btn-secondary {
+  background-color: #e5e7eb;
+  color: #4a4a68;
+  border: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.light .btn-secondary:hover {
+  background-color: #d1d5db;
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.btn-outline {
+  border: 1px solid #60a5fa;
+  color: #60a5fa;
+}
+
+.btn-outline:hover {
+  background-color: #60a5fa;
+  color: #ffffff;
+}
+
+.light .btn-outline {
+  border: 1px solid #8b5cf6;
+  color: #8b5cf6;
+}
+
+.light .btn-outline:hover {
+  background-color: #8b5cf6;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+/* Gradient text - 更加生動的漸變 */
+.gradient-text {
+  color: transparent;
+  background-clip: text;
+  background-image: linear-gradient(to right, #60a5fa, #a78bfa);
+}
+
+.light .gradient-text {
+  color: transparent;
+  background-clip: text;
+  background-image: linear-gradient(to right, #8b5cf6, #4f46e5);
+}
+
+/* Glass effect - 更加生動的玻璃效果 */
+.glass {
+  background-color: rgba(30, 30, 30, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.light .glass {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.05);
+}
+
+/* Section styles - 更加生動的區塊樣式 */
+.section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  position: relative;
+}
+
+.light .section:nth-child(even) {
+  background-image: linear-gradient(135deg, #f5f7ff 0%, #ede9fe 100%);
+  border-top: 1px solid rgba(124, 58, 237, 0.05);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.light .section:nth-child(even)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: transparent;
+  background-clip: text;
+  background-image: linear-gradient(to right, #60a5fa, #a78bfa);
+}
+
+.light .section-title {
+  color: transparent;
+  background-clip: text;
+  background-image: linear-gradient(to right, #8b5cf6, #4f46e5);
+  position: relative;
+  display: inline-block;
+}
+
+.light .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 0;
+  width: 50%;
+  height: 3px;
+  background-image: linear-gradient(to right, #8b5cf6, #4f46e5);
+  border-radius: 3px;
+}
+
+/* 亮色主題下的技能卡片 - 更加生動的技能卡片 */
+.light .skill-item .w-16 {
+  background: linear-gradient(135deg, #fff 0%, #f5f7ff 100%);
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.05);
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+
+.light .skill-item:hover .w-16 {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.1);
+}

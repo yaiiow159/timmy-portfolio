@@ -1,0 +1,180 @@
+<template>
+  <div class="admin-dashboard">
+    <h1 class="text-2xl font-bold mb-6 text-text-primary dark:text-text-primary-light">
+      {{ t('admin.dashboardTitle') }}
+    </h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-primary dark:bg-primary-light rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-text-secondary dark:text-text-secondary-light text-sm">
+              {{ t('admin.totalPosts') }}
+            </p>
+            <h2 class="text-3xl font-bold text-text-primary dark:text-text-primary-light">
+              {{ stats.posts }}
+            </h2>
+          </div>
+          <div class="bg-blue-100 dark:bg-blue-800 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 dark:text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-primary dark:bg-primary-light rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-text-secondary dark:text-text-secondary-light text-sm">
+              {{ t('admin.totalProjects') }}
+            </p>
+            <h2 class="text-3xl font-bold text-text-primary dark:text-text-primary-light">
+              {{ stats.projects }}
+            </h2>
+          </div>
+          <div class="bg-green-100 dark:bg-green-800 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 dark:text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-primary dark:bg-primary-light rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-text-secondary dark:text-text-secondary-light text-sm">
+              {{ t('admin.totalComments') }}
+            </p>
+            <h2 class="text-3xl font-bold text-text-primary dark:text-text-primary-light">
+              {{ stats.comments }}
+            </h2>
+          </div>
+          <div class="bg-purple-100 dark:bg-purple-800 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500 dark:text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-primary dark:bg-primary-light rounded-lg shadow p-6 mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-text-primary dark:text-text-primary-light">
+        {{ t('admin.recentActivity') }}
+      </h3>
+      
+      <div v-if="isLoading" class="flex justify-center py-8">
+        <svg class="animate-spin h-8 w-8 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      
+      <div v-else-if="recentPosts.length === 0" class="text-center py-8 text-text-secondary dark:text-text-secondary-light">
+        {{ t('admin.noRecentActivity') }}
+      </div>
+      
+      <ul v-else class="divide-y divide-gray-200 dark:divide-gray-700">
+        <li v-for="post in recentPosts" :key="post.id" class="py-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-medium text-text-primary dark:text-text-primary-light">
+                {{ post.title }}
+              </h4>
+              <p class="text-sm text-text-secondary dark:text-text-secondary-light">
+                {{ new Date(post.date).toLocaleDateString() }}
+              </p>
+            </div>
+            <router-link 
+              :to="{ name: 'AdminEditPost', params: { id: post.id } }"
+              class="text-accent hover:text-accent-light"
+            >
+              {{ t('admin.edit') }}
+            </router-link>
+          </div>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="bg-primary dark:bg-primary-light rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 text-text-primary dark:text-text-primary-light">
+        {{ t('admin.quickActions') }}
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <router-link 
+          :to="{ name: 'AdminNewPost' }"
+          class="flex items-center p-4 bg-secondary dark:bg-secondary-light rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span class="text-text-primary dark:text-text-primary-light">
+            {{ t('admin.newPost') }}
+          </span>
+        </router-link>
+        
+        <router-link 
+          :to="{ name: 'AdminProjects' }"
+          class="flex items-center p-4 bg-secondary dark:bg-secondary-light rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+          <span class="text-text-primary dark:text-text-primary-light">
+            {{ t('admin.manageProjects') }}
+          </span>
+        </router-link>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import api from '../../services/api'
+import { useAuthStore } from '@/store/authStore.ts'
+import type { BlogPost } from '@/store/blogStore.ts'
+
+const { t } = useI18n()
+const authStore = useAuthStore()
+
+const isLoading = ref(true)
+const stats = ref({
+  posts: 0,
+  projects: 0,
+  comments: 0
+})
+const recentPosts = ref<BlogPost[]>([])
+
+onMounted(async () => {
+  if (!authStore.isAuthenticated) return
+  
+  try {
+    const statsResponse = await api.get('/admin/stats', {
+      headers: {
+        'x-auth-token': authStore.token
+      }
+    })
+    
+    stats.value = {
+      posts: statsResponse.data.postsCount,
+      projects: statsResponse.data.projectsCount,
+      comments: statsResponse.data.commentsCount
+    }
+    
+    const postsResponse = await api.get('/posts', {
+      params: { page: 1, limit: 5 }
+    })
+    
+    recentPosts.value = postsResponse.data.posts
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error)
+  } finally {
+    isLoading.value = false
+  }
+})
+</script>

@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "Home",
+    "blog": "Blog",
+    "portfolio": "Portfolio",
+    "resume": "Resume",
+    "contact": "Contact"
+  },
+  "home": {
+    "greeting": "Hello, I'm",
+    "name": "Timmy",
+    "title": "Software Engineer",
+    "intro": "Experienced full-stack developer with expertise in Java, Spring Boot, Vue.js, and more.",
+    "cta": "View My Work"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "My thoughts and experiences in tech",
+    "readMore": "Read More",
+    "postedOn": "Posted on",
+    "comments": "Comments",
+    "leaveComment": "Leave a comment",
+    "yourName": "Your Name",
+    "yourEmail": "Your Email",
+    "yourComment": "Your Comment",
+    "submit": "Submit",
+    "recentPosts": "Recent Posts",
+    "categories": "Categories"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "Check out my latest projects",
+    "viewProject": "View Project",
+    "technologies": "Technologies",
+    "viewLive": "View Live",
+    "viewCode": "View Code"
+  },
+  "resume": {
+    "title": "Resume",
+    "download": "Download Resume",
+    "downloadChinese": "Download Chinese Version",
+    "downloadEnglish": "Download English Version",
+    "experience": "Work Experience",
+    "education": "Education",
+    "skills": "Technical Skills",
+    "languages": "Languages",
+    "present": "Present"
+  },
+  "contact": {
+    "title": "Contact Me",
+    "subtitle": "Get in touch with me",
+    "name": "Your Name",
+    "email": "Your Email",
+    "message": "Your Message",
+    "send": "Send Message",
+    "address": "Address",
+    "phone": "Phone",
+    "emailAddress": "Email"
+  },
+  "footer": {
+    "copyright": " 2025 Timmy. All Rights Reserved.",
+    "madeWith": "Made with Vue.js",
+    "developerDescription": "Full-stack developer with expertise in Java, Spring Boot, Vue.js, and more."
+  }
+}

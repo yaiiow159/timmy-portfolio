@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "首页",
+    "blog": "博客",
+    "portfolio": "作品集",
+    "resume": "简历",
+    "contact": "联系我"
+  },
+  "home": {
+    "greeting": "你好，我是",
+    "name": "Timmy",
+    "title": "软件工程师",
+    "intro": "经验丰富的全栈开发者，专精于 Java、Spring Boot、Vue.js 等技术。",
+    "cta": "查看我的作品"
+  },
+  "blog": {
+    "title": "博客",
+    "subtitle": "我在科技领域的想法和经验",
+    "readMore": "阅读更多",
+    "postedOn": "发表于",
+    "comments": "评论",
+    "leaveComment": "留下评论",
+    "yourName": "您的姓名",
+    "yourEmail": "您的电子邮箱",
+    "yourComment": "您的评论",
+    "submit": "提交",
+    "recentPosts": "最新文章",
+    "categories": "分类"
+  },
+  "portfolio": {
+    "title": "作品集",
+    "subtitle": "查看我的最新项目",
+    "viewProject": "查看项目",
+    "technologies": "使用技术",
+    "viewLive": "查看线上版本",
+    "viewCode": "查看源代码"
+  },
+  "resume": {
+    "title": "简历",
+    "download": "下载简历",
+    "downloadChinese": "下载中文版",
+    "downloadEnglish": "下载英文版",
+    "experience": "工作经验",
+    "education": "教育背景",
+    "skills": "技术技能",
+    "languages": "语言能力",
+    "present": "至今"
+  },
+  "contact": {
+    "title": "联系我",
+    "subtitle": "与我取得联系",
+    "name": "您的姓名",
+    "email": "您的电子邮箱",
+    "message": "您的信息",
+    "send": "发送信息",
+    "address": "地址",
+    "phone": "电话",
+    "emailAddress": "电子邮箱"
+  },
+  "footer": {
+    "copyright": " 2025 Timmy. ",
+    "madeWith": " Vue.js ",
+    "developerDescription": "全栈开发者，专精于 Java、Spring Boot、Vue.js 等技术。"
+  }
+}

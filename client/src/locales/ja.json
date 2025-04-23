@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "blog": "ブログ",
+    "portfolio": "ポートフォリオ",
+    "resume": "履歴書",
+    "contact": "お問い合わせ"
+  },
+  "home": {
+    "greeting": "こんにちは、私は",
+    "name": "Timmy",
+    "title": "ソフトウェアエンジニア",
+    "intro": "Java、Spring Boot、Vue.jsなどの技術に精通した経験豊富なフルスタック開発者です。",
+    "cta": "作品を見る"
+  },
+  "blog": {
+    "title": "ブログ",
+    "subtitle": "テクノロジーに関する私の考えと経験",
+    "readMore": "続きを読む",
+    "postedOn": "投稿日",
+    "comments": "コメント",
+    "leaveComment": "コメントを残す",
+    "yourName": "お名前",
+    "yourEmail": "メールアドレス",
+    "yourComment": "コメント",
+    "submit": "送信",
+    "recentPosts": "最近の投稿",
+    "categories": "カテゴリー"
+  },
+  "portfolio": {
+    "title": "ポートフォリオ",
+    "subtitle": "最新のプロジェクトをご覧ください",
+    "viewProject": "プロジェクトを見る",
+    "technologies": "使用技術",
+    "viewLive": "ライブデモを見る",
+    "viewCode": "コードを見る"
+  },
+  "resume": {
+    "title": "履歴書",
+    "download": "履歴書をダウンロード",
+    "downloadChinese": "中国語版をダウンロード",
+    "downloadEnglish": "英語版をダウンロード",
+    "experience": "職歴",
+    "education": "学歴",
+    "skills": "技術スキル",
+    "languages": "言語能力",
+    "present": "現在"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "ご連絡はこちらから",
+    "name": "お名前",
+    "email": "メールアドレス",
+    "message": "メッセージ",
+    "send": "送信",
+    "address": "住所",
+    "phone": "電話番号",
+    "emailAddress": "メールアドレス"
+  },
+  "footer": {
+    "copyright": " 2025 Timmy. All Rights Reserved.",
+    "madeWith": "Vue.js",
+    "developerDescription": "Java、Spring Boot、Vue.jsなどの技術に精通したフルスタック開発者です。"
+  }
+}
