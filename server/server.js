@@ -20,6 +20,18 @@ config();
 
 const app = express();
 
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'Accept-Language'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range']
+}));
+
+app.options('*', cors());
+
+app.use(express.json({ limit: '10mb' }));
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -33,13 +45,13 @@ app.use(helmet({
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,      
+  legacyHeaders: false,
   message: { msg: 'Too many requests, please try again later' }
 });
 
 app.use('/api/', apiLimiter);
-
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
 
 const uploadsDir = path.join(__dirname, '../uploads');
 const imageDir = path.join(uploadsDir, 'images');
@@ -63,19 +75,25 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
-
+  
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'));
+    if (!req.path.startsWith('/api/')) {
+      res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'));
+    } else {
+      res.status(404).json({ msg: 'API endpoint not found' });
+    }
+  });
+} else {
+  app.use((req, res) => {
+    res.status(404).json({ msg: 'Route not found' });
   });
 }
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send({ msg: 'Server Error' });
+  res.status(500).json({ msg: 'Server Error' });
 });
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   await prisma.$disconnect();
   process.exit(0);

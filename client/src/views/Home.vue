@@ -56,7 +56,15 @@ const skills = [
   { name: 'Node.js', icon: 'devicon-nodejs-plain' },
   { name: 'MongoDB', icon: 'devicon-mongodb-plain' },
   { name: 'MySQL', icon: 'devicon-mysql-plain' },
-  { name: 'Docker', icon: 'devicon-docker-plain' }
+  { name: 'Docker', icon: 'devicon-docker-plain' },
+  { name: 'AWS', icon: 'devicon-amazonwebservices-plain' },
+  { name: 'Google Cloud', icon: 'devicon-googlecloud-plain' },
+  { name: 'Git', icon: 'devicon-git-plain' },
+  { name: 'Linux', icon: 'devicon-linux-plain' },
+  { name: 'Docker', icon: 'devicon-docker-plain' },
+  { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain' },
+  { name: 'HTML', icon: 'devicon-html5-plain' },
+  { name: 'CSS', icon: 'devicon-css3-plain' }
 ]
 
 function navigateTo(path: string) {
@@ -190,4 +198,24 @@ function navigateTo(path: string) {
 </template>
 
 <style scoped>
+.hero-title {
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.hero-cta {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
 </style>

@@ -2,11 +2,12 @@ version: '3.8'
 
 services:
   frontend:
+    container_name: frontend
     build:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -14,14 +15,16 @@ services:
       - NODE_ENV=development
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
     networks:
-      - app-network
-
+      app-network:
+        aliases:
+          - frontend
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
+    container_name: backend
     ports:
       - "5000:5000"
     volumes:
@@ -38,7 +41,15 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - backend
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/api/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   postgres:
     image: postgres:16-alpine

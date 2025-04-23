@@ -1,6 +1,10 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const UPLOAD_DIRS = {
   images: path.join(__dirname, '../../uploads/images'),
@@ -29,7 +33,6 @@ const storage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function(req, file, cb) {
-    // Create a safe filename with timestamp to avoid duplicates
     cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`);
   }
 });
@@ -48,8 +51,8 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, 
   fileFilter: fileFilter
 });
 
-module.exports = upload;
+export default upload;

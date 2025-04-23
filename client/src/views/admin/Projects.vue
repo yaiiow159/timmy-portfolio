@@ -1,41 +1,44 @@
 <template>
-  <div class="admin-projects">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-text-primary dark:text-text-primary-light">
+  <div class="admin-projects bg-slate-50 p-6 min-h-screen space-y-6">
+    <div class="flex justify-between items-center mb-6 bg-white p-6 rounded-lg shadow-sm">
+      <h1 class="text-2xl font-bold text-slate-800">
         {{ t('admin.manageProjects') }}
       </h1>
       
       <button 
         @click="openProjectModal()"
-        class="bg-accent hover:bg-accent-light text-white px-4 py-2 rounded-lg flex items-center"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg flex items-center shadow-sm transition-colors duration-200"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
         {{ t('admin.newProject') }}
       </button>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
       <div v-if="isLoading" class="col-span-full flex justify-center py-12">
-        <svg class="animate-spin h-8 w-8 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
       </div>
       
-      <div v-else-if="projects.length === 0" class="col-span-full text-center py-12 text-text-secondary dark:text-text-secondary-light">
-        {{ t('admin.noProjects') }}
+      <div v-else-if="projects.length === 0" class="col-span-full flex flex-col items-center justify-center py-16 bg-white rounded-lg shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <p class="mt-4 text-lg font-medium text-slate-600">{{ t('admin.noProjects') }}</p>
       </div>
       
       <div 
         v-else
         v-for="project in projects" 
         :key="project.id"
-        class="bg-primary dark:bg-primary-light rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+        class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
       >
         <div 
-          class="h-48 bg-gray-200 dark:bg-gray-700 relative"
+          class="h-56 bg-slate-100 dark:bg-slate-700 relative"
           :class="{'flex items-center justify-center': !project.imageUrl}"
         >
           <img 
@@ -47,7 +50,7 @@
           <svg 
             v-else
             xmlns="http://www.w3.org/2000/svg" 
-            class="h-12 w-12 text-gray-400" 
+            class="h-16 w-16 text-slate-400" 
             fill="none" 
             viewBox="0 0 24 24" 
             stroke="currentColor"
@@ -55,10 +58,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           
-          <div class="absolute top-2 right-2 flex space-x-1">
+          <div class="absolute top-4 right-4 flex space-x-2">
             <button 
               @click="openProjectModal(project)"
-              class="p-1 bg-white dark:bg-gray-800 rounded-full shadow-md text-text-secondary dark:text-text-secondary-light hover:text-accent"
+              class="p-2.5 bg-white rounded-lg shadow-md text-slate-600 hover:text-blue-600 transition-colors duration-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -67,7 +70,7 @@
             
             <button 
               @click="confirmDelete(project)"
-              class="p-1 bg-white dark:bg-gray-800 rounded-full shadow-md text-text-secondary dark:text-text-secondary-light hover:text-red-500"
+              class="p-2.5 bg-white rounded-lg shadow-md text-slate-600 hover:text-red-600 transition-colors duration-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -75,38 +78,38 @@
             </button>
           </div>
           
-          <div v-if="project.featured" class="absolute top-2 left-2 bg-accent text-white px-2 py-1 text-xs rounded-md">
+          <div v-if="project.featured" class="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1.5 text-sm rounded-lg shadow-sm">
             {{ t('admin.featured') }}
           </div>
         </div>
         
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-text-primary dark:text-text-primary-light mb-2">
+        <div class="p-8">
+          <h3 class="text-xl font-semibold text-slate-800 mb-4">
             {{ project.title }}
           </h3>
           
-          <p class="text-text-secondary dark:text-text-secondary-light text-sm mb-4 line-clamp-3">
+          <p class="text-slate-600 text-base mb-6 line-clamp-3">
             {{ project.description }}
           </p>
           
-          <div class="flex flex-wrap gap-1 mb-4">
+          <div class="flex flex-wrap gap-2 mb-6">
             <span 
               v-for="tech in project.technologies" 
               :key="tech"
-              class="bg-secondary dark:bg-secondary-light text-xs px-2 py-1 rounded"
+              class="bg-slate-100 text-slate-600 text-sm px-4 py-1.5 rounded-lg"
             >
               {{ tech }}
             </span>
           </div>
           
-          <div class="flex justify-between">
+          <div class="flex justify-between pt-6 border-t border-slate-100">
             <a 
               v-if="project.liveUrl"
               :href="project.liveUrl" 
               target="_blank"
-              class="text-accent hover:text-accent-light text-sm flex items-center"
+              class="text-blue-600 hover:text-blue-800 text-sm flex items-center transition-colors duration-200"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               {{ t('admin.liveDemo') }}
@@ -116,9 +119,9 @@
               v-if="project.codeUrl"
               :href="project.codeUrl" 
               target="_blank"
-              class="text-accent hover:text-accent-light text-sm flex items-center"
+              class="text-blue-600 hover:text-blue-800 text-sm flex items-center transition-colors duration-200"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
               {{ t('admin.viewCode') }}
@@ -130,107 +133,107 @@
     
     <div v-if="showProjectModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showProjectModal = false"></div>
+        <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showProjectModal = false"></div>
         
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         
-        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6">
-            <div class="mb-4">
-              <h3 class="text-lg leading-6 font-medium text-text-primary dark:text-text-primary-light" id="modal-title">
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          <div class="bg-white px-6 pt-6 pb-4">
+            <div class="mb-6">
+              <h3 class="text-xl font-semibold text-slate-800" id="modal-title">
                 {{ isEditing ? t('admin.editProject') : t('admin.newProject') }}
               </h3>
             </div>
             
-            <form @submit.prevent="saveProject">
-              <div class="mb-4">
-                <label class="block text-text-primary dark:text-text-primary-light mb-2" for="project-title">
+            <form @submit.prevent="saveProject" class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2" for="project-title">
                   {{ t('admin.title') }} *
                 </label>
                 <input 
                   v-model="projectForm.title"
                   type="text" 
                   id="project-title"
-                  class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-text-primary dark:text-text-primary-light"
+                  class="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   :placeholder="t('admin.titlePlaceholder')"
                   required
                 >
               </div>
               
-              <div class="mb-4">
-                <label class="block text-text-primary dark:text-text-primary-light mb-2" for="project-description">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2" for="project-description">
                   {{ t('admin.description') }} *
                 </label>
                 <textarea 
                   v-model="projectForm.description"
                   id="project-description"
-                  rows="3"
-                  class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-text-primary dark:text-text-primary-light"
+                  rows="4"
+                  class="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   :placeholder="t('admin.descriptionPlaceholder')"
                   required
                 ></textarea>
               </div>
               
-              <div class="mb-4">
-                <label class="block text-text-primary dark:text-text-primary-light mb-2" for="project-technologies">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2" for="project-technologies">
                   {{ t('admin.technologies') }} *
                 </label>
                 
-                <div class="flex flex-wrap items-center gap-2 mb-2">
+                <div class="flex flex-wrap items-center gap-2 mb-3">
                   <div 
                     v-for="(tech, index) in projectForm.technologies" 
                     :key="index"
-                    class="bg-secondary dark:bg-secondary-light px-3 py-1 rounded-full flex items-center"
+                    class="bg-slate-100 px-3 py-1 rounded-lg flex items-center"
                   >
-                    <span class="text-text-primary dark:text-text-primary-light mr-2">{{ tech }}</span>
+                    <span class="text-slate-700 mr-2">{{ tech }}</span>
                     <button 
                       type="button"
                       @click="removeTechnology(index)"
-                      class="text-text-secondary dark:text-text-secondary-light hover:text-red-500"
+                      class="text-slate-400 hover:text-red-600 transition-colors duration-200"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   </div>
-                  
-                  <div class="flex items-center">
-                    <input 
-                      v-model="newTech"
-                      type="text" 
-                      class="px-3 py-1 border rounded-lg bg-white dark:bg-gray-700 text-text-primary dark:text-text-primary-light"
-                      :placeholder="t('admin.addTechnology')"
-                      @keydown.enter.prevent="addTechnology"
-                    >
-                    <button 
-                      type="button"
-                      @click="addTechnology"
-                      class="ml-2 p-1 bg-accent text-white rounded-full"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                      </svg>
-                    </button>
-                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <input 
+                    v-model="newTech"
+                    type="text" 
+                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                    :placeholder="t('admin.addTechnology')"
+                    @keydown.enter.prevent="addTechnology"
+                  >
+                  <button 
+                    type="button"
+                    @click="addTechnology"
+                    class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
                 </div>
               </div>
               
-              <div class="mb-4">
-                <label class="block text-text-primary dark:text-text-primary-light mb-2" for="project-image">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2" for="project-image">
                   {{ t('admin.imageUrl') }}
                 </label>
-                <div class="flex items-center">
+                <div class="flex items-center gap-3">
                   <input 
                     v-model="projectForm.imageUrl"
                     type="text" 
                     id="project-image"
-                    class="flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-text-primary dark:text-text-primary-light"
+                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                     :placeholder="t('admin.imageUrlPlaceholder')"
                   >
                   
-                  <span class="mx-2">{{ t('admin.or') }}</span>
+                  <span class="text-slate-500">{{ t('admin.or') }}</span>
                   
-                  <label class="px-4 py-2 bg-secondary dark:bg-secondary-light text-text-primary dark:text-text-primary-light rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">
+                  <label class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg cursor-pointer hover:bg-slate-200 transition-colors duration-200">
                     {{ t('admin.upload') }}
                     <input 
                       type="file" 
@@ -242,51 +245,51 @@
                 </div>
               </div>
               
-              <div class="mb-4">
-                <label class="block text-text-primary dark:text-text-primary-light mb-2" for="project-live-url">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2" for="project-live-url">
                   {{ t('admin.liveUrl') }}
                 </label>
                 <input 
                   v-model="projectForm.liveUrl"
                   type="url" 
                   id="project-live-url"
-                  class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-text-primary dark:text-text-primary-light"
+                  class="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   :placeholder="t('admin.liveUrlPlaceholder')"
                 >
               </div>
               
-              <div class="mb-4">
-                <label class="block text-text-primary dark:text-text-primary-light mb-2" for="project-code-url">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2" for="project-code-url">
                   {{ t('admin.codeUrl') }}
                 </label>
                 <input 
                   v-model="projectForm.codeUrl"
                   type="url" 
                   id="project-code-url"
-                  class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-text-primary dark:text-text-primary-light"
+                  class="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   :placeholder="t('admin.codeUrlPlaceholder')"
                 >
               </div>
               
-              <div class="mb-4 flex items-center">
+              <div class="flex items-center">
                 <input 
                   v-model="projectForm.featured"
                   type="checkbox" 
                   id="project-featured"
-                  class="h-4 w-4 text-accent focus:ring-accent border-gray-300 rounded"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded transition-colors duration-200"
                 >
-                <label class="ml-2 block text-text-primary dark:text-text-primary-light" for="project-featured">
+                <label class="ml-2 block text-sm text-slate-700" for="project-featured">
                   {{ t('admin.featuredProject') }}
                 </label>
               </div>
             </form>
           </div>
           
-          <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <div class="bg-slate-50 px-6 py-4 flex flex-row-reverse gap-3">
             <button 
               @click="saveProject"
               type="button" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-accent text-base font-medium text-white hover:bg-accent-light focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+              class="inline-flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               :disabled="isSubmitting"
             >
               <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -298,7 +301,7 @@
             <button 
               @click="showProjectModal = false"
               type="button" 
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-text-primary dark:text-text-primary-light hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              class="inline-flex justify-center px-4 py-2 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
               {{ t('admin.cancel') }}
             </button>
@@ -309,12 +312,12 @@
     
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showDeleteModal = false"></div>
+        <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showDeleteModal = false"></div>
         
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         
-        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-6 pt-6 pb-4">
             <div class="sm:flex sm:items-start">
               <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                 <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -322,29 +325,29 @@
                 </svg>
               </div>
               <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-lg leading-6 font-medium text-text-primary dark:text-text-primary-light" id="modal-title">
+                <h3 class="text-lg font-medium text-slate-800" id="modal-title">
                   {{ t('admin.deleteProject') }}
                 </h3>
                 <div class="mt-2">
-                  <p class="text-sm text-text-secondary dark:text-text-secondary-light">
+                  <p class="text-sm text-slate-600">
                     {{ t('admin.deleteProjectConfirmation', { title: projectToDelete?.title }) }}
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <div class="bg-slate-50 px-6 py-4 flex flex-row-reverse gap-3">
             <button 
               @click="deleteProject"
               type="button" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+              class="inline-flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
             >
               {{ t('admin.delete') }}
             </button>
             <button 
               @click="showDeleteModal = false"
               type="button" 
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-text-primary dark:text-text-primary-light hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              class="inline-flex justify-center px-4 py-2 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
               {{ t('admin.cancel') }}
             </button>

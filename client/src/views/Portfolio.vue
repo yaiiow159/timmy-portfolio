@@ -218,5 +218,4 @@ function selectCategory(category: string) {
 </template>
 
 <style scoped>
-/* Add any component-specific styles here */
 </style>

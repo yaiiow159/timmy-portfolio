@@ -7,7 +7,7 @@
       
       <div class="flex space-x-2">
         <button 
-          @click="$router.push({ name: 'AdminPosts' })"
+          @click="router.push({ name: 'AdminPosts' })"
           class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-text-primary dark:text-text-primary-light hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           {{ t('admin.cancel') }}
@@ -29,7 +29,6 @@
     
     <div class="bg-primary dark:bg-primary-light rounded-lg p-6">
       <form @submit.prevent="savePost">
-        <!-- Title -->
         <div class="mb-4">
           <label class="block text-text-primary dark:text-text-primary-light mb-2" for="title">
             {{ t('admin.title') }} *
@@ -44,7 +43,6 @@
           >
         </div>
         
-        <!-- Excerpt -->
         <div class="mb-4">
           <label class="block text-text-primary dark:text-text-primary-light mb-2" for="excerpt">
             {{ t('admin.excerpt') }} *
@@ -59,7 +57,6 @@
           ></textarea>
         </div>
         
-        <!-- Cover Image -->
         <div class="mb-4">
           <label class="block text-text-primary dark:text-text-primary-light mb-2" for="cover-image">
             {{ t('admin.coverImage') }}
@@ -99,7 +96,6 @@
           </div>
         </div>
         
-        <!-- Tags -->
         <div class="mb-4">
           <label class="block text-text-primary dark:text-text-primary-light mb-2" for="tags">
             {{ t('admin.tags') }}
@@ -144,7 +140,6 @@
           </div>
         </div>
         
-        <!-- Content -->
         <div class="mb-4">
           <label class="block text-text-primary dark:text-text-primary-light mb-2" for="content">
             {{ t('admin.content') }} *
@@ -296,7 +291,6 @@ const form = ref({
   tags: [] as string[]
 })
 
-// Render markdown content for preview
 const renderedContent = computed(() => {
   try {
     return marked(form.value.content)
@@ -306,7 +300,6 @@ const renderedContent = computed(() => {
   }
 })
 
-// Add a new tag
 function addTag() {
   if (newTag.value.trim() && !form.value.tags.includes(newTag.value.trim())) {
     form.value.tags.push(newTag.value.trim())
@@ -314,12 +307,10 @@ function addTag() {
   }
 }
 
-// Remove a tag
 function removeTag(index: number) {
   form.value.tags.splice(index, 1)
 }
 
-// Insert markdown syntax into the content textarea
 function insertMarkdown(prefix: string, suffix: string) {
   if (!contentTextarea.value) return
   
@@ -333,7 +324,6 @@ function insertMarkdown(prefix: string, suffix: string) {
   
   form.value.content = beforeText + prefix + selectedText + suffix + afterText
   
-  // Set cursor position after insertion
   setTimeout(() => {
     textarea.focus()
     textarea.selectionStart = start + prefix.length + selectedText.length
@@ -341,7 +331,6 @@ function insertMarkdown(prefix: string, suffix: string) {
   }, 0)
 }
 
-// Upload an image
 async function uploadImage(event: Event) {
   const input = event.target as HTMLInputElement
   if (!input.files || input.files.length === 0) return
@@ -359,6 +348,7 @@ async function uploadImage(event: Event) {
       duration: 3000
     })
   } catch (error) {
+    console.error('Error uploading image:', error)
     notificationStore.addNotification({
       type: 'error',
       message: t('admin.imageUploadError'),
@@ -369,13 +359,11 @@ async function uploadImage(event: Event) {
   }
 }
 
-// Save the post (create or update)
 async function savePost() {
   try {
     isSubmitting.value = true
     
     if (isEditing.value) {
-      // Update existing post
       await blogStore.updatePost(route.params.id as string, form.value)
       
       notificationStore.addNotification({
@@ -384,11 +372,10 @@ async function savePost() {
         duration: 5000
       })
     } else {
-      // Create new post
       await blogStore.createPost({
         ...form.value,
-        author: 'Timmy', // Add default author
-        date: new Date().toISOString() // Add current date
+        author: 'Timmy',
+        date: new Date().toISOString() 
       })
       
       notificationStore.addNotification({
@@ -398,9 +385,9 @@ async function savePost() {
       })
     }
     
-    // Redirect to posts list
     router.push({ name: 'AdminPosts' })
   } catch (error) {
+    console.error('Error saving post:', error)
     notificationStore.addNotification({
       type: 'error',
       message: isEditing.value ? t('admin.updateError') : t('admin.createError'),
@@ -411,7 +398,6 @@ async function savePost() {
   }
 }
 
-// Load post data if editing
 onMounted(async () => {
   if (isEditing.value) {
     try {
@@ -428,6 +414,7 @@ onMounted(async () => {
         }
       }
     } catch (error) {
+      console.error('Error loading post:', error)
       notificationStore.addNotification({
         type: 'error',
         message: t('admin.loadError'),

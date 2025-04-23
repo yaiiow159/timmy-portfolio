@@ -84,25 +84,25 @@ await transporter.sendMail({
     <body>
       <div class="email-container">
         <div class="header">
-          <h2>📬 新的聯絡訊息</h2>
+          <h2>New Contact Message</h2>
         </div>
         <div class="content">
           <div class="field">
-            <div class="label">👤 寄件人</div>
+            <div class="label">👤 Receiver</div>
             ${name}
           </div>
           <div class="field">
-            <div class="label">📧 電子郵件</div>
+            <div class="label">📧 Email</div>
             <a href="mailto:${email}">${email}</a>
           </div>
           <div class="field">
-            <div class="label">💌 訊息內容</div>
+            <div class="label">💌 Message</div>
             <div class="message-box">
               ${message.replace(/\n/g, '<br>')}
             </div>
           </div>
           <div class="timestamp">
-            收到時間：${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}
+            Received at ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}
           </div>
         </div>
       </div>

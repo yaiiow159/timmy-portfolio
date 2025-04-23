@@ -47,10 +47,8 @@
             </div>
           </div>
           
-          <!-- Title -->
           <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ post.title }}</h1>
           
-          <!-- Featured Image -->
           <div v-if="post.coverImage" class="mb-8">
             <img :src="post.coverImage" :alt="post?.title" class="w-full h-auto rounded-lg">
           </div>
@@ -61,16 +59,13 @@
           </div>
         </div>
         
-        <!-- Blog Content -->
         <div class="blog-content prose prose-lg dark:prose-invert prose-headings:text-text-primary dark:prose-headings:text-text-primary-light prose-p:text-text-primary dark:prose-p:text-text-primary-light prose-a:text-accent hover:prose-a:text-accent-light prose-code:text-accent-light prose-pre:bg-secondary dark:prose-pre:bg-secondary-light max-w-none mb-12">
           <div v-html="renderedContent"></div>
         </div>
         
-        <!-- Comments Section -->
         <div class="mt-12 border-t border-secondary dark:border-secondary-light pt-8">
           <h2 class="text-2xl font-bold mb-6">{{ t('blog.comments') }} ({{ post.comments.length }})</h2>
           
-          <!-- Comment List -->
           <div v-if="post.comments.length > 0" class="space-y-6 mb-8">
             <div 
               v-for="comment in post.comments" 
@@ -108,7 +103,6 @@
             <p>{{ t('blog.beFirstToComment') }}</p>
           </div>
           
-          <!-- Comment Form -->
           <div class="mt-8">
             <h3 class="text-xl font-semibold mb-4">{{ t('blog.leaveComment') }}</h3>
             <form @submit.prevent="submitComment" class="space-y-4">
@@ -165,7 +159,6 @@
         </div>
       </div>
       
-      <!-- Error State -->
       <div v-else class="text-center py-20">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -181,7 +174,6 @@
       </div>
     </div>
     
-    <!-- Related Posts Sidebar -->
     <div v-if="post && !isLoading" class="container mx-auto px-4 sm:px-6 lg:px-8 mt-12">
       <div class="max-w-4xl mx-auto">
         <div class="border-t border-secondary dark:border-secondary-light pt-8">
@@ -225,22 +217,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { useBlogStore, type BlogPost } from '../store/blogStore'
-import { marked } from 'marked'
-import type { MarkedOptions } from 'marked'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
+import {type BlogPost, useBlogStore} from '../store/blogStore'
+import type {MarkedOptions} from 'marked'
+import {marked} from 'marked'
 import hljs from 'highlight.js'
 import gsap from 'gsap'
 
-// Initialize composables
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const blogStore = useBlogStore()
 
-// Reactive state
 const post = ref<BlogPost | null>(null)
 const isLoading = ref(true)
 const isSubmitting = ref(false)
@@ -250,7 +240,6 @@ const commentForm = ref({
   content: ''
 })
 
-// Configure marked with syntax highlighting
 marked.setOptions({
   highlight: function(code: string, lang: string): string {
     if (lang && hljs.getLanguage(lang)) {
@@ -265,15 +254,13 @@ onMounted(async () => {
   const postId = route.params.id as string
   
   try {
-    const fetchedPost = await blogStore.fetchPostById(postId)
-    post.value = fetchedPost
+    post.value = await blogStore.fetchPostById(postId)
   } catch (error) {
     console.error('Error fetching post:', error)
     router.push('/blog')
   } finally {
     isLoading.value = false
     
-    // Animation sequence
     const tl = gsap.timeline()
     
     tl.from('.blog-header', {
@@ -291,7 +278,6 @@ onMounted(async () => {
   }
 })
 
-// Computed properties
 const renderedContent = computed(() => {
   if (!post.value) return ''
   try {
@@ -302,7 +288,6 @@ const renderedContent = computed(() => {
   }
 })
 
-// Methods
 async function submitComment() {
   if (!post.value) return
   
@@ -315,14 +300,12 @@ async function submitComment() {
       content: commentForm.value.content
     })
     
-    // Reset form
     commentForm.value = {
       name: '',
       email: '',
       content: ''
     }
     
-    // Refetch post to get updated comments
     const updatedPost = await blogStore.fetchPostById(post.value.id)
     post.value = updatedPost
   } catch (error) {
@@ -335,10 +318,8 @@ async function submitComment() {
 </script>
 
 <style>
-/* Import highlight.js theme */
 @import '../assets/atom-one-dark.css';
 
-/* Custom styling for code blocks */
 .blog-content pre {
   border-radius: 0.5rem;
   padding: 1rem;
@@ -351,21 +332,18 @@ async function submitComment() {
   font-size: 0.9em;
 }
 
-/* Custom styling for blockquotes */
 .blog-content blockquote {
   border-left: 4px solid theme('colors.accent');
   padding-left: 1rem;
   font-style: italic;
 }
 
-/* Custom styling for images */
 .blog-content img {
   border-radius: 0.5rem;
   max-width: 100%;
   height: auto;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

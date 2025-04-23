@@ -19,7 +19,6 @@ export const markdownToHtml = (markdown: string): string => {
   return marked.parse(markdown) as string
 }
 
-// Function to create a safe excerpt from markdown
 export const createExcerpt = (markdown: string, length: number = 150): string => {
   const plainText = markdown
     .replace(/#+\s+(.*)/g, '$1') // Remove headings

@@ -1,11 +1,11 @@
 <template>
-  <div class="auth-page min-h-screen bg-primary dark:bg-primary-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full">
+  <div class="auth-page min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl w-full">
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-text-primary dark:text-text-primary-light">
+        <h1 class="text-3xl font-bold mb-2 gradient-text">
           {{ t('auth.welcomeBack') }}
         </h1>
-        <p class="mt-2 text-text-secondary dark:text-text-secondary-light">
+        <p class="mt-2 text-text-secondary dark:text-text-secondary-light text-lg">
           {{ t('auth.accountAccess') }}
         </p>
       </div>
@@ -60,5 +60,11 @@ function handleAuthSuccess() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r;
+  @apply dark:from-blue-400 dark:to-purple-400;
+  @apply from-blue-600 to-purple-600;
 }
 </style>

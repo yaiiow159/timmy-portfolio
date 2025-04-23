@@ -18,7 +18,6 @@ router.get('/', async (req, res) => {
     
     const skip = (page - 1) * limit;
     
-    // Build search filter
     const where = search ? {
       OR: [
         { title: { contains: search, mode: 'insensitive' } },

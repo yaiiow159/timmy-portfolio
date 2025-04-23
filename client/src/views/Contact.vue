@@ -17,7 +17,6 @@ const formError = ref('')
 const formSuccess = ref(false)
 
 onMounted(() => {
-  // Animation sequence
   const tl = gsap.timeline()
   
   tl.from('.contact-header', {
@@ -82,7 +81,6 @@ async function submitForm() {
 <template>
   <div class="min-h-screen py-12">
     <div class="container mx-auto px-4">
-      <!-- Contact Header -->
       <div class="contact-header mb-12 text-center">
         <h1 class="text-4xl font-bold mb-4 text-text-primary">{{ t('contact.title') }}</h1>
         <p class="text-lg text-text-secondary max-w-2xl mx-auto">
@@ -91,7 +89,6 @@ async function submitForm() {
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Contact Form -->
         <div class="lg:col-span-2 contact-form">
           <div class="bg-secondary rounded-lg p-6 shadow-lg">
             <form @submit.prevent="submitForm" class="space-y-6">
@@ -147,12 +144,10 @@ async function submitForm() {
                 ></textarea>
               </div>
               
-              <!-- Error Message -->
               <div v-if="formError" class="text-red-500 text-sm">
                 {{ formError }}
               </div>
               
-              <!-- Success Message -->
               <div v-if="formSuccess" class="bg-green-900/20 border border-green-500 text-green-500 px-4 py-3 rounded-lg">
                 Your message has been sent successfully! I'll get back to you as soon as possible.
               </div>
@@ -171,7 +166,6 @@ async function submitForm() {
           </div>
         </div>
         
-        <!-- Contact Info -->
         <div class="contact-info">
           <div class="bg-secondary rounded-lg p-6 shadow-lg mb-8">
             <h3 class="text-xl font-semibold mb-6 text-accent">Contact Information</h3>
@@ -185,7 +179,7 @@ async function submitForm() {
                 <div>
                   <h4 class="font-medium text-text-primary mb-1">{{ t('contact.emailAddress') }}</h4>
                   <a href="mailto:timmy@example.com" class="text-text-secondary hover:text-accent transition-colors">
-                    timmy@example.com
+                    examyou076@gmail.com
                   </a>
                 </div>
               </div>
@@ -199,7 +193,7 @@ async function submitForm() {
                 <div>
                   <h4 class="font-medium text-text-primary mb-1">{{ t('contact.phone') }}</h4>
                   <a href="tel:+886123456789" class="text-text-secondary hover:text-accent transition-colors">
-                    +886 123 456 789
+                    +886 092 077 8600
                   </a>
                 </div>
               </div>
@@ -221,7 +215,6 @@ async function submitForm() {
             </div>
           </div>
           
-          <!-- Social Media -->
           <div class="bg-secondary rounded-lg p-6 shadow-lg">
             <h3 class="text-xl font-semibold mb-6 text-accent">Follow Me</h3>
             <div class="flex flex-wrap gap-4">

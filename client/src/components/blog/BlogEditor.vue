@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { markdownToHtml } from '../../utils/markdown'
-import { validateFileSize, isImageFile } from '../../utils/fileUpload'
-import { blogService } from '../../services/blogService'
-import { useAuthStore } from '../../store/authStore' // Import authStore
-import type { BlogPost } from '../../store/blogStore'
+import { markdownToHtml } from '@/utils/markdown.ts'
+import { validateFileSize, isImageFile } from '@/utils/fileUpload.ts'
+import { blogService } from '@/services/blogService.ts'
+import { useAuthStore } from '@/store/authStore.ts' // Import authStore
+import type { BlogPost } from '@/store/blogStore.ts'
 
 const props = defineProps<{
   post?: BlogPost

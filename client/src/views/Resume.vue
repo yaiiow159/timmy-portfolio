@@ -3,15 +3,16 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import ResumeDialog from '../components/common/ResumeDialog.vue'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const { t } = useI18n()
 const languageBarsAnimated = ref(false)
 const showDownloadOptions = ref(false)
+const showDialog = ref(false)
 
 onMounted(() => {
-  // Initial animations
   const tl = gsap.timeline()
   
   tl.from('.resume-header', {
@@ -62,6 +63,12 @@ function animateWorkExperience() {
       stagger: 0.05,
       ease: 'back.out(1.7)'
     }, '-=0.2')
+    .from(entry.querySelector('.job-date'), {
+      width: 0,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power3.inOut'
+    }, '-=0.3')
   })
 }
 
@@ -84,6 +91,13 @@ function animateLanguageSkills() {
       stagger: 0.2,
       ease: 'power3.inOut'
     })
+    .from('.language-label', {
+      y: 10,
+      opacity: 0,
+      duration: 0.4,
+      stagger: 0.1,
+      ease: 'back.out(1.7)'
+    }, '-=0.5')
   }
 }
 
@@ -92,19 +106,17 @@ function toggleDownloadOptions() {
 }
 
 function downloadResume(language: 'zh' | 'en') {
-  const resumeUrl = language === 'zh' 
-    ? './public/resume_zh.pdf' 
+  const resumeUrl = language === 'zh'
+    ? './public/resume_zh.pdf'
     : './public/resume_en.pdf'
-  
+
   const link = document.createElement('a')
   link.href = resumeUrl
   link.target = '_blank'
-  link.download = language === 'zh' ? 'Timmy_Resume_中文.pdf' : 'Timmy_Resume_English.pdf'
-  
+  link.download = language === 'zh' ? 'resume_zh.pdf' : 'resume_en.pdf'
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-  showDownloadOptions.value = false
 }
 </script>
 
@@ -117,33 +129,18 @@ function downloadResume(language: 'zh' | 'en') {
           Full-stack developer with expertise in Java, Spring Boot, Vue.js, and more.
         </p>
         
-        <div class="relative inline-block">
-          <button 
-            @click="toggleDownloadOptions" 
-            class="inline-flex items-center px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            {{ t('resume.download') }}
-          </button>
-
-          <div v-if="showDownloadOptions" class="absolute mt-2 w-48 bg-secondary rounded-lg shadow-lg overflow-hidden z-10">
-            <button 
-              @click="downloadResume('zh')" 
-              class="w-full text-left px-4 py-2 hover:bg-primary-light transition-colors text-text-primary"
-            >
-              {{ t('resume.downloadChinese') }}
-            </button>
-            <button 
-              @click="downloadResume('en')" 
-              class="w-full text-left px-4 py-2 hover:bg-primary-light transition-colors text-text-primary"
-            >
-              {{ t('resume.downloadEnglish') }}
-            </button>
-          </div>
-        </div>
+        <button
+          class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-6 rounded-lg transition-colors"
+          @click="showDialog = true"
+        >
+          {{ t('resume.download') }}
+        </button>
       </div>
+      
+      <ResumeDialog
+        v-model="showDialog"
+        @download="downloadResume"
+      />
       
       <section class="resume-section mb-12 bg-secondary rounded-lg p-6 shadow-lg">
         <h2 class="text-2xl font-bold mb-6 text-accent">{{ t('resume.skills') }}</h2>
@@ -203,7 +200,6 @@ function downloadResume(language: 'zh' | 'en') {
             </ul>
           </div>
           
-          <!-- Databases & Storage -->
           <div>
             <h3 class="text-xl font-semibold mb-3 text-text-primary">Databases & Storage</h3>
             <ul class="space-y-2">
@@ -252,7 +248,7 @@ function downloadResume(language: 'zh' | 'en') {
                 <span class="text-accent mr-2">•</span>
                 <div>
                   <span class="font-medium">Deployment / Automation Tools:</span>
-                  <span class="text-text-secondary"> Jenkins, Shell Script, BAT Script</span>
+                  <span class="text-text-secondary">GitLab CI/CD, Jenkins, Shell Script, BAT Script</span>
                 </div>
               </li>
             </ul>
@@ -300,8 +296,41 @@ function downloadResume(language: 'zh' | 'en') {
           <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
           <div class="mb-2 job-detail">
             <h3 class="text-xl font-semibold text-text-primary">Software Engineer</h3>
+            <p class="text-accent">Onework Co., Ltd. — Taipei, Taiwan</p>
+            <p class="text-sm text-text-secondary job-date">Apr 2023 - Aug 2023</p>
+          </div>
+          
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Project-Based System Development</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Designed backend architecture and implemented features including API development, performance testing, database deployment, and mobile-based UI/UX prototyping.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Managed over 30 proxy tests, each handling 50,000+ sensors, 1,000+ devices, and 500+ equipment counters for time data processing and frontend visualizations.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Optimized XML performance and WebSocket handling to process high-frequency payloads across multiple processing servers within 1s response time.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Addressed mobile server data synchronization challenges under low bandwidth (64 Kbps) environments.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Applied Observer and Singleton patterns to decouple modules and implement real-time state propagation.</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="job-entry mb-8 relative pl-6 border-l-2 border-accent">
+          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
+          <div class="mb-2 job-detail">
+            <h3 class="text-xl font-semibold text-text-primary">Software Engineer</h3>
             <p class="text-accent">EBound Technology Co., Ltd. — Taipei, Taiwan</p>
-            <p class="text-sm text-text-secondary">Sep 2023 - Jan 2024</p>
+            <p class="text-sm text-text-secondary job-date">Sep 2023 - Jan 2024</p>
           </div>
           
           <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Full-Stack Development & Maintenance</h4>
@@ -333,47 +362,8 @@ function downloadResume(language: 'zh' | 'en') {
           </ul>
         </div>
         
-        <div class="job-entry mb-8 relative pl-6 border-l-2 border-accent">
-          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
-          <div class="mb-2 job-detail">
-            <h3 class="text-xl font-semibold text-text-primary">Software Engineer</h3>
-            <p class="text-accent">Hitrax Technology Co., Ltd. — Taipei, Taiwan</p>
-            <p class="text-sm text-text-secondary">Aug 2022 - Sep 2023</p>
-          </div>
-          
-          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Vault-ID System Refactoring & Feature Expansion</h4>
-          <ul class="space-y-2 text-text-secondary">
-            <li class="flex items-start job-detail">
-              <span class="text-accent mr-2">•</span>
-              <span>Led a team developing a workflow system including SEO-based navigation design, approval mechanisms, custom report generators (Excel/PDF), and third-party API integration.</span>
-            </li>
-            <li class="flex items-start job-detail">
-              <span class="text-accent mr-2">•</span>
-              <span>Enhanced integration between modules and improved overall system modularity and maintainability.</span>
-            </li>
-          </ul>
-          
-          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">ACS / 3DS System Optimization & Asynchronous Architecture</h4>
-          <ul class="space-y-2 text-text-secondary">
-            <li class="flex items-start job-detail">
-              <span class="text-accent mr-2">•</span>
-              <span>Refactored the framework query routine by applying indexing and table partitioning, reducing query time from 30 seconds to under 5 seconds.</span>
-            </li>
-            <li class="flex items-start job-detail">
-              <span class="text-accent mr-2">•</span>
-              <span>Integrated RabbitMQ to handle asynchronous transaction workback, significantly improving system stability and scalability.</span>
-            </li>
-            <li class="flex items-start job-detail">
-              <span class="text-accent mr-2">•</span>
-              <span>Developed and executed data migration scripts in transition from Oracle to MySQL.</span>
-            </li>
-          </ul>
-        </div>
-        
-        <!-- More jobs would be added here -->
       </section>
       
-      <!-- Education Section -->
       <section class="resume-section mb-12 bg-secondary rounded-lg p-6 shadow-lg">
         <h2 class="text-2xl font-bold mb-6 text-accent">{{ t('resume.education') }}</h2>
         
@@ -393,32 +383,31 @@ function downloadResume(language: 'zh' | 'en') {
         </div>
       </section>
       
-      <!-- Languages Section -->
       <section class="resume-section language-section bg-secondary rounded-lg p-6 shadow-lg">
         <h2 class="text-2xl font-bold mb-6 text-accent">{{ t('resume.languages') }}</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex items-center">
             <div class="w-24">
-              <span class="font-medium text-text-primary">Chinese</span>
+              <span class="font-medium text-text-primary language-label">Chinese</span>
             </div>
             <div class="flex-grow">
               <div class="h-2 w-full bg-gray-700 rounded-full">
                 <div class="language-bar h-2 rounded-full bg-accent" style="width: 100%"></div>
               </div>
-              <span class="text-sm text-text-secondary">Native / Bilingual Proficiency</span>
+              <span class="text-sm text-text-secondary language-label">Native / Bilingual Proficiency</span>
             </div>
           </div>
           
           <div class="flex items-center">
             <div class="w-24">
-              <span class="font-medium text-text-primary">English</span>
+              <span class="font-medium text-text-primary language-label">English</span>
             </div>
             <div class="flex-grow">
               <div class="h-2 w-full bg-gray-700 rounded-full">
                 <div class="language-bar h-2 rounded-full bg-accent" style="width: 85%"></div>
               </div>
-              <span class="text-sm text-text-secondary">Advanced Proficiency</span>
+              <span class="text-sm text-text-secondary language-label">Advanced Proficiency</span>
             </div>
           </div>
         </div>
@@ -428,12 +417,21 @@ function downloadResume(language: 'zh' | 'en') {
 </template>
 
 <style scoped>
-/* Animation styles */
 .job-entry {
   overflow: hidden;
 }
 
 .language-bar {
   transform-origin: left;
+}
+
+.job-date {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.language-label {
+  display: inline-block;
 }
 </style>
