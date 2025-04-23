@@ -43,16 +43,6 @@ app.use(helmet({
   },
 }));
 
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 500,
-  standardHeaders: true,      
-  legacyHeaders: false,
-  message: { msg: 'Too many requests, please try again later' }
-});
-
-app.use('/api/', apiLimiter);
-
 const uploadsDir = path.join(__dirname, '../uploads');
 const imageDir = path.join(uploadsDir, 'images');
 const videoDir = path.join(uploadsDir, 'videos');
