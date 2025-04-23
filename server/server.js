@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import { PrismaClient } from '@prisma/client';
 import { config } from 'dotenv';
 import fs from 'fs';
