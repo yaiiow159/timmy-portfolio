@@ -77,7 +77,6 @@
       </div>
       
       <div v-else class="space-y-4">
-        <!-- 活動列表 -->
       </div>
     </div>
     
@@ -116,10 +115,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useBlogStore } from '@/store/blogStore'
+import { useActivityStore } from '@/store/activityStore'
+import type { Activity } from '@/types/activity'
 
 const { t } = useI18n()
+const blogStore = useBlogStore()
+const activityStore = useActivityStore()
 
 const stats = ref({
   posts: 0,
@@ -127,5 +131,18 @@ const stats = ref({
   comments: 0
 })
 
-const recentActivity = ref([])
+const recentActivity = ref<Activity[]>([])
+
+onMounted(async () => {
+  try {
+    await blogStore.fetchPosts()
+    stats.value.posts = blogStore.posts.length
+    
+    // 獲取活動記錄
+    const response = await activityStore.fetchActivities()
+    recentActivity.value = response.activities.slice(0, 5)
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error)
+  }
+})
 </script>

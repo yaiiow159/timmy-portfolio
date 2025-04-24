@@ -25,8 +25,8 @@ async function main() {
   try {
     logger.info('Starting database initialization...');
 
-    const adminEmail = 'examyou076@gmail.com';
-    const adminPassword = 'timmy0728';
+    const adminEmail = 'admin123@gmail.com';
+    const adminPassword = 'admin123';
     
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(adminPassword, salt);

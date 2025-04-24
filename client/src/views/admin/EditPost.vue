@@ -1,26 +1,24 @@
 <template>
-  <div class="edit-post min-h-screen bg-primary dark:bg-primary-dark p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-text-primary dark:text-text-primary-light">
-        {{ isEditing ? t('admin.editPost') : t('admin.createPost') }}
-      </h1>
-      
-      <div class="flex space-x-2">
-        <button 
-          @click="$router.push({ name: 'AdminPosts' })"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-text-primary dark:text-text-primary-light hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          {{ t('admin.cancel') }}
-        </button>
+  <div class="min-h-screen py-12 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-text-primary mb-2">
+          {{ isEditing ? t('admin.editPost') : t('admin.createPost') }}
+        </h1>
       </div>
+
+      <div v-if="isLoading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+      </div>
+
+      <BlogEditor
+        v-else
+        :post="currentPost as BlogPost"
+        :is-editing="isEditing"
+        @save="handleSave"
+        @cancel="router.push('/admin/posts')"
+      />
     </div>
-    
-    <BlogEditor
-      :post="currentPost"
-      :is-editing="isEditing"
-      @save="savePost"
-      @cancel="$router.push({ name: 'AdminPosts' })"
-    />
   </div>
 </template>
 
@@ -42,68 +40,32 @@ const notificationStore = useNotificationStore()
 const authStore = useAuthStore()
 
 const isEditing = computed(() => !!route.params.id)
-const isSubmitting = ref(false)
+const isLoading = ref(false)
 const currentPost = ref<Partial<BlogPost>>({
   title: '',
   content: '',
   excerpt: '',
   coverImage: '',
-  tags: []
+  tags: [],
+  author: authStore.user?.name || 'Anonymous'
 })
-
-async function savePost(postData: Partial<BlogPost>) {
-  try {
-    isSubmitting.value = true
-    const basePostData: Omit<BlogPost, 'id'> = {
-      title: postData.title || '',
-      content: postData.content || '',
-      excerpt: postData.excerpt || '',
-      coverImage: postData.coverImage || '',
-      tags: postData.tags || [],
-      date: new Date().toISOString(),
-      author: authStore.user?.name || 'Anonymous',
-      comments: []
-    }
-
-    let savedPost: BlogPost
-    if (isEditing.value && route.params.id) {
-      savedPost = await blogStore.updatePost(route.params.id as string, basePostData)
-    } else {
-      savedPost = await blogStore.createPost(basePostData)
-    }
-
-    notificationStore.addNotification({
-      type: 'success',
-      message: t('admin.saveSuccess'),
-      duration: 3000
-    })
-
-    router.push(`/blog/${savedPost.id}`)
-  } catch (error) {
-    console.error('Error saving post:', error)
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('admin.saveError'),
-      duration: 3000
-    })
-  } finally {
-    isSubmitting.value = false
-  }
-}
 
 onMounted(async () => {
   if (isEditing.value) {
     try {
-      isSubmitting.value = true
+      isLoading.value = true
       const post = await blogStore.fetchPostById(route.params.id as string)
       
       if (post) {
         currentPost.value = {
+          id: post.id,
           title: post.title,
-          excerpt: post.excerpt,
           content: post.content,
+          excerpt: post.excerpt,
           coverImage: post.coverImage || '',
-          tags: [...post.tags]
+          tags: [...post.tags],
+          author: post.author,
+          date: post.date
         }
       }
     } catch (error) {
@@ -113,10 +75,52 @@ onMounted(async () => {
         message: t('admin.loadError'),
         duration: 5000
       })
-      router.push({ name: 'AdminPosts' })
+      router.push('/admin/posts')
     } finally {
-      isSubmitting.value = false
+      isLoading.value = false
     }
   }
 })
+
+async function handleSave(postData: Partial<BlogPost>) {
+  try {
+    isLoading.value = true
+    const completePostData = {
+      title: postData.title || '',
+      content: postData.content || '',
+      excerpt: postData.content?.substring(0, 200).replace(/<[^>]*>/g, '') || '',
+      coverImage: postData.coverImage || '',
+      tags: postData.tags || [],
+      date: currentPost.value.date || new Date().toISOString(),
+      author: currentPost.value.author || authStore.user?.name || 'Anonymous'
+    }
+
+    if (isEditing.value && route.params.id) {
+      await blogStore.updatePost(route.params.id as string, completePostData)
+      notificationStore.addNotification({
+        type: 'success',
+        message: t('admin.postUpdated'),
+        duration: 3000
+      })
+    } else {
+      await blogStore.createPost(completePostData)
+      notificationStore.addNotification({
+        type: 'success',
+        message: t('admin.postCreated'),
+        duration: 3000
+      })
+    }
+
+    router.push('/admin/posts')
+  } catch (error) {
+    console.error('Error saving post:', error)
+    notificationStore.addNotification({
+      type: 'error',
+      message: t('admin.saveError'),
+      duration: 3000
+    })
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>

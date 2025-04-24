@@ -144,8 +144,12 @@ export const useBlogStore = defineStore('blog', () => {
   }
 
   async function addComment(postId: string, comment: Omit<Comment, 'id' | 'date'>) {
+    if (!authStore.isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+    
     try {
-      const response = await blogService.addComment(postId, comment)
+      const response = await blogService.addComment(postId, comment, authStore.token as string)
       return response
     } catch (err) {
       console.error('Error adding comment:', err)

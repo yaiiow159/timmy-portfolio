@@ -2,7 +2,6 @@ import axios from 'axios'
 import { useLanguageStore } from '../store/languageStore'
 import { useNotificationStore } from '../store/notificationStore'
 
-// 在開發和生產環境中都使用相對路徑
 const baseURL = '/api'
 
 const api = axios.create({
@@ -38,9 +37,8 @@ api.interceptors.response.use(
   }
 )
 
-// 靜態檔案路徑處理
 export function getStaticUrl(path: string): string {
-  return path // 使用相對路徑，Vite 代理會處理轉發
+  return path 
 }
 
 export default api

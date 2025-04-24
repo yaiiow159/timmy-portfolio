@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import api from '@/services/api'
 import type { Activity, ActivityResponse } from '@/types/activity'
+import { useAuthStore } from '@/store/authStore'
 
 interface ActivityState {
   activities: Activity[]
@@ -33,8 +34,17 @@ export const useActivityStore = defineStore('activity', {
     },
 
     async createActivity(activity: Omit<Activity, 'id' | 'date'>) {
+      const authStore = useAuthStore()
+      if (!authStore.isAuthenticated) {
+        throw new Error('Authentication required')
+      }
+
       try {
-        const response = await api.post<Activity>('/activities', activity)
+        const response = await api.post<Activity>('/activities', activity, {
+          headers: {
+            'x-auth-token': authStore.token
+          }
+        })
         return response.data
       } catch (error) {
         this.error = '無法創建活動記錄'

@@ -1,6 +1,6 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import auth from '../middleware/auth.js';
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -220,4 +220,32 @@ router.get('/list', async (req, res) => {
   }
 });
 
-export default router;
+// @route   GET api/posts/latest
+// @desc    Get latest posts for homepage
+// @access  Public
+router.get('/latest', async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({
+      take: 3,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        coverImage: true,
+        createdAt: true,
+        author: true,
+        tags: true
+      }
+    });
+    
+    res.json(posts);
+  } catch (err) {
+    console.error('Error fetching latest posts:', err);
+    res.status(500).json({ error: 'Failed to fetch latest posts' });
+  }
+});
+
+module.exports = router;

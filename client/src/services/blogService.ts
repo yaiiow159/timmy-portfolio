@@ -43,14 +43,13 @@ export const blogService = {
       }
     })
     
-    // 記錄活動
     const activityStore = useActivityStore()
     const authStore = useAuthStore()
     await activityStore.createActivity({
       type: 'POST_CREATED',
       title: '發布了新文章',
       description: `《${post.title}》`,
-      userName: authStore.user?.name || 'Anonymous',
+      userName: authStore.user?.name ?? 'Anonymous',
       targetId: response.data.id,
       targetType: 'post'
     })
@@ -75,8 +74,12 @@ export const blogService = {
     })
   },
 
-  addComment: async (postId: string, comment: Omit<Comment, 'id' | 'date'>): Promise<Comment[]> => {
-    const response = await api.post(`/posts/${postId}/comments`, comment)
+  addComment: async (postId: string, comment: Omit<Comment, 'id' | 'date'>, token: string): Promise<Comment[]> => {
+    const response = await api.post(`/posts/${postId}/comments`, comment, {
+      headers: {
+        'x-auth-token': token
+      }
+    })
     
     // 記錄活動
     const activityStore = useActivityStore()

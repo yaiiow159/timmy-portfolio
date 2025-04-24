@@ -1,5 +1,5 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -18,6 +18,37 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
+  }
+});
+
+// @route   GET api/projects/featured
+// @desc    Get featured projects for homepage
+// @access  Public
+router.get('/featured', async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      where: {
+        featured: true
+      },
+      take: 3,
+      orderBy: {
+        date: 'desc'
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrl: true,
+        technologies: true,
+        liveUrl: true,
+        codeUrl: true
+      }
+    });
+    
+    res.json(projects);
+  } catch (err) {
+    console.error('Error fetching featured projects:', err);
+    res.status(500).json({ error: 'Failed to fetch featured projects' });
   }
 });
 
@@ -45,7 +76,7 @@ router.get('/:id', async (req, res) => {
 
 // @route   POST api/projects
 // @desc    Create a project
-// @access  Private (would require auth middleware in a real app)
+// @access  Private 
 router.post('/', async (req, res) => {
   try {
     const project = await prisma.project.create({
@@ -69,7 +100,7 @@ router.post('/', async (req, res) => {
 
 // @route   PUT api/projects/:id
 // @desc    Update a project
-// @access  Private (would require auth middleware in a real app)
+// @access  Private
 router.put('/:id', async (req, res) => {
   try {
     const project = await prisma.project.update({
@@ -101,7 +132,7 @@ router.put('/:id', async (req, res) => {
 
 // @route   DELETE api/projects/:id
 // @desc    Delete a project
-// @access  Private (would require auth middleware in a real app)
+// @access 
 router.delete('/:id', async (req, res) => {
   try {
     await prisma.project.delete({
@@ -122,4 +153,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

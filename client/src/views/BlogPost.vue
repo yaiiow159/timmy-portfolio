@@ -1,4 +1,3 @@
-
 <template>
   <div class="blog-post-container min-h-screen bg-primary dark:bg-primary-light text-text-primary dark:text-text-primary-light py-8">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -217,12 +216,12 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useI18n} from 'vue-i18n'
-import {type BlogPost, useBlogStore} from '../store/blogStore'
-import type {MarkedOptions} from 'marked'
-import {marked} from 'marked'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useBlogStore, type BlogPost } from '../store/blogStore'
+import { marked } from 'marked'
+import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
 import gsap from 'gsap'
 
@@ -254,7 +253,8 @@ onMounted(async () => {
   const postId = route.params.id as string
   
   try {
-    post.value = await blogStore.fetchPostById(postId)
+    const fetchedPost = await blogStore.fetchPostById(postId)
+    post.value = fetchedPost
   } catch (error) {
     console.error('Error fetching post:', error)
     router.push('/blog')
@@ -333,7 +333,7 @@ async function submitComment() {
 }
 
 .blog-content blockquote {
-  border-left: 4px solid theme('colors.accent');
+  border-left: 4px solid theme('colors.accent.DEFAULT');
   padding-left: 1rem;
   font-style: italic;
 }

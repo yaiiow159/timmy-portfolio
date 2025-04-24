@@ -1,10 +1,10 @@
-import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
-import auth from '../middleware/auth.js';
-import winston from 'winston';
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs/promises');
+const { fileURLToPath } = require('url');
+const auth = require('../middleware/auth');
+const winston = require('winston');
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -23,14 +23,11 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(__dirname, '../../uploads');
 const imageDir = path.join(uploadsDir, 'images');
 const videoDir = path.join(uploadsDir, 'videos');
 const fileDir = path.join(uploadsDir, 'files');
 
-// 確保上傳目錄存在
 async function ensureUploadsDirs() {
   try {
     await fs.access(uploadsDir);
@@ -239,4 +236,4 @@ router.delete('/:filename', auth, async (req, res) => {
   }
 });
 
-export default router; 
+module.exports = router; 

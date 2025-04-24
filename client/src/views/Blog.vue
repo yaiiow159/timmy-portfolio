@@ -4,8 +4,12 @@ import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '../store/blogStore'
 import gsap from 'gsap'
 import { blogService } from '../services/blogService'
+import { useAuthStore } from '../store/authStore'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
+const router = useRouter()
+const authStore = useAuthStore()
 
 const searchQuery = ref('')
 const selectedCategory = ref('')
@@ -55,13 +59,11 @@ onMounted(async () => {
   }
 })
 
-// Extract all unique categories from posts
 const categories = computed(() => {
   const allTags = posts.value.flatMap(post => post.tags)
   return [...new Set(allTags)].sort()
 })
 
-// Filter posts based on search query and selected category
 const filteredPosts = computed(() => {
   let result = posts.value
   
@@ -84,19 +86,16 @@ const filteredPosts = computed(() => {
   return result
 })
 
-// Paginate posts
 const paginatedPosts = computed(() => {
   const startIndex = (currentPage.value - 1) * postsPerPage
   const endIndex = startIndex + postsPerPage
   return filteredPosts.value.slice(startIndex, endIndex)
 })
 
-// Calculate total pages
 const totalPages = computed(() => {
   return Math.ceil(filteredPosts.value.length / postsPerPage)
 })
 
-// Generate page numbers array
 const pageNumbers = computed(() => {
   const pages = []
   for (let i = 1; i <= totalPages.value; i++) {
@@ -148,18 +147,24 @@ function selectCategory(category: string) {
 <template>
   <div class="min-h-screen py-12">
     <div class="container mx-auto px-4">
-      <!-- Blog Header -->
       <div class="blog-header mb-12 text-center">
         <h1 class="text-4xl font-bold mb-4 text-text-primary">{{ t('blog.title') }}</h1>
         <p class="text-lg text-text-secondary max-w-2xl mx-auto">
           {{ t('blog.subtitle') }}
         </p>
+        <div v-if="authStore.isAuthenticated" class="mt-4">
+          <button
+            @click="router.push('/admin/posts/new')"
+            class="inline-flex items-center px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
+          >
+            <span class="material-icons mr-2">add</span>
+            {{ t('blog.createPost') }}
+          </button>
+        </div>
       </div>
       
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Main Content -->
         <div class="lg:w-2/3">
-          <!-- Search Bar -->
           <div class="mb-8">
             <div class="relative">
               <input 
@@ -174,7 +179,6 @@ function selectCategory(category: string) {
             </div>
           </div>
           
-          <!-- Loading State -->
           <div v-if="isLoading" class="space-y-8">
             <div v-for="i in 3" :key="i" class="bg-secondary rounded-lg overflow-hidden shadow-lg animate-pulse">
               <div class="h-64 bg-gray-700"></div>
@@ -189,7 +193,6 @@ function selectCategory(category: string) {
             </div>
           </div>
           
-          <!-- Blog Posts -->
           <div v-else-if="paginatedPosts.length > 0" class="space-y-8">
             <div 
               v-for="post in paginatedPosts" 
@@ -234,7 +237,6 @@ function selectCategory(category: string) {
             </div>
           </div>
           
-          <!-- No Results -->
           <div v-else class="text-center py-12">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-text-secondary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -243,7 +245,6 @@ function selectCategory(category: string) {
             <p class="text-text-secondary">Try adjusting your search or filter criteria</p>
           </div>
           
-          <!-- Pagination -->
           <div v-if="totalPages > 1 && !isLoading" class="flex justify-center mt-12">
             <div class="flex space-x-2">
               <button 
@@ -279,9 +280,7 @@ function selectCategory(category: string) {
           </div>
         </div>
         
-        <!-- Sidebar -->
         <div class="lg:w-1/3 blog-sidebar">
-          <!-- Categories -->
           <div class="bg-secondary rounded-lg p-6 shadow-lg mb-8">
             <h3 class="text-xl font-semibold mb-4 text-accent">{{ t('blog.categories') }}</h3>
             <div class="flex flex-wrap gap-2">
@@ -297,7 +296,6 @@ function selectCategory(category: string) {
             </div>
           </div>
           
-          <!-- Recent Posts -->
           <div class="bg-secondary rounded-lg p-6 shadow-lg">
             <h3 class="text-xl font-semibold mb-4 text-accent">{{ t('blog.recentPosts') }}</h3>
             <div class="space-y-4">

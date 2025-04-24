@@ -3,15 +3,28 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import gsap from 'gsap'
-import RecentActivity from '@/components/activity/RecentActivity.vue'
+import { usePortfolioStore } from '@/store/portfolioStore'
+import { useBlogStore } from '@/store/blogStore'
+
 
 const { t } = useI18n()
 const router = useRouter()
-
+const portfolioStore = usePortfolioStore()
+const blogStore = useBlogStore()
 const isLoaded = ref(false)
 
-onMounted(() => {
+
+onMounted(async () => {
   isLoaded.value = true
+  
+  try {
+    await Promise.all([
+      portfolioStore.fetchFeaturedProjects(),
+      blogStore.fetchPosts({ page: 1, limit: 3 })
+    ])
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  }
   
   const tl = gsap.timeline()
   
@@ -146,7 +159,7 @@ function navigateTo(path: string) {
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="i in 3" :key="i" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+          <div v-if="portfolioStore.isLoading" v-for="i in 3" :key="i" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <div class="h-48 bg-gray-700 animate-pulse"></div>
             <div class="p-6">
               <div class="h-6 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
@@ -156,6 +169,53 @@ function navigateTo(path: string) {
                 <div v-for="j in 3" :key="j" class="h-6 bg-gray-700 rounded px-3 animate-pulse"></div>
               </div>
               <div class="h-10 bg-gray-700 rounded w-full animate-pulse"></div>
+            </div>
+          </div>
+          
+          <div v-else v-for="project in portfolioStore.featuredProjects" :key="project.id" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+            <div class="h-48 relative overflow-hidden">
+              <img 
+                v-if="project.imageUrl" 
+                :src="project.imageUrl" 
+                :alt="project.title"
+                class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+              />
+              <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-2 text-text-primary">{{ project.title }}</h3>
+              <p class="text-text-secondary mb-4">{{ project.description }}</p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span 
+                  v-for="tech in project.technologies.slice(0, 3)" 
+                  :key="tech"
+                  class="px-2 py-1 bg-primary text-text-secondary text-sm rounded"
+                >
+                  {{ tech }}
+                </span>
+              </div>
+              <div class="flex gap-4">
+                <a 
+                  v-if="project.liveUrl"
+                  :href="project.liveUrl" 
+                  target="_blank"
+                  class="flex-1 px-4 py-2 bg-accent text-white text-center rounded hover:bg-accent-light transition-colors"
+                >
+                  {{ t('portfolio.viewLive') }}
+                </a>
+                <a 
+                  v-if="project.codeUrl"
+                  :href="project.codeUrl" 
+                  target="_blank"
+                  class="flex-1 px-4 py-2 border border-accent text-accent text-center rounded hover:bg-accent hover:text-white transition-colors"
+                >
+                  {{ t('portfolio.viewCode') }}
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -180,7 +240,7 @@ function navigateTo(path: string) {
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div v-for="i in 3" :key="i" class="bg-primary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+          <div v-if="blogStore.isLoading" v-for="i in 3" :key="i" class="bg-primary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <div class="h-48 bg-gray-700 animate-pulse"></div>
             <div class="p-6">
               <div class="h-6 bg-gray-700 rounded w-3/4 mb-2 animate-pulse"></div>
@@ -191,32 +251,39 @@ function navigateTo(path: string) {
               <div class="h-8 bg-gray-700 rounded w-1/3 animate-pulse"></div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="py-16">
-      <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="md:col-span-2">
-            <h2 class="text-3xl font-bold text-text-primary mb-8">
-              {{ t('activity.recentActivity') }}
-            </h2>
-            <RecentActivity />
-          </div>
-          <div class="bg-secondary rounded-lg p-6">
-            <h3 class="text-xl font-bold text-text-primary mb-4">
-              {{ t('contact.title') }}
-            </h3>
-            <p class="text-text-secondary mb-6">
-              {{ t('contact.subtitle') }}
-            </p>
-            <button 
-              @click="navigateTo('/contact')" 
-              class="w-full px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
-            >
-              {{ t('contact.send') }}
-            </button>
+          
+          <div v-else v-for="post in blogStore.posts" :key="post.id" class="bg-primary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+            <div class="h-48 relative overflow-hidden">
+              <img 
+                v-if="post.coverImage" 
+                :src="post.coverImage" 
+                :alt="post.title"
+                class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+              />
+              <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+              </div>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-2 text-text-primary">{{ post.title }}</h3>
+              <div class="flex items-center gap-2 text-text-secondary text-sm mb-4">
+                <span>{{ post.author }}</span>
+                <span>•</span>
+                <span>{{ new Date(post.date).toLocaleDateString() }}</span>
+              </div>
+              <p class="text-text-secondary mb-4">{{ post.excerpt }}</p>
+              <router-link 
+                :to="`/blog/${post.id}`"
+                class="inline-flex items-center text-accent hover:text-accent-light transition-colors"
+              >
+                {{ t('blog.readMore') }}
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </router-link>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import winston from 'winston';
+const jwt = require('jsonwebtoken');
+const winston = require('winston');
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-export default function auth(req, res, next) {
+function auth(req, res, next) {
   logger.info('Auth middleware triggered', { headers: req.headers });
   
   const token = req.header('x-auth-token');
@@ -39,4 +39,6 @@ export default function auth(req, res, next) {
     logger.error('Token verification failed:', err);
     res.status(401).json({ msg: 'Token is not valid' });
   }
-};
+}
+
+module.exports = auth;

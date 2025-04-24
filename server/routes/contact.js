@@ -1,6 +1,6 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import nodemailer from 'nodemailer';
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const nodemailer = require('nodemailer');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -117,4 +117,4 @@ await transporter.sendMail({
   }
 });
 
-export default router;
+module.exports = router;
