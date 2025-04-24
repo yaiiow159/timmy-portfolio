@@ -45,9 +45,7 @@ function handleAuthSuccess() {
     message: t('auth.successMessage'),
     duration: 5000
   })
-  
-  // Redirect to admin dashboard or home page
-  router.push('/')
+  router.push('/admin')
 }
 </script>
 

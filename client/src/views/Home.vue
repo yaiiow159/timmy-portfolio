@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import gsap from 'gsap'
+import RecentActivity from '@/components/activity/RecentActivity.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -56,7 +57,6 @@ const skills = [
   { name: 'Node.js', icon: 'devicon-nodejs-plain' },
   { name: 'MongoDB', icon: 'devicon-mongodb-plain' },
   { name: 'MySQL', icon: 'devicon-mysql-plain' },
-  { name: 'Docker', icon: 'devicon-docker-plain' },
   { name: 'AWS', icon: 'devicon-amazonwebservices-plain' },
   { name: 'Google Cloud', icon: 'devicon-googlecloud-plain' },
   { name: 'Git', icon: 'devicon-git-plain' },
@@ -190,6 +190,33 @@ function navigateTo(path: string) {
               <div class="h-4 bg-gray-700 rounded w-2/3 mb-4 animate-pulse"></div>
               <div class="h-8 bg-gray-700 rounded w-1/3 animate-pulse"></div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="md:col-span-2">
+            <h2 class="text-3xl font-bold text-text-primary mb-8">
+              {{ t('activity.recentActivity') }}
+            </h2>
+            <RecentActivity />
+          </div>
+          <div class="bg-secondary rounded-lg p-6">
+            <h3 class="text-xl font-bold text-text-primary mb-4">
+              {{ t('contact.title') }}
+            </h3>
+            <p class="text-text-secondary mb-6">
+              {{ t('contact.subtitle') }}
+            </p>
+            <button 
+              @click="navigateTo('/contact')" 
+              class="w-full px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+            >
+              {{ t('contact.send') }}
+            </button>
           </div>
         </div>
       </div>

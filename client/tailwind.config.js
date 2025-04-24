@@ -9,22 +9,24 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#121212',
-          light: '#f8f9fa'
+          DEFAULT: 'var(--bg-primary)',
+          light: 'var(--bg-primary)'
         },
         secondary: {
-          DEFAULT: '#1e1e1e',
-          light: '#e9ecef'
+          DEFAULT: 'var(--bg-secondary)',
+          light: 'var(--bg-secondary)'
         },
-        accent: '#60a5fa',
-        'accent-light': '#93c5fd',
+        accent: {
+          DEFAULT: 'var(--accent)',
+          light: 'var(--accent-light)'
+        },
         'text-primary': {
-          DEFAULT: '#f3f4f6',
-          light: '#212529'
+          DEFAULT: 'var(--text-primary)',
+          light: 'var(--text-primary)'
         },
         'text-secondary': {
-          DEFAULT: '#9ca3af',
-          light: '#6c757d'
+          DEFAULT: 'var(--text-secondary)',
+          light: 'var(--text-secondary)'
         },
         dark: {
           100: '#171717',

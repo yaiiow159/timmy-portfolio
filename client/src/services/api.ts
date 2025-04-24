@@ -2,14 +2,16 @@ import axios from 'axios'
 import { useLanguageStore } from '../store/languageStore'
 import { useNotificationStore } from '../store/notificationStore'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+// 在開發和生產環境中都使用相對路徑
+const baseURL = '/api'
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL,
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10000
 })
 
 api.interceptors.request.use(config => {
@@ -24,7 +26,7 @@ api.interceptors.response.use(
   response => response,
   error => {
     const notificationStore = useNotificationStore()
-    const errorMessage = error.response?.data?.msg || 'An error occurred'
+    const errorMessage = error.response?.data?.msg ?? 'An error occurred'
     
     notificationStore.addNotification({
       type: 'error',
@@ -32,8 +34,13 @@ api.interceptors.response.use(
       duration: 5000
     })
     
-    return Promise.reject(error)
+    return Promise.reject(new Error(errorMessage))
   }
 )
+
+// 靜態檔案路徑處理
+export function getStaticUrl(path: string): string {
+  return path // 使用相對路徑，Vite 代理會處理轉發
+}
 
 export default api

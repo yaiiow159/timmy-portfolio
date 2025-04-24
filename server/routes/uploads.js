@@ -20,9 +20,11 @@ router.post('/', auth, upload.single('file'), (req, res) => {
     const fileType = req.file.mimetype.startsWith('image/') ? 'images' : 
                     req.file.mimetype.startsWith('video/') ? 'videos' : 'files';
     
+    const filePath = `/uploads/${fileType}/${req.file.filename}`;
+    
     res.json({
       fileName: req.file.filename,
-      filePath: `/uploads/${fileType}/${req.file.filename}`
+      filePath: filePath
     });
   } catch (err) {
     console.error(err.message);

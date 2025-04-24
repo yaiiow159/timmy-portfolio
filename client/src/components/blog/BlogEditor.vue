@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { markdownToHtml } from '@/utils/markdown.ts'
-import { validateFileSize, isImageFile } from '@/utils/fileUpload.ts'
-import { blogService } from '@/services/blogService.ts'
-import { useAuthStore } from '@/store/authStore.ts' // Import authStore
-import type { BlogPost } from '@/store/blogStore.ts'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
+import Link from '@tiptap/extension-link'
+import { useAuthStore } from '@/store/authStore'
+import { blogService } from '@/services/blogService'
+import type { BlogPost } from '@/store/blogStore'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   post?: BlogPost
@@ -17,307 +22,220 @@ const emit = defineEmits<{
 }>()
 
 const title = ref(props.post?.title || '')
-const content = ref(props.post?.content || '')
-const tags = ref(props.post?.tags?.join(', ') || '')
-const previewMode = ref(false)
-const isUploading = ref(false)
-const uploadError = ref('')
+const selectedTags = ref<string[]>(props.post?.tags || [])
+const newTag = ref('')
 
-const htmlContent = computed(() => {
-  return markdownToHtml(content.value)
+// 編輯器配置
+const editor = useEditor({
+  content: props.post?.content || '',
+  extensions: [
+    StarterKit,
+    Image.configure({
+      HTMLAttributes: {
+        class: 'max-w-full rounded-lg',
+      },
+    }),
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-accent hover:text-accent-light underline',
+      },
+    }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose dark:prose-invert max-w-none focus:outline-none min-h-[200px] px-4 py-2',
+    },
+  },
 })
 
-function insertAtCursor(textarea: HTMLTextAreaElement, text: string) {
-  const startPos = textarea.selectionStart
-  const endPos = textarea.selectionEnd
-  
-  textarea.value = textarea.value.substring(0, startPos) + text + textarea.value.substring(endPos)
-  
-  textarea.selectionStart = startPos + text.length
-  textarea.selectionEnd = startPos + text.length
-  
-  textarea.focus()
-}
+// 編輯器命令
+const editorCommands = [
+  { name: 'bold', icon: 'format_bold', action: () => editor.value?.chain().focus().toggleBold().run() },
+  { name: 'italic', icon: 'format_italic', action: () => editor.value?.chain().focus().toggleItalic().run() },
+  { name: 'strike', icon: 'strikethrough_s', action: () => editor.value?.chain().focus().toggleStrike().run() },
+  { name: 'code', icon: 'code', action: () => editor.value?.chain().focus().toggleCode().run() },
+  { name: 'h1', icon: 'looks_one', action: () => editor.value?.chain().focus().toggleHeading({ level: 1 }).run() },
+  { name: 'h2', icon: 'looks_two', action: () => editor.value?.chain().focus().toggleHeading({ level: 2 }).run() },
+  { name: 'bulletList', icon: 'format_list_bulleted', action: () => editor.value?.chain().focus().toggleBulletList().run() },
+  { name: 'orderedList', icon: 'format_list_numbered', action: () => editor.value?.chain().focus().toggleOrderedList().run() },
+  { name: 'blockquote', icon: 'format_quote', action: () => editor.value?.chain().focus().toggleBlockquote().run() },
+  { name: 'horizontalRule', icon: 'horizontal_rule', action: () => editor.value?.chain().focus().setHorizontalRule().run() },
+  { name: 'undo', icon: 'undo', action: () => editor.value?.chain().focus().undo().run() },
+  { name: 'redo', icon: 'redo', action: () => editor.value?.chain().focus().redo().run() },
+]
 
-function insertMarkdown(type: string) {
-  const textarea = document.getElementById('content') as HTMLTextAreaElement
-  if (!textarea) return
-  
-  const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd)
-  
-  switch (type) {
-    case 'bold':
-      if (selectedText) {
-        insertAtCursor(textarea, `**${selectedText}**`)
-      } else {
-        insertAtCursor(textarea, '**bold text**')
-      }
-      break
-    case 'italic':
-      if (selectedText) {
-        insertAtCursor(textarea, `*${selectedText}*`)
-      } else {
-        insertAtCursor(textarea, '*italic text*')
-      }
-      break
-    case 'heading':
-      insertAtCursor(textarea, `\n## ${selectedText || 'Heading'}\n`)
-      break
-    case 'link':
-      if (selectedText) {
-        insertAtCursor(textarea, `[${selectedText}](url)`)
-      } else {
-        insertAtCursor(textarea, '[link text](url)')
-      }
-      break
-    case 'image':
-      insertAtCursor(textarea, `![${selectedText || 'alt text'}](image-url)`)
-      break
-    case 'code':
-      if (selectedText) {
-        insertAtCursor(textarea, `\`\`\`\n${selectedText}\n\`\`\``)
-      } else {
-        insertAtCursor(textarea, '```\ncode block\n```')
-      }
-      break
-    case 'list':
-      insertAtCursor(textarea, `\n- List item 1\n- List item 2\n- List item 3\n`)
-      break
+// 標籤管理
+function addTag() {
+  if (newTag.value.trim() && !selectedTags.value.includes(newTag.value.trim())) {
+    selectedTags.value.push(newTag.value.trim())
+    newTag.value = ''
   }
 }
 
+function removeTag(tag: string) {
+  selectedTags.value = selectedTags.value.filter(t => t !== tag)
+}
+
+// 圖片上傳
 async function handleImageUpload(event: Event) {
   const input = event.target as HTMLInputElement
-  if (!input.files || input.files.length === 0) return
-  
+  if (!input.files?.length) return
+
   const file = input.files[0]
-  
-  if (!isImageFile(file)) {
-    uploadError.value = 'Please upload an image file'
-    return
-  }
-  
-  if (!validateFileSize(file, 5 * 1024 * 1024)) {
-    uploadError.value = 'Image size should be less than 5MB'
-    return
-  }
-  
+  const authStore = useAuthStore()
+
   try {
-    isUploading.value = true
-    uploadError.value = ''
-    
-    const authStore = useAuthStore()
     const result = await blogService.uploadImage(file, authStore.token as string)
-    
-    const textarea = document.getElementById('content') as HTMLTextAreaElement
-    if (textarea) {
-      insertAtCursor(textarea, `![Image](${result.filePath})`)
-    }
+    editor.value?.chain().focus().setImage({ src: result.filePath }).run()
   } catch (error) {
     console.error('Error uploading image:', error)
-    uploadError.value = 'Failed to upload image. Please try again.'
   } finally {
-    isUploading.value = false
     input.value = ''
   }
 }
 
+// 儲存文章
 function savePost() {
-  if (!title.value.trim() || !content.value.trim()) {
-    alert('Please fill in all required fields')
+  if (!title.value.trim() || !editor.value?.getHTML()) {
+    alert(t('fillAllFields'))
     return
   }
-  
+
   const postData: Partial<BlogPost> = {
     title: title.value.trim(),
-    content: content.value.trim(),
-    tags: tags.value.split(',').map(tag => tag.trim()).filter(tag => tag)
+    content: editor.value.getHTML(),
+    tags: selectedTags.value
   }
-  
+
   emit('save', postData)
 }
 
-function autoResizeTextarea(event: Event) {
-  const textarea = event.target as HTMLTextAreaElement
-  textarea.style.height = 'auto'
-  textarea.style.height = `${textarea.scrollHeight}px`
-}
-
+// 組件生命週期
 onMounted(() => {
-  // Initialize textarea height
-  const textarea = document.getElementById('content') as HTMLTextAreaElement
-  if (textarea) {
-    textarea.style.height = `${textarea.scrollHeight}px`
+  if (editor.value) {
+    editor.value.commands.focus()
+  }
+})
+
+onUnmounted(() => {
+  if (editor.value) {
+    editor.value.destroy()
   }
 })
 </script>
 
 <template>
-  <div class="bg-secondary rounded-lg p-6 shadow-lg">
-    <div class="mb-6 flex justify-between items-center">
-      <h2 class="text-2xl font-bold text-text-primary">
-        {{ isEditing ? 'Edit Post' : 'Create New Post' }}
-      </h2>
-      <div class="flex items-center space-x-2">
-        <button 
-          @click="previewMode = !previewMode" 
-          class="px-4 py-2 rounded-lg border border-gray-700 text-text-secondary hover:text-accent transition-colors"
-        >
-          {{ previewMode ? 'Edit' : 'Preview' }}
-        </button>
-        <button 
-          @click="emit('cancel')" 
-          class="px-4 py-2 rounded-lg border border-gray-700 text-text-secondary hover:text-accent transition-colors"
-        >
-          Cancel
-        </button>
-        <button 
-          @click="savePost" 
-          class="px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
-        >
-          Save
-        </button>
-      </div>
+  <div class="bg-secondary dark:bg-secondary-dark rounded-lg p-6 shadow-lg">
+    <!-- 標題輸入 -->
+    <div class="mb-6">
+      <input
+        v-model="title"
+        type="text"
+        :placeholder="t('enterTitle')"
+        class="w-full text-2xl font-bold bg-transparent border-b border-gray-300 dark:border-gray-700 focus:border-accent dark:focus:border-accent-light outline-none py-2"
+      />
     </div>
-    
-    <div v-if="!previewMode" class="space-y-6">
-      <div>
-        <label for="title" class="block text-sm font-medium text-text-secondary mb-1">
-          Title *
-        </label>
-        <input 
-          v-model="title"
-          type="text" 
-          id="title"
-          class="w-full bg-primary border border-gray-700 rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
-          placeholder="Enter post title"
-          required
-        />
-      </div>
-      
-      <div>
-        <label for="tags" class="block text-sm font-medium text-text-secondary mb-1">
-          Tags (comma separated)
-        </label>
-        <input 
-          v-model="tags"
-          type="text" 
-          id="tags"
-          class="w-full bg-primary border border-gray-700 rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
-          placeholder="Vue.js, TypeScript, Frontend"
-        />
-      </div>
-      
-      <div class="flex flex-wrap gap-2 p-2 bg-primary rounded-t-lg border border-gray-700 border-b-0">
-        <button 
-          @click="insertMarkdown('bold')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="Bold"
-        >
-          <span class="font-bold">B</span>
-        </button>
-        <button 
-          @click="insertMarkdown('italic')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="Italic"
-        >
-          <span class="italic">I</span>
-        </button>
-        <button 
-          @click="insertMarkdown('heading')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="Heading"
-        >
-          <span class="font-bold">H</span>
-        </button>
-        <button 
-          @click="insertMarkdown('link')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="Link"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-          </svg>
-        </button>
-        <button 
-          @click="insertMarkdown('image')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="Image"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </button>
-        <button 
-          @click="insertMarkdown('code')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="Code Block"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-          </svg>
-        </button>
-        <button 
-          @click="insertMarkdown('list')" 
-          class="p-2 rounded hover:bg-gray-700 transition-colors" 
-          title="List"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        
-        <label class="p-2 rounded hover:bg-gray-700 transition-colors cursor-pointer" title="Upload Image">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-          </svg>
-          <input 
-            type="file" 
-            accept="image/*" 
-            class="hidden" 
-            @change="handleImageUpload"
-          />
-        </label>
-      </div>
-      
-      <div>
-        <textarea 
-          v-model="content"
-          id="content"
-          rows="15"
-          class="w-full bg-primary border border-gray-700 rounded-b-lg py-3 px-4 text-text-primary font-mono focus:outline-none focus:ring-2 focus:ring-accent"
-          placeholder="Write your post content in Markdown..."
-          required
-          @input="autoResizeTextarea"
-        ></textarea>
-        
-        <div v-if="isUploading" class="mt-2 text-text-secondary">
-          Uploading image...
-        </div>
-        <div v-if="uploadError" class="mt-2 text-red-500 text-sm">
-          {{ uploadError }}
-        </div>
-      </div>
-    </div>
-    
-    <div v-else class="space-y-6">
-      <h1 class="text-3xl font-bold text-text-primary">{{ title || 'Untitled Post' }}</h1>
-      
-      <div v-if="tags" class="flex flex-wrap gap-2">
-        <span 
-          v-for="tag in tags.split(',').map(t => t.trim()).filter(t => t)" 
+
+    <!-- 標籤管理 -->
+    <div class="mb-6">
+      <div class="flex flex-wrap gap-2 mb-2">
+        <span
+          v-for="tag in selectedTags"
           :key="tag"
-          class="text-xs px-2 py-1 rounded-full bg-accent/20 text-accent"
+          class="px-3 py-1 bg-accent/20 dark:bg-accent-light/20 text-accent dark:text-accent-light rounded-full flex items-center gap-2"
         >
           {{ tag }}
+          <button @click="removeTag(tag)" class="hover:text-red-500">×</button>
         </span>
       </div>
+      <div class="flex gap-2">
+        <input
+          v-model="newTag"
+          @keyup.enter="addTag"
+          type="text"
+          :placeholder="t('addTag')"
+          class="px-3 py-1 bg-primary dark:bg-primary-dark border border-gray-300 dark:border-gray-700 rounded-lg"
+        />
+        <button
+          @click="addTag"
+          class="px-3 py-1 bg-accent hover:bg-accent-light text-white rounded-lg"
+        >
+          {{ t('add') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- 編輯器工具列 -->
+    <div class="border border-gray-300 dark:border-gray-700 rounded-t-lg p-2 flex flex-wrap gap-2">
+      <button
+        v-for="item in editorCommands"
+        :key="item.name"
+        @click="item.action"
+        :class="[
+          'p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors',
+          { 'bg-gray-200 dark:bg-gray-700': editor?.isActive(item.name) }
+        ]"
+        :title="item.name"
+      >
+        <span class="material-icons">{{ item.icon }}</span>
+      </button>
       
-      <div class="prose prose-invert max-w-none" v-html="htmlContent"></div>
+      <label class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+        <input
+          type="file"
+          accept="image/*"
+          class="hidden"
+          @change="handleImageUpload"
+        />
+        <span class="material-icons">image</span>
+      </label>
+    </div>
+
+    <!-- 編輯器內容區 -->
+    <div class="border border-t-0 border-gray-300 dark:border-gray-700 rounded-b-lg bg-primary dark:bg-primary-dark">
+      <editor-content :editor="editor" />
+    </div>
+
+    <!-- 操作按鈕 -->
+    <div class="mt-6 flex justify-end gap-2">
+      <button
+        @click="emit('cancel')"
+        class="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      >
+        {{ t('cancel') }}
+      </button>
+      <button
+        @click="savePost"
+        class="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
+      >
+        {{ t('save') }}
+      </button>
     </div>
   </div>
 </template>
 
-<style scoped>
-/* Add any component-specific styles here */
+<style>
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror {
+  > * + * {
+    margin-top: 0.75em;
+  }
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid var(--accent);
+}
 </style>

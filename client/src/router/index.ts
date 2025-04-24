@@ -79,6 +79,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'projects',
         name: 'AdminProjects',
         component: () => import('../views/admin/Projects.vue')
+      },
+      {
+        path: 'files',
+        name: 'AdminFiles',
+        component: () => import('../views/admin/Files.vue')
       }
     ]
   },

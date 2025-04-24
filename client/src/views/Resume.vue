@@ -9,7 +9,6 @@ gsap.registerPlugin(ScrollTrigger)
 
 const { t } = useI18n()
 const languageBarsAnimated = ref(false)
-const showDownloadOptions = ref(false)
 const showDialog = ref(false)
 
 onMounted(() => {
@@ -73,36 +72,18 @@ function animateWorkExperience() {
 }
 
 function animateLanguageSkills() {
-  const languageSection = document.querySelector('.language-section')
+  if (languageBarsAnimated.value) return
   
-  if (languageSection && !languageBarsAnimated.value) {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: languageSection as gsap.DOMTarget,
-        start: 'top 80%',
-        toggleActions: 'play none none none',
-        onEnter: () => { languageBarsAnimated.value = true }
-      }
-    })
-    
-    tl.from('.language-bar', {
-      width: 0,
-      duration: 1,
-      stagger: 0.2,
-      ease: 'power3.inOut'
-    })
-    .from('.language-label', {
-      y: 10,
-      opacity: 0,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: 'back.out(1.7)'
-    }, '-=0.5')
-  }
-}
-
-function toggleDownloadOptions() {
-  showDownloadOptions.value = !showDownloadOptions.value
+  languageBarsAnimated.value = true
+  
+  gsap.to('.language-bar', {
+    width: (_index, element) => {
+      return element.getAttribute('data-percent')
+    },
+    duration: 1.5,
+    ease: 'power3.out',
+    stagger: 0.1
+  })
 }
 
 function downloadResume(language: 'zh' | 'en') {
@@ -261,7 +242,7 @@ function downloadResume(language: 'zh' | 'en') {
                 <span class="text-accent mr-2">•</span>
                 <div>
                   <span class="font-medium">Monitoring Tools:</span>
-                  <span class="text-text-secondary"> Grafana, Prometheus, Kibana, Console</span>
+                  <span class="text-text-secondary"> Grafana, Prometheus, Kibana, Jconsole</span>
                 </div>
               </li>
               <li class="flex items-start">
@@ -297,22 +278,26 @@ function downloadResume(language: 'zh' | 'en') {
           <div class="mb-2 job-detail">
             <h3 class="text-xl font-semibold text-text-primary">Software Engineer</h3>
             <p class="text-accent">Onework Co., Ltd. — Taipei, Taiwan</p>
-            <p class="text-sm text-text-secondary job-date">Apr 2023 - Aug 2023</p>
+            <p class="text-sm text-text-secondary job-date">Aug 2024 - Apr 2025</p>
           </div>
           
-          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Project-Based System Development</h4>
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">PDS-Connected IoT Platform (End-to-End Independent Development)</h4>
           <ul class="space-y-2 text-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Designed backend architecture and implemented features including API development, performance testing, database deployment, and mobile-based UI/UX prototyping.</span>
+              <span>Designed backend architecture and implemented features including API development, performance testing (JMeter, Postman), Dockerized deployment, and Jenkins-based CI/CD pipeline.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Managed over 30 proxy tests, each handling 50,000+ sensors, 1,000+ devices, and 500+ equipment counters for time data processing and frontend visualizations.</span>
+              <span>Managed over 30 proxy units, each handling 10,000+ sensors, 10,000+ devices, and 500+ equipment, ensuring real-time data processing and frontend visualization.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Optimized XML performance and WebSocket handling to process high-frequency payloads across multiple processing servers within 1s response time.</span>
+              <span>Optimized JVM performance and WebSocket handling to process high-frequency payloads (optical image streaming every 500ms, multi-proxy sensor updates within 1s).</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Reduced equipment query latency from 64 seconds to under 95 milliseconds.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -329,26 +314,26 @@ function downloadResume(language: 'zh' | 'en') {
           <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
           <div class="mb-2 job-detail">
             <h3 class="text-xl font-semibold text-text-primary">Software Engineer</h3>
-            <p class="text-accent">EBound Technology Co., Ltd. — Taipei, Taiwan</p>
-            <p class="text-sm text-text-secondary job-date">Sep 2023 - Jan 2024</p>
+            <p class="text-accent">ESound Technology Co., Ltd. — Taipei, Taiwan</p>
+            <p class="text-sm text-text-secondary job-date">Sep 2023 - Feb 2024</p>
           </div>
           
           <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Full-Stack Development & Maintenance</h4>
           <ul class="space-y-2 text-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Maintained the full-stack development and maintenance for the Child Placement and Tracking System, including feature enhancements, bug fixes, performance tuning, and system deployment. Covered end-to-end development from backend logic to frontend UI.</span>
+              <span>Independently led full-stack development and ongoing maintenance for the Child Placement and Tracking System, including feature enhancements, bug fixes, performance tuning, and system deployment. Covered end-to-end development from backend logic to frontend UI.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Backend built with Spring MVC. Database systems included Oracle and MySQL. Frontend technologies used jQuery, Thymeleaf, Bootstrap, and CSS.</span>
+              <span>Backend built with Spring MVC, database systems included Oracle and MySQL. Frontend technologies used: jQuery, Thymeleaf, Bootstrap, and CSS.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
               <span>Designed and optimized Oracle Procedures, Functions, Schemas, Tables, and Indexes to significantly improve query performance.</span>
             </li>
           </ul>
-          
+
           <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">System Performance & Security Enhancements</h4>
           <ul class="space-y-2 text-text-secondary">
             <li class="flex items-start job-detail">
@@ -362,6 +347,90 @@ function downloadResume(language: 'zh' | 'en') {
           </ul>
         </div>
         
+        <div class="job-entry mb-8 relative pl-6 border-l-2 border-accent">
+          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
+          <div class="mb-2 job-detail">
+            <h3 class="text-xl font-semibold text-text-primary">Software Engineer</h3>
+            <p class="text-accent">Hitrust Technology Co., Ltd. — Taipei, Taiwan</p>
+            <p class="text-sm text-text-secondary job-date">Aug 2022 - Sep 2023</p>
+          </div>
+
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Veri-id System Refactoring & Feature Expansion</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Led module refactoring and integration, including SSO-based permission design, approval mechanisms, custom report exports (Excel/PDF), and third-party API integration.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Resolved integration bottlenecks and enhanced overall system modularity and maintainability.</span>
+            </li>
+          </ul>
+
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">ACS / 3DS System Optimization & Asynchronous Architecture</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Refactored the transaction query module by applying indexing and table partitioning, reducing query time from 30 seconds to under 3 seconds.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Integrated RocketMQ to handle asynchronous transaction writeback, significantly improving system stability and scalability.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Developed and executed data migration scripts to transition from Oracle to MySQL.</span>
+            </li>
+          </ul>
+
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Test Automation & Efficiency Improvement</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Created automated test modules using Selenium, replacing manual testing and reducing testing time by over 50%.</span>
+            </li>
+          </ul>
+
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Bank of Communications / SeaMoney Testing Support</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Refactored legacy code from JPA to MyBatis, ensuring better testability through comprehensive unit tests.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Collaborated with the Shanghai team to define test workflows and documentation, ensuring consistency and test quality.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="job-entry mb-8 relative pl-6 border-l-2 border-accent">
+          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
+          <div class="mb-2 job-detail">
+            <h3 class="text-xl font-semibold text-text-primary">MIS Specialist</h3>
+            <p class="text-accent">EverBiz Industrial Co., Ltd. — Taipei, Taiwan</p>
+            <p class="text-sm text-text-secondary job-date">Apr 2016 - Dec 2016</p>
+          </div>
+
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Developed Excel VBA scripts to automate the generation of departmental reports and analytical charts, significantly reducing manual effort and improving data processing efficiency.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Supported the IT team in managing employee accounts, system access, and device configurations, ensuring data security and proper access control across the organization.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Created multiple custom VBA tools for data cleansing, report generation, automatic data comparison, and routine task automation, streamlining daily operational workflows.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Contributed to the development of internal surveillance software and an automated employee check-in system, improving administrative efficiency and attendance tracking.</span>
+            </li>
+          </ul>
+        </div>
       </section>
       
       <section class="resume-section mb-12 bg-secondary rounded-lg p-6 shadow-lg">
@@ -372,12 +441,12 @@ function downloadResume(language: 'zh' | 'en') {
           <div class="mb-2">
             <h3 class="text-xl font-semibold text-text-primary">Tamkang University of Science and Technology</h3>
             <p class="text-accent">B.B.A. in Information Management</p>
-            <p class="text-sm text-text-secondary">2018 - 2021</p>
+            <p class="text-sm text-text-secondary">2016 - 2021</p>
           </div>
           
           <p class="text-text-secondary mt-4">
-            Actively pursued IT skills during university, earning certifications including CCNA, MTA, and TOC Java. 
-            Developed a strong interest in Java, leading to in-depth study of language design and practical application. 
+            Actively pursued IT skills during university, earning certifications including CCNA, MTA, and TQC Java.
+            Developed a strong interest in Java, leading to in-depth study of language design and practical application.
             Successfully transitioned into the industry as a Java software engineer, applying academic knowledge to real-world development.
           </p>
         </div>

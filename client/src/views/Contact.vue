@@ -118,10 +118,10 @@ async function submitForm() {
                   />
                 </div>
               </div>
-              
+                
               <div>
                 <label for="subject" class="block text-sm font-medium text-text-secondary mb-1">
-                  Subject
+                  {{ t('contact.subject') }}
                 </label>
                 <input 
                   v-model="contactForm.subject"

@@ -26,12 +26,12 @@
           >
             <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                {{ $t('resume.download.title', '選擇履歷版本') }}
+                {{ $t('resume.download.title') }}
               </DialogTitle>
 
               <div class="mt-4">
                 <p class="text-sm text-gray-500">
-                  {{ $t('resume.download.description', '請選擇您想要下載的履歷版本：') }}
+                  {{ $t('resume.download.description') }}
                 </p>
                 <div class="mt-6 flex justify-center space-x-4">
                   <button
@@ -39,14 +39,14 @@
                     class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     @click="$emit('download', 'zh')"
                   >
-                    {{ $t('resume.download.chinese', '中文版') }}
+                    {{ $t('resume.download.chinese') }}
                   </button>
                   <button
                     type="button"
                     class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     @click="$emit('download', 'en')"
                   >
-                    {{ $t('resume.download.english', 'English') }}
+                    {{ $t('resume.download.english') }}
                   </button>
                 </div>
               </div>
@@ -57,7 +57,7 @@
                   class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   @click="$emit('update:modelValue', false)"
                 >
-                  {{ $t('common.cancel', '取消') }}
+                  {{ $t('common.cancel') }}
                 </button>
               </div>
             </DialogPanel>
@@ -78,4 +78,6 @@ defineProps<{
 defineEmits<{
   (e: 'update:modelValue', value: boolean): void
   (e: 'download', language: 'en' | 'zh'): void
-}>()</script> 
+}>()
+
+</script>

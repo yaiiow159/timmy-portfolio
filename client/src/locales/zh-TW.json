@@ -130,12 +130,59 @@
     "addFile": "新增文件",
     "addLink": "新增連結",
     "addTag": "新增標籤",
-    "addParagraph": "新增段落"
+    "addParagraph": "新增段落",
+    "excerpt": "摘要",
+    "tags": "標籤",
+    "coverImage": "封面圖片",
+    "content": "內容",
+    "upload": "上傳",
+    "preview": "預覽",
+    "description": "描述",
+    "fetchError": "獲取文章失敗",
+    "deleteSuccess": "文章已刪除",
+    "technologies": "技術",
+    "imageUrl": "圖片URL",
+    "sortByComments": "按評論排序",
+    "add": "新增",
+    "projectTitlePlaceholder": "請輸入專案標題",
+    "projectDescriptionPlaceholder": "請輸入專案描述",
+    "chooseFile": "選擇文件",
+    "projectImage": "專案圖片",
+    "imageRequirements": "圖片尺寸應為600x400像素",
+    "newProjectDescription": "新專案描述",
+    "githubUrl": "GitHub URL",
+    "createProject": "建立專案",
+    "or": "或",
+    "managePostsDescription": "管理並編輯您的部落格文章",
+    "imageUploaded": "圖片已上傳",
+    "projectCreated": "專案已建立",
+    "projectUpdated": "專案已更新",
+    "projectDeleted": "專案已刪除",
+    "manageFiles": "檔案管理",
+    "files": "檔案",
+    "refresh": "重新整理",
+    "noFiles": "目前沒有檔案",
+    "deleteFile": "刪除檔案",
+    "deleteFileConfirmation": "確定要刪除 {name} 嗎？",
+    "fileDeleted": "檔案已成功刪除",
+    "deleteFileError": "刪除檔案失敗",
+    "fetchFilesError": "取得檔案列表失敗",
+    "urlCopied": "已複製連結至剪貼簿",
+    "copyUrlError": "複製連結失敗",
+    "copyUrl": "複製連結",
+    "uploadFile": "上傳檔案",
+    "dragAndDrop": "拖曳檔案至此，或點擊選擇檔案",
+    "uploadSuccess": "檔案上傳成功",
+    "uploadError": "檔案上傳失敗",
+    "fileSizeLimit": "檔案大小不能超過 5MB",
+    "loading": "載入中...",
+    "updateProject": "更新專案"
   },
   "contact": {
     "title": "聯絡我",
     "subtitle": "與我聯繫",
     "name": "您的姓名",
+    "subject": "主題",
     "email": "您的電子郵件",
     "message": "您的訊息",
     "send": "發送訊息",
@@ -157,5 +204,46 @@
     "delete": "刪除",
     "edit": "編輯",
     "close": "關閉"
+  },
+  "errors": {
+    "general": {
+      "title": "錯誤",
+      "message": "發生錯誤，請稍後再試",
+      "retry": "重試"
+    },
+    "auth": {
+      "loginFailed": "登入失敗",
+      "registerFailed": "註冊失敗",
+      "sessionExpired": "登入已過期，請重新登入",
+      "unauthorized": "未授權訪問"
+    },
+    "blog": {
+      "createFailed": "文章創建失敗",
+      "updateFailed": "文章更新失敗",
+      "deleteFailed": "文章刪除失敗",
+      "uploadFailed": "檔案上傳失敗",
+      "invalidFileType": "不支援的檔案類型",
+      "fileTooLarge": "檔案大小超過限制",
+      "videoUploadFailed": "影片上傳失敗",
+      "videoProcessingFailed": "影片處理失敗"
+    },
+    "portfolio": {
+      "createFailed": "作品創建失敗",
+      "updateFailed": "作品更新失敗",
+      "deleteFailed": "作品刪除失敗"
+    },
+    "contact": {
+      "sendFailed": "訊息發送失敗",
+      "invalidEmail": "無效的電子郵件地址",
+      "messageTooShort": "訊息太短"
+    }
+  },
+  "activity": {
+    "recentActivity": "最近活動",
+    "errorLoading": "載入活動記錄時發生錯誤",
+    "noActivities": "目前沒有任何活動",
+    "viewDetails": "查看詳情",
+    "loading": "載入中...",
+    "loadMore": "載入更多"
   }
 }

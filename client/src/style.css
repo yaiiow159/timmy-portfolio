@@ -6,14 +6,32 @@
 
 :root {
   color-scheme: dark;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --accent: #60a5fa;
+  --accent-light: #93c5fd;
 }
 
 html.dark {
   color-scheme: dark;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --accent: #60a5fa;
+  --accent-light: #93c5fd;
 }
 
 html.light {
   color-scheme: light;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7ff;
+  --text-primary: #4a4a68;
+  --text-secondary: #6b7280;
+  --accent: #8b5cf6;
+  --accent-light: #a78bfa;
 }
 
 /* 暗色主題 (默認) */
@@ -43,7 +61,6 @@ html.light body {
   position: relative;
 }
 
-/* 亮色主題 - 裝飾元素 */
 html.light body::before {
   content: "";
   position: absolute;
@@ -64,24 +81,34 @@ html.light body::before {
   z-index: 1;
 }
 
-/* 暗色主題顏色 */
-.dark .bg-primary {
-  background-color: #121212;
+.bg-primary {
+  background-color: var(--bg-primary);
 }
 
-.dark .bg-secondary {
-  background-color: #1e1e1e;
+.bg-secondary {
+  background-color: var(--bg-secondary);
 }
 
-.dark .text-text-primary {
-  color: #f3f4f6;
+.text-text-primary {
+  color: var(--text-primary);
 }
 
-.dark .text-text-secondary {
-  color: #9ca3af;
+.text-text-secondary {
+  color: var(--text-secondary);
 }
 
-/* 亮色主題顏色 - 更加生動的配色 */
+.text-accent {
+  color: var(--accent);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.border-accent {
+  border-color: var(--accent);
+}
+
 .light .bg-primary {
   background-color: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -102,40 +129,24 @@ html.light body::before {
   color: #6b7280;
 }
 
-/* 強調色 */
-.text-accent {
-  color: #60a5fa;
-}
-
-.bg-accent {
-  background-color: #60a5fa;
-}
-
-/* 亮色主題下的強調色 - 更加生動的紫色 */
 .light .text-accent {
-  color: #8b5cf6; /* 亮紫色 */
+  color: #8b5cf6; 
 }
 
 .light .bg-accent {
-  background-color: #8b5cf6; /* 亮紫色 */
-}
-
-.border-accent {
-  border-color: #60a5fa;
+  background-color: #8b5cf6;
 }
 
 .light .border-accent {
-  border-color: #8b5cf6; /* 亮紫色 */
+  border-color: #8b5cf6; 
 }
 
-/* 亮色主題下的漸變文字 - 更加生動的漸變 */
 .light .gradient-text {
   color: transparent;
   background-clip: text;
   background-image: linear-gradient(to right, #9333ea, #4338ca);
 }
 
-/* Animation classes */
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -164,7 +175,6 @@ html.light body::before {
   }
 }
 
-/* Code block styling */
 pre {
   background-color: #1e1e1e;
   border-radius: 0.5rem;
@@ -183,7 +193,6 @@ code {
   font-size: 0.875rem;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 0.5rem;
 }
@@ -213,7 +222,6 @@ code {
   background-color: #a78bfa;
 }
 
-/* Transitions */
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.3s;
@@ -224,7 +232,6 @@ code {
   opacity: 0;
 }
 
-/* Card and container styles - 更加生動的卡片 */
 .card {
   background-color: #1e1e1e;
   border-radius: 0.5rem;
@@ -289,7 +296,6 @@ code {
   }
 }
 
-/* Button styles - 更加生動的按鈕 */
 .btn {
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -361,7 +367,6 @@ code {
   box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
 }
 
-/* Gradient text - 更加生動的漸變 */
 .gradient-text {
   color: transparent;
   background-clip: text;
@@ -374,7 +379,6 @@ code {
   background-image: linear-gradient(to right, #8b5cf6, #4f46e5);
 }
 
-/* Glass effect - 更加生動的玻璃效果 */
 .glass {
   background-color: rgba(30, 30, 30, 0.2);
   backdrop-filter: blur(8px);
@@ -387,7 +391,6 @@ code {
   box-shadow: 0 4px 6px rgba(124, 58, 237, 0.05);
 }
 
-/* Section styles - 更加生動的區塊樣式 */
 .section {
   padding-top: 4rem;
   padding-bottom: 4rem;
@@ -442,7 +445,6 @@ code {
   border-radius: 3px;
 }
 
-/* 亮色主題下的技能卡片 - 更加生動的技能卡片 */
 .light .skill-item .w-16 {
   background: linear-gradient(135deg, #fff 0%, #f5f7ff 100%);
   box-shadow: 0 4px 6px rgba(124, 58, 237, 0.08);

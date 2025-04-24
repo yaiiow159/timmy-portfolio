@@ -1,11 +1,29 @@
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' })
+  ]
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
 
 const prisma = new PrismaClient();
 
 async function main() {
   try {
-    console.log('Starting database initialization...');
+    logger.info('Starting database initialization...');
 
     const adminEmail = 'examyou076@gmail.com';
     const adminPassword = 'timmy0728';
@@ -24,17 +42,17 @@ async function main() {
       },
     });
 
-    console.log('Admin user created:', admin);
-    console.log('Database initialization completed');
+    logger.info('Admin user created:', admin);
+    logger.info('Database initialization completed');
   } catch (error) {
-    console.error('Error during database initialization:', error);
+    logger.error('Error during database initialization:', error);
     throw error;
   }
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    logger.error('Database initialization error:', e);
     process.exit(1);
   })
   .finally(async () => {

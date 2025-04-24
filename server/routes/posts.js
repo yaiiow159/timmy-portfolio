@@ -175,15 +175,6 @@ router.post('/:id/comments', async (req, res) => {
       return res.status(404).json({ msg: 'Post not found' });
     }
     
-    const comment = await prisma.comment.create({
-      data: {
-        name: req.body.name,
-        email: req.body.email,
-        content: req.body.content,
-        postId: req.params.id
-      }
-    });
-    
     const comments = await prisma.comment.findMany({
       where: {
         postId: req.params.id
@@ -194,6 +185,35 @@ router.post('/:id/comments', async (req, res) => {
     });
     
     res.json(comments);
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
+
+// @route   GET api/posts/list
+// @desc    Get all posts as a list
+// @access  Public
+router.get('/list', async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        comments: true
+      }
+    });
+    
+    const formattedPosts = posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      createdAt: post.createdAt,
+      commentsCount: post.comments.length
+    }));
+    
+    res.json(formattedPosts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

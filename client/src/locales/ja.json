@@ -116,7 +116,53 @@
     "addFile": "ファイルを追加",
     "addLink": "リンクを追加",
     "addTag": "タグを追加",
-    "addParagraph": "段落を追加"
+    "addParagraph": "段落を追加",
+    "excerpt": "要約",
+    "tags": "タグ",
+    "coverImage": "カバー画像",
+    "content": "内容",
+    "upload": "アップロード",
+    "preview": "プレビュー",
+    "description": "説明",
+    "fetchError": "投稿を取得できませんでした",
+    "deleteSuccess": "投稿を削除しました",
+    "technologies": "技術",
+    "imageUrl": "画像URL",
+    "sortByComments": "コメント数順に並び替え",
+    "add": "追加",
+    "projectTitlePlaceholder": "プロジェクトタイトルを入力してください",
+    "projectDescriptionPlaceholder": "プロジェクト説明を入力してください",
+    "chooseFile": "ファイルを選択",
+    "projectImage": "プロジェクト画像",
+    "imageRequirements": "画像サイズは600x400ピクセルである必要があります。",
+    "newProjectDescription": "新しいプロジェクトの説明",
+    "githubUrl": "GitHub URL",
+    "createProject": "プロジェクトを作成",
+    "or": "または",
+    "managePostsDescription": "ブログ投稿を管理および編集する",
+    "imageUploaded": "画像がアップロードされました",
+    "projectCreated": "プロジェクトが作成されました",
+    "projectUpdated": "プロジェクトが更新されました",
+    "projectDeleted": "プロジェクトが削除されました",
+    "manageFiles": "ファイル管理",
+    "files": "ファイル",
+    "refresh": "更新",
+    "noFiles": "ファイルがありません",
+    "deleteFile": "ファイルを削除",
+    "deleteFileConfirmation": "{name} を削除しますか？",
+    "fileDeleted": "ファイルが削除されました",
+    "deleteFileError": "ファイルの削除に失敗しました",
+    "fetchFilesError": "ファイルの取得に失敗しました",
+    "urlCopied": "URLがクリップボードにコピーされました",
+    "copyUrlError": "URLのコピーに失敗しました",
+    "copyUrl": "URLをコピー",
+    "uploadFile": "ファイルをアップロード",
+    "dragAndDrop": "ファイルをここにドラッグ&ドロップするか、クリックして選択してください",
+    "uploadSuccess": "ファイルがアップロードされました",
+    "uploadError": "ファイルのアップロードに失敗しました",
+    "fileSizeLimit": "ファイルサイズは5MBを超えてはいけません",
+    "loading": "読み込み中...",
+    "updateProject": "プロジェクトを更新"
   },
   "resume": {
     "title": "履歴書",
@@ -143,6 +189,7 @@
     "address": "住所",
     "phone": "電話番号",
     "emailAddress": "メールアドレス",
+    "subject": "件名",
     "requiredFields": "必須項目をすべて入力してください",
     "sendError": "送信に失敗しました。後でもう一度お試しください。"
   },
@@ -158,5 +205,51 @@
     "delete": "削除",
     "edit": "編集",
     "close": "閉じる"
+  },
+  "errors": {
+    "general": {
+      "title": "エラー",
+      "message": "エラーが発生しました。後でもう一度お試しください",
+      "retry": "再試行"
+    },
+    "auth": {
+      "loginFailed": "ログインに失敗しました",
+      "registerFailed": "登録に失敗しました",
+      "sessionExpired": "セッションが切れました。再度ログインしてください",
+      "unauthorized": "権限がありません"
+    },
+    "blog": {
+      "createFailed": "記事の作成に失敗しました",
+      "updateFailed": "記事の更新に失敗しました",
+      "deleteFailed": "記事の削除に失敗しました",
+      "uploadFailed": "ファイルのアップロードに失敗しました",
+      "invalidFileType": "サポートされていないファイル形式です",
+      "fileTooLarge": "ファイルサイズが制限を超えています",
+      "videoUploadFailed": "動画のアップロードに失敗しました",
+      "videoProcessingFailed": "動画の処理に失敗しました"
+    },
+    "portfolio": {
+      "createFailed": "ポートフォリオの作成に失敗しました",
+      "updateFailed": "ポートフォリオの更新に失敗しました",
+      "deleteFailed": "ポートフォリオの削除に失敗しました"
+    },
+    "contact": {
+      "sendFailed": "メッセージの送信に失敗しました",
+      "invalidEmail": "無効なメールアドレスです",
+      "messageTooShort": "メッセージが短すぎます"
+    }
+  },
+  "activity": {
+    "recentActivity": "最近のアクティビティ",
+    "errorLoading": "アクティビティの読み込みに失敗しました",
+    "noActivities": "アクティビティはありません",
+    "viewDetails": "詳細を見る",
+    "loading": "読み込み中...",
+    "loadMore": "もっと見る",
+    "postCreated": "新しい記事を投稿しました",
+    "projectAdded": "新しいプロジェクトを追加しました",
+    "commentAdded": "コメントを追加しました",
+    "fileUploaded": "ファイルをアップロードしました",
+    "profileUpdated": "プロフィールを更新しました"
   }
 }

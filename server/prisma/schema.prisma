@@ -57,3 +57,15 @@ model Contact {
   date    DateTime @default(now())
   read    Boolean  @default(false)
 }
+
+model Activity {
+  id          String   @id @default(uuid())
+  type        String   // 'POST_CREATED', 'PROJECT_ADDED', 'COMMENT_ADDED' 等
+  title       String
+  description String?
+  userId      String?
+  userName    String
+  targetId    String?  // 關聯的文章、項目或評論的 ID
+  targetType  String?  // 'post', 'project', 'comment' 等
+  date        DateTime @default(now())
+}
