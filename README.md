@@ -7,11 +7,13 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 
 </div>
 
 <p align="center">
-A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment.
+A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment and scalability.
 </p>
 
 ---
@@ -20,6 +22,7 @@ A modern, responsive portfolio website with blog functionality, built using Vue.
 
 - [💻 System Requirements](#-system-requirements)
 - [🏗️ Project Structure](#️-project-structure)
+- [✨ Key Features](#-key-features)
 - [🚀 Development Setup](#-development-setup)
   - [🖥️ Frontend Development](#️-frontend-development)
   - [⚙️ Backend Development](#️-backend-development)
@@ -28,6 +31,9 @@ A modern, responsive portfolio website with blog functionality, built using Vue.
   - [📜 Using Deployment Scripts](#-using-deployment-scripts)
   - [🛠️ Manual Deployment](#️-manual-deployment)
   - [⚙️ Environment Configuration](#️-environment-configuration)
+- [🔄 CI/CD Integration](#-cicd-integration)
+- [🧪 Testing](#-testing)
+- [📝 License](#-license)
 - [❓ FAQ](#-faq)
 
 ---
@@ -54,10 +60,18 @@ timmy-portfolio/
 ├── client/                 # Vue.js Frontend Application
 │   ├── public/             # Static Assets
 │   ├── src/                # Source Code
+│   │   ├── assets/         # Images, fonts, etc.
+│   │   ├── components/     # Reusable components
+│   │   ├── composables/    # Vue composables
+│   │   ├── views/          # Page components
+│   │   ├── router/         # Vue Router configuration
+│   │   ├── stores/         # Pinia stores
+│   │   └── utils/          # Utility functions
 │   └── package.json        # Frontend Dependencies
 ├── server/                 # Node.js Backend Application
 │   ├── prisma/             # Database Models & Migrations
 │   ├── routes/             # API Routes
+│   ├── middleware/         # Express middleware
 │   ├── scripts/            # Script Files
 │   └── package.json        # Backend Dependencies
 ├── docker-compose.yml      # Docker Configuration
@@ -66,6 +80,19 @@ timmy-portfolio/
 ├── deploy.sh               # Linux/macOS Deployment Script
 └── deploy.ps1              # Windows Deployment Script
 ```
+
+## ✨ Key Features
+
+- 📱 **Responsive Design** - Optimized for all device sizes
+- 🎨 **Modern UI** - Built with TailwindCSS for a clean, modern look
+- 📝 **Blog System** - Create, edit, and publish blog posts with rich text editing
+- 🔐 **Authentication** - Secure user authentication and authorization
+- 🎯 **Project Showcase** - Display your projects with detailed information
+- 📧 **Contact Form** - Allow visitors to reach out via a contact form
+- 📊 **Admin Dashboard** - Manage content through an intuitive admin interface
+- 🌐 **SEO Optimized** - Structured for better search engine visibility
+- 🔄 **Real-time Updates** - Dynamic content updates without page reloads
+- 🌙 **Dark Mode** - Toggle between light and dark themes
 
 ---
 
@@ -199,24 +226,26 @@ This will start the frontend, backend, and database services. The frontend will 
 
 2. Modify environment files for production:
    - `server/.env`: Set production database connection, email configuration, etc.
-   - `client/.env`: Set correct API URL
+   - `client/.env`: Set production API URL
 
-3. Run deployment script:
+3. Run the deployment script:
 
 ```bash
 # Linux/macOS
-./deploy.sh
+./deploy.sh --production
 
 # Windows
-.\deploy.ps1
+.\deploy.ps1 -Production
 ```
+
+This will build and deploy the application in production mode.
 
 </details>
 
 ### 🛠️ Manual Deployment
 
 <details>
-<summary><b>Click to expand frontend deployment steps</b></summary>
+<summary><b>Click to expand detailed steps</b></summary>
 
 #### Frontend Deployment
 
@@ -226,24 +255,13 @@ This will start the frontend, backend, and database services. The frontend will 
 cd client
 ```
 
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Build production version:
+2. Build for production:
 
 ```bash
 npm run build
 ```
 
-4. Deploy the files from the `dist` directory to your web server.
-
-</details>
-
-<details>
-<summary><b>Click to expand backend deployment steps</b></summary>
+3. Serve the built files using Nginx or another web server.
 
 #### Backend Deployment
 
@@ -253,60 +271,134 @@ npm run build
 cd server
 ```
 
-2. Install dependencies:
+2. Install production dependencies:
 
 ```bash
-npm install
+npm install --production
 ```
 
-3. Set up environment variables in `.env` file.
-
-4. Run database migrations:
-
-```bash
-npx prisma migrate deploy
-```
-
-5. Start the server:
+3. Start the server:
 
 ```bash
 npm start
 ```
 
+Or use a process manager like PM2:
+
+```bash
+pm2 start server.js --name timmy-portfolio-backend
+```
+
 </details>
 
----
+### ⚙️ Environment Configuration
+
+<details>
+<summary><b>Click to expand configuration details</b></summary>
+
+#### Frontend Environment Variables
+
+| Variable | Description | Default |
+|:---------|:------------|:--------|
+| `VITE_API_URL` | Backend API URL | http://localhost:5000 |
+
+#### Backend Environment Variables
+
+| Variable | Description | Required |
+|:---------|:------------|:---------|
+| `PORT` | Server port | Yes |
+| `NODE_ENV` | Environment | Yes |
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `CORS_ORIGIN` | Allowed CORS origin | Yes |
+| `JWT_SECRET` | JWT secret key | Yes |
+| `EMAIL_HOST` | SMTP host | For email |
+| `EMAIL_PORT` | SMTP port | For email |
+| `EMAIL_SECURE` | Use TLS | For email |
+| `EMAIL_USER` | SMTP username | For email |
+| `EMAIL_PASS` | SMTP password | For email |
+| `EMAIL_RECIPIENT` | Contact form recipient | For email |
+
+</details>
+
+## 🔄 CI/CD Integration
+
+This project is configured for continuous integration and deployment using GitHub Actions. Each push to the main branch triggers automated tests and deployment to the staging environment.
+
+## 🧪 Testing
+
+<details>
+<summary><b>Click to expand testing information</b></summary>
+
+### Frontend Tests
+
+```bash
+cd client
+npm run test
+```
+
+### Backend Tests
+
+```bash
+cd server
+npm run test
+```
+
+</details>
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## ❓ FAQ
 
 <details>
-<summary><b>Common Issues and Solutions</b></summary>
+<summary><b>How do I reset the admin password?</b></summary>
 
-1. **Database Connection Issues**
-   - Ensure PostgreSQL is running
-   - Check DATABASE_URL in .env file
-   - Verify database credentials
+Run the password reset script:
 
-2. **Docker Container Issues**
-   - Check container logs: `docker-compose logs [service]`
-   - Ensure all required ports are available
-   - Verify network connectivity between containers
+```bash
+cd server
+node scripts/reset-password.js
+```
 
-3. **Prisma Migration Issues**
-   - Run `npx prisma generate` after schema changes
-   - Check migration history: `npx prisma migrate status`
-   - Reset database if needed: `npx prisma migrate reset`
+</details>
+
+<details>
+<summary><b>How do I backup the database?</b></summary>
+
+If using Docker:
+
+```bash
+docker exec -t timmy-portfolio-db pg_dump -U postgres timmy_portfolio > backup.sql
+```
+
+If using local PostgreSQL:
+
+```bash
+pg_dump -U postgres timmy_portfolio > backup.sql
+```
+
+</details>
+
+<details>
+<summary><b>How do I restore the database?</b></summary>
+
+If using Docker:
+
+```bash
+cat backup.sql | docker exec -i timmy-portfolio-db psql -U postgres -d timmy_portfolio
+```
+
+If using local PostgreSQL:
+
+```bash
+psql -U postgres -d timmy_portfolio < backup.sql
+```
 
 </details>
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-Made with ❤️ by Timmy
-</div>
+<p align="center">
+© 2025 Timmy's Portfolio. All rights reserved.
+</p>

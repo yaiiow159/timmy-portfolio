@@ -25,7 +25,6 @@ const title = ref(props.post?.title || '')
 const selectedTags = ref<string[]>(props.post?.tags || [])
 const newTag = ref('')
 
-// 編輯器配置
 const editor = useEditor({
   content: props.post?.content || '',
   extensions: [
@@ -49,7 +48,6 @@ const editor = useEditor({
   },
 })
 
-// 編輯器命令
 const editorCommands = [
   { name: 'bold', icon: 'format_bold', action: () => editor.value?.chain().focus().toggleBold().run() },
   { name: 'italic', icon: 'format_italic', action: () => editor.value?.chain().focus().toggleItalic().run() },
@@ -65,7 +63,6 @@ const editorCommands = [
   { name: 'redo', icon: 'redo', action: () => editor.value?.chain().focus().redo().run() },
 ]
 
-// 標籤管理
 function addTag() {
   if (newTag.value.trim() && !selectedTags.value.includes(newTag.value.trim())) {
     selectedTags.value.push(newTag.value.trim())
@@ -77,7 +74,6 @@ function removeTag(tag: string) {
   selectedTags.value = selectedTags.value.filter(t => t !== tag)
 }
 
-// 圖片上傳
 async function handleImageUpload(event: Event) {
   const input = event.target as HTMLInputElement
   if (!input.files?.length) return
@@ -95,7 +91,6 @@ async function handleImageUpload(event: Event) {
   }
 }
 
-// 儲存文章
 function savePost() {
   if (!title.value.trim() || !editor.value?.getHTML()) {
     alert(t('fillAllFields'))
@@ -111,7 +106,6 @@ function savePost() {
   emit('save', postData)
 }
 
-// 組件生命週期
 onMounted(() => {
   if (editor.value) {
     editor.value.commands.focus()
@@ -127,7 +121,6 @@ onUnmounted(() => {
 
 <template>
   <div class="bg-secondary dark:bg-secondary-dark rounded-lg p-6 shadow-lg">
-    <!-- 標題輸入 -->
     <div class="mb-6">
       <input
         v-model="title"
@@ -137,7 +130,6 @@ onUnmounted(() => {
       />
     </div>
 
-    <!-- 標籤管理 -->
     <div class="mb-6">
       <div class="flex flex-wrap gap-2 mb-2">
         <span
@@ -166,7 +158,6 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- 編輯器工具列 -->
     <div class="border border-gray-300 dark:border-gray-700 rounded-t-lg p-2 flex flex-wrap gap-2">
       <button
         v-for="item in editorCommands"
@@ -192,12 +183,10 @@ onUnmounted(() => {
       </label>
     </div>
 
-    <!-- 編輯器內容區 -->
     <div class="border border-t-0 border-gray-300 dark:border-gray-700 rounded-b-lg bg-primary dark:bg-primary-dark">
       <editor-content :editor="editor" />
     </div>
 
-    <!-- 操作按鈕 -->
     <div class="mt-6 flex justify-end gap-2">
       <button
         @click="emit('cancel')"
