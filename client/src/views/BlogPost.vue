@@ -58,7 +58,7 @@
           </div>
         </div>
         
-        <div class="blog-content prose prose-lg dark:prose-invert prose-headings:text-text-primary dark:prose-headings:text-text-primary-light prose-p:text-text-primary dark:prose-p:text-text-primary-light prose-a:text-accent hover:prose-a:text-accent-light prose-code:text-accent-light prose-pre:bg-secondary dark:prose-pre:bg-secondary-light max-w-none mb-12">
+        <div class="blog-content prose prose-lg dark:prose-invert max-w-none mb-12">
           <div v-html="renderedContent"></div>
         </div>
         
@@ -297,30 +297,122 @@ async function submitComment() {
 <style>
 @import '../assets/atom-one-dark.css';
 
+/* Basic content styling */
+.blog-content {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+/* Code blocks styling */
 .blog-content pre {
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 1.25rem;
   margin: 1.5rem 0;
   overflow-x: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .blog-content code {
   font-family: 'Fira Code', monospace;
   font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
 }
 
+/* Blockquote styling */
 .blog-content blockquote {
-  border-left: 4px solid theme('colors.accent.DEFAULT');
-  padding-left: 1rem;
+  border-left: 4px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 1.5rem;
   font-style: italic;
+  margin: 1.5rem 0;
+  background-color: rgba(var(--accent-rgb), 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
 }
 
+/* Image styling */
 .blog-content img {
   border-radius: 0.5rem;
   max-width: 100%;
   height: auto;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Headings styling */
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.blog-content h1 {
+  font-size: 2.25rem;
+}
+
+.blog-content h2 {
+  font-size: 1.875rem;
+  border-bottom: 1px solid rgba(var(--text-primary-rgb), 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.blog-content h3 {
+  font-size: 1.5rem;
+}
+
+.blog-content h4 {
+  font-size: 1.25rem;
+}
+
+/* List styling */
+.blog-content ul,
+.blog-content ol {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+}
+
+.blog-content ul {
+  list-style-type: disc;
+}
+
+.blog-content ol {
+  list-style-type: decimal;
+}
+
+/* Table styling */
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.blog-content th,
+.blog-content td {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(var(--text-primary-rgb), 0.1);
+}
+
+.blog-content th {
+  background-color: rgba(var(--accent-rgb), 0.1);
+  font-weight: 600;
+}
+
+.blog-content tr:nth-child(even) {
+  background-color: rgba(var(--text-primary-rgb), 0.03);
+}
+
+/* Animation */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

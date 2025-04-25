@@ -1,6 +1,6 @@
-import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
-import winston from 'winston';
+const bcrypt = require('bcryptjs');
+const { PrismaClient } = require('@prisma/client');
+const winston = require('winston');
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -58,4 +58,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

@@ -75,7 +75,102 @@ export default {
       boxShadow: {
         'neon': '0 0 5px theme("colors.accent"), 0 0 20px theme("colors.accent")',
       },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            color: theme('colors.text-primary.DEFAULT'),
+            a: {
+              color: theme('colors.accent.DEFAULT'),
+              '&:hover': {
+                color: theme('colors.accent.light'),
+              },
+            },
+            h1: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            h2: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            h3: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            h4: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            h5: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            h6: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            strong: {
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            code: {
+              color: theme('colors.accent.DEFAULT'),
+              backgroundColor: theme('colors.secondary.DEFAULT'),
+              padding: '0.25rem',
+              borderRadius: '0.25rem',
+              fontWeight: '400',
+            },
+            pre: {
+              backgroundColor: theme('colors.secondary.DEFAULT'),
+              color: theme('colors.text-primary.DEFAULT'),
+            },
+            blockquote: {
+              color: theme('colors.text-secondary.DEFAULT'),
+              borderLeftColor: theme('colors.accent.DEFAULT'),
+            },
+          },
+        },
+        dark: {
+          css: {
+            color: theme('colors.text-primary.light'),
+            a: {
+              color: theme('colors.accent.light'),
+              '&:hover': {
+                color: theme('colors.accent.DEFAULT'),
+              },
+            },
+            h1: {
+              color: theme('colors.text-primary.light'),
+            },
+            h2: {
+              color: theme('colors.text-primary.light'),
+            },
+            h3: {
+              color: theme('colors.text-primary.light'),
+            },
+            h4: {
+              color: theme('colors.text-primary.light'),
+            },
+            h5: {
+              color: theme('colors.text-primary.light'),
+            },
+            h6: {
+              color: theme('colors.text-primary.light'),
+            },
+            strong: {
+              color: theme('colors.text-primary.light'),
+            },
+            code: {
+              color: theme('colors.accent.light'),
+              backgroundColor: theme('colors.secondary.light'),
+            },
+            pre: {
+              backgroundColor: theme('colors.secondary.light'),
+              color: theme('colors.text-primary.light'),
+            },
+            blockquote: {
+              color: theme('colors.text-secondary.light'),
+              borderLeftColor: theme('colors.accent.light'),
+            },
+          },
+        },
+      }),
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

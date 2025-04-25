@@ -40,6 +40,7 @@
     "subtitle": "My thoughts and experiences in tech",
     "readMore": "Read More",
     "postedOn": "Posted on",
+    "by": "by",
     "comments": "Comments",
     "leaveComment": "Leave a comment",
     "name": "Name",
@@ -62,7 +63,9 @@
     "editPost": "Edit Post",
     "deletePost": "Delete Post",
     "commentSuccess": "Comment posted successfully!",
-    "loginToComment": "Please login to leave a comment"
+    "loginToComment": "Please login to leave a comment",
+    "noPosts": "No posts found",
+    "tryDifferent": "Try adjusting your search or filter criteria"
   },
   "portfolio": {
     "title": "Portfolio",
@@ -187,7 +190,9 @@
     "commentsPlaceholder": "Add a comment...",
     "commentSuccess": "Comment added successfully",
     "commentDeleted": "Comment deleted successfully",
-    "commentUpdated": "Comment updated successfully"
+    "commentUpdated": "Comment updated successfully",
+    "close": "Close",
+    "login": "Login"
   },
   "resume": {
     "title": "Resume",
@@ -200,7 +205,7 @@
     },
     "experience": "Work Experience",
     "education": "Education",
-    "skills": "Technical Skills",
+    "skills": "Skills",
     "languages": "Languages",
     "present": "Present"
   },
@@ -209,85 +214,72 @@
     "subtitle": "Get in touch",
     "name": "Your Name",
     "email": "Your Email",
+    "subject": "Subject",
     "message": "Your Message",
     "send": "Send Message",
-    "address": "Address",
-    "phone": "Phone",
-    "emailAddress": "Email",
-    "subject": "Subject",
+    "sending": "Sending...",
+    "sendSuccess": "Message sent successfully! I'll get back to you soon.",
+    "sendError": "Failed to send message. Please try again later.",
     "requiredFields": "Please fill in all required fields",
-    "sendError": "Failed to send message. Please try again later."
-  },
-  "footer": {
-    "copyright": " 2025 Timmy. All Rights Reserved.",
-    "madeWith": "Made with Vue.js",
-    "developerDescription": "Full-stack developer with expertise in Java, Spring Boot, Vue.js, and more."
-  },
-  "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "close": "Close"
+    "info": "Contact Information",
+    "social": "Social Media",
+    "emailAddress": "Email Address",
+    "phone": "Phone",
+    "address": "Address"
   },
   "errors": {
     "general": {
       "title": "Error",
-      "message": "An error occurred, please try again later",
+      "message": "An error occurred. Please try again later.",
       "retry": "Retry",
-      "badRequest": "Invalid request",
+      "badRequest": "Bad request",
       "notFound": "Resource not found",
-      "serverError": "Server error, please try again later",
+      "serverError": "Server error. Please try again later.",
       "validationError": "Invalid input data",
-      "tooManyRequests": "Too many requests, please try again later",
-      "offline": "Network connection lost, please check your network settings"
+      "tooManyRequests": "Too many requests. Please try again later.",
+      "offline": "You are offline. Please check your internet connection."
     },
     "auth": {
       "loginFailed": "Login failed",
       "registerFailed": "Registration failed",
-      "sessionExpired": "Session expired, please login again",
+      "sessionExpired": "Your session has expired. Please login again.",
       "unauthorized": "Unauthorized access",
-      "forbidden": "Access forbidden",
+      "forbidden": "You don't have permission to access this resource",
       "loginSuccess": "Login successful",
       "registerSuccess": "Registration successful",
       "logoutSuccess": "Logout successful"
     },
     "blog": {
-      "createFailed": "Failed to create article",
-      "updateFailed": "Failed to update article",
-      "deleteFailed": "Failed to delete article",
-      "uploadFailed": "File upload failed",
-      "invalidFileType": "Unsupported file type",
+      "createFailed": "Failed to create post",
+      "updateFailed": "Failed to update post",
+      "deleteFailed": "Failed to delete post",
+      "uploadFailed": "Failed to upload file",
+      "invalidFileType": "Invalid file type",
       "fileTooLarge": "File size exceeds limit",
-      "videoUploadFailed": "Video upload failed",
-      "videoProcessingFailed": "Video processing failed"
+      "videoUploadFailed": "Failed to upload video",
+      "videoProcessingFailed": "Failed to process video"
     },
     "portfolio": {
-      "createFailed": "Failed to create portfolio",
-      "updateFailed": "Failed to update portfolio",
-      "deleteFailed": "Failed to delete portfolio"
+      "createFailed": "Failed to create project",
+      "updateFailed": "Failed to update project",
+      "deleteFailed": "Failed to delete project"
     },
     "contact": {
       "sendFailed": "Failed to send message",
       "invalidEmail": "Invalid email address",
-      "messageTooShort": "Message is too short",
-      "social": "Social Media",
-      "info": "Information"
+      "messageTooShort": "Message is too short"
+    },
+    "activities": {
+      "fetch": "Failed to fetch recent activities"
     }
   },
   "activity": {
     "recentActivity": "Recent Activity",
     "errorLoading": "Error loading activities",
-    "noActivities": "No activities yet",
+    "noActivities": "No activities found",
     "viewDetails": "View Details",
     "loading": "Loading...",
-    "loadMore": "Load More",
-    "postCreated": "Created a new post",
-    "projectAdded": "Added a new project",
-    "commentAdded": "Added a comment",
-    "fileUploaded": "Uploaded a file",
-    "profileUpdated": "Updated profile"
+    "loadMore": "Load More"
   },
   "notFound": {
     "title": "404",
@@ -296,30 +288,62 @@
     "backToHome": "Back to Home"
   },
   "editor": {
-    "titleLabel": "Title",
     "enterTitle": "Enter title",
-    "contentLabel": "Content",
-    "contentPlaceholder": "Enter article content...",
+    "titleLabel": "Title",
     "tagsLabel": "Tags",
+    "contentLabel": "Content",
     "addTag": "Add Tag",
-    "titleRequired": "Please enter a title",
-    "contentRequired": "Please enter content",
+    "add": "Add",
+    "titleRequired": "Title is required",
+    "contentRequired": "Content is required",
+    "contentPlaceholder": "Write your content here...",
+    "uploadImage": "Upload Image",
+    "imageUploading": "Uploading image...",
+    "imageUploadError": "Failed to upload image",
+    "imageUploadSuccess": "Image uploaded successfully",
+    "insertImage": "Insert Image",
+    "insertVideo": "Insert Video",
+    "insertLink": "Insert Link",
+    "removeFormat": "Remove Format",
+    "undo": "Undo",
+    "redo": "Redo",
+    "heading": "Heading",
+    "fontSize": "Font Size",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strike": "Strike",
+    "color": "Text Color",
+    "background": "Background Color",
+    "list": "List",
+    "bulletList": "Bullet List",
+    "numberedList": "Numbered List",
+    "indent": "Indent",
+    "outdent": "Outdent",
+    "align": "Align",
+    "alignLeft": "Align Left",
+    "alignCenter": "Align Center",
+    "alignRight": "Align Right",
+    "alignJustify": "Justify",
+    "blockquote": "Blockquote",
+    "codeBlock": "Code Block",
+    "clean": "Clean",
     "coverImage": "Cover Image",
     "dragImageHere": "Drag image here",
-    "or": "or",
     "selectImage": "Select Image",
     "removeImage": "Remove Image",
-    "imageUploadError": "Failed to upload image"
+    "placeholder": "Start writing your article...",
+    "saveError": "Failed to save, please try again later"
   },
   "blogPost": {
-    "readingTime": "Reading time",
+    "readingTime": "Reading Time",
     "minutes": "minutes",
     "publishedOn": "Published on",
     "by": "by",
     "tags": "Tags",
     "relatedPosts": "Related Posts",
     "comments": "Comments",
-    "leaveComment": "Leave a comment",
+    "leaveComment": "Leave a Comment",
     "commentPlaceholder": "Write your thoughts...",
     "submit": "Submit",
     "loadMore": "Load More",
@@ -328,12 +352,24 @@
     "editPost": "Edit Post",
     "deletePost": "Delete Post"
   },
-  "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "minLength": "Must be at least {min} characters",
-    "maxLength": "Must be no more than {max} characters",
-    "passwordMatch": "Passwords do not match",
-    "url": "Please enter a valid URL"
+  "footer": {
+    "about": "About",
+    "posts": "Posts",
+    "contact": "Contact",
+    "subscribe": "Subscribe",
+    "privacy": "Privacy Policy",
+    "terms": "Terms",
+    "copyright": "© 2023 Timmy Portfolio",
+    "backToTop": "Back to Top",
+    "language": "Language",
+    "madeWith": "Made with",
+    "developerDescription": "This website is made with Vue.js, Nuxt.js, and Tailwind CSS."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close"
   }
 }

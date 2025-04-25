@@ -121,7 +121,7 @@ import { useActivityStore } from '@/store/activityStore'
 import { useNotificationStore } from '@/store/notificationStore'
 import { useAuthStore } from '@/store/authStore'
 import type { Activity } from '@/types/activity'
-import api from '@/services/api'
+import api, { handleApiError } from '@/services/api'
 
 const { t } = useI18n()
 const activityStore = useActivityStore()
@@ -149,13 +149,24 @@ onMounted(async () => {
       comments: response.data.commentsCount
     }
     
-    await activityStore.fetchActivities()
-    recentActivity.value = activityStore.activities.slice(0, 5)
+    try {
+      await activityStore.fetchActivities()
+      recentActivity.value = activityStore.activities.slice(0, 5)
+    } catch (activityError) {
+      console.error('Error fetching activities:', activityError)
+      const errorResult = handleApiError(activityError)
+      notificationStore.addNotification({
+        type: errorResult.type,
+        message: t('errors.activities.fetch') || '無法獲取最近活動',
+        duration: 5000
+      })
+    }
   } catch (error: any) {
     console.error('Error fetching dashboard data:', error)
+    const errorResult = handleApiError(error)
     notificationStore.addNotification({
-      type: 'error',
-      message: t('errors.general.message'),
+      type: errorResult.type,
+      message: t('errors.general.message') || '發生錯誤，請稍後再試',
       duration: 5000
     })
   }

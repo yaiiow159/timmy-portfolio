@@ -1,28 +1,28 @@
-FROM node:18-alpine AS base
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
+# 安裝依賴
 COPY client/package*.json ./
-
 RUN npm install
 
-FROM base AS development
+# 複製前端代碼
+COPY client/ ./
 
-EXPOSE 3000
-
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
-
-FROM base AS build
-
-COPY client/ .
-
+# 構建前端應用
 RUN npm run build
 
-FROM nginx:alpine AS production
+# 生產環境階段
+FROM nginx:alpine
 
+# 複製 nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# 複製構建產物
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# 設定環境變數
+ENV NODE_ENV=production
 
 EXPOSE 80
 

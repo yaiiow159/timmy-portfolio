@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useAuthStore } from '@/store/authStore'
+import { useI18n } from 'vue-i18n'
 import { blogService } from '@/services/blogService'
 import type { BlogPost } from '@/store/blogStore'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
@@ -63,15 +63,13 @@ function removeTag(tag: string) {
   selectedTags.value = selectedTags.value.filter(t => t !== tag)
 }
 
-async function handleImageUpload(file: File) {
-  const authStore = useAuthStore()
-
+async function handleImageUpload(file: File): Promise<string> {
   try {
     const result = await blogService.uploadImage(file, authStore.token as string)
     return result.filePath
   } catch (error) {
     console.error('Error uploading image:', error)
-    return null
+    return '' // Return empty string instead of null
   }
 }
 
@@ -112,8 +110,10 @@ async function savePost() {
     let coverImageUrl = props.post?.coverImage || ''
     if (coverImage.value) {
       try {
-        const result = await blogService.uploadImage(coverImage.value, authStore.token as string)
-        coverImageUrl = result.filePath
+        const result = await handleImageUpload(coverImage.value)
+        if (result) {
+          coverImageUrl = result
+        }
       } catch (error) {
         console.error('Error uploading cover image:', error)
         alert(t('editor.imageUploadError'))
@@ -140,7 +140,7 @@ async function savePost() {
   }
 }
 
-function onEditorChange({ html, text }: { html: string; text: string }) {
+function onEditorChange({ html }: { html: string }) {
   editorContent.value = html
 }
 
@@ -521,7 +521,7 @@ function onEditorReady(editor: any) {
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 8px 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dark .ql-tooltip {

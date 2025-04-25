@@ -1,0 +1,63 @@
+FROM node:18-alpine AS frontend-build
+
+WORKDIR /app/client
+
+# 安裝前端依賴
+COPY client/package*.json ./
+RUN npm install
+
+# 複製前端代碼
+COPY client/ ./
+
+# 構建前端應用
+RUN npm run build
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+# 安裝後端依賴
+COPY server/package*.json ./
+RUN npm install
+RUN npm install -g prisma
+
+# 複製 Prisma 相關文件
+COPY server/prisma ./prisma/
+RUN npx prisma generate
+
+# 複製後端代碼和腳本
+COPY server/ ./
+
+# 複製前端構建產物
+COPY --from=frontend-build /app/client/dist ./client/dist
+
+# 建立上傳目錄
+RUN mkdir -p ../uploads/images ../uploads/videos ../uploads/files
+
+# 設定環境變數
+ENV NODE_ENV=production
+ENV PORT=5000
+
+# 建立啟動腳本
+RUN echo '#!/bin/sh\n\
+# 等待資料庫連接\n\
+echo "等待資料庫連接..."\n\
+sleep 5\n\
+\n\
+# 執行 Prisma 遷移（生產環境使用 deploy）\n\
+echo "執行資料庫遷移..."\n\
+npx prisma migrate deploy\n\
+\n\
+# 初始化資料庫\n\
+echo "初始化資料庫..."\n\
+node scripts/init-db.js\n\
+\n\
+# 啟動應用程式\n\
+echo "啟動應用程式..."\n\
+node server.js' > /app/railway-entrypoint.sh
+
+RUN chmod +x /app/railway-entrypoint.sh
+
+EXPOSE 5000
+
+CMD ["/app/railway-entrypoint.sh"]

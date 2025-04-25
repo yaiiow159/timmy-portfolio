@@ -25,7 +25,8 @@
     "haveAccount": "已經有帳戶了？",
     "successMessage": "登入成功！",
     "registerSuccess": "註冊成功！",
-    "passwordMismatch": "密碼不一致"
+    "passwordMismatch": "密碼不一致",
+    "logoutSuccess": "登出成功！"
   },
   "home": {
     "greeting": "你好，我是",
@@ -39,6 +40,7 @@
     "subtitle": "我在科技領域的想法和經驗",
     "readMore": "閱讀更多",
     "postedOn": "發表於",
+    "by": "作者",
     "comments": "留言",
     "leaveComment": "留下評論",
     "name": "姓名",
@@ -61,7 +63,9 @@
     "editPost": "編輯文章",
     "deletePost": "刪除文章",
     "loginToComment": "請登入後發表評論",
-    "commentSuccess": "評論發表成功！"
+    "commentSuccess": "評論發表成功！",
+    "noPosts": "沒有找到文章",
+    "tryDifferent": "請嘗試調整搜尋條件"
   },
   "portfolio": {
     "title": "作品集",
@@ -199,37 +203,28 @@
     "commentsPlaceholder": "添加評論...",
     "commentSuccess": "評論成功",
     "commentDeleted": "評論已刪除",
-    "commentUpdated": "評論已更新"
+    "commentUpdated": "評論已更新",
+    "close": "關閉",
+    "login": "登入"
   },
   "contact": {
     "title": "聯絡我",
-    "subtitle": "與我聯繫",
+    "subtitle": "請填寫以下表單與我聯繫",
     "name": "您的姓名",
-    "subject": "主題",
     "email": "您的電子郵件",
-    "message": "您的訊息",
+    "subject": "主旨",
+    "message": "訊息",
     "send": "發送訊息",
-    "address": "地址",
-    "phone": "電話",
-    "emailAddress": "電子郵件",
-    "requiredFields": "請填寫所有必填欄位",
+    "sending": "發送中...",
+    "sendSuccess": "訊息已成功發送！我會盡快回覆您。",
     "sendError": "發送失敗，請稍後再試",
+    "requiredFields": "請填寫所有必填欄位",
+    "info": "聯絡資訊",
     "social": "社群媒體",
-    "info": "資訊"
-  },
-  "footer": {
-    "copyright": " 2025 Timmy. 版權所有。",
-    "madeWith": "使用 Vue.js 開發",
-    "developerDescription": "全端開發者，專精於 Java、Spring Boot、Vue.js 等技術。"
-  },
-  "common": {
-    "cancel": "取消",
-    "confirm": "確認",
-    "save": "儲存",
-    "delete": "刪除",
-    "edit": "編輯",
-    "close": "關閉",
-    "login": "登入"
+    "emailAddress": "電子郵件",
+    "phone": "電話",
+    "address": "地址",
+    "resume": "簡歷"
   },
   "errors": {
     "general": {
@@ -272,6 +267,9 @@
       "sendFailed": "訊息發送失敗",
       "invalidEmail": "無效的電子郵件地址",
       "messageTooShort": "訊息太短"
+    },
+    "activities": {
+      "fetch": "無法獲取最近活動"
     }
   },
   "activity": {
@@ -332,7 +330,9 @@
     "coverImage": "封面圖片",
     "dragImageHere": "拖曳圖片至此處",
     "selectImage": "選擇圖片",
-    "removeImage": "移除圖片"
+    "removeImage": "移除圖片",
+    "placeholder": "開始撰寫您的文章...",
+    "saveError": "保存失敗，請稍後再試"
   },
   "blogPost": {
     "readingTime": "閱讀時間",
@@ -351,12 +351,17 @@
     "editPost": "編輯文章",
     "deletePost": "刪除文章"
   },
-  "validation": {
-    "required": "標題和內容為必填欄位",
-    "email": "請輸入有效的電子郵件地址",
-    "minLength": "至少需要 {min} 個字元",
-    "maxLength": "不能超過 {max} 個字元",
-    "passwordMatch": "密碼不一致",
-    "url": "請輸入有效的網址"
+  "footer": {
+    "about": "關於",
+    "posts": "文章",
+    "contact": "聯繫我",
+    "subscribe": "訂閱",
+    "privacy": "隱私政策",
+    "terms": "條款",
+    "copyright": "© 2023 Timmy Portfolio",
+    "backToTop": "回到頂部",
+    "language": "語言",
+    "madeWith": "Made with",
+    "developerDescription": "這個網站是用 Vue.js、Nuxt.js 和 Tailwind CSS 開發的"
   }
 }

@@ -26,17 +26,17 @@ export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null)
     const isLoading = ref(false)
     const error = ref<string | null>(null)
-
+    const { t } = useI18n()
     const notificationStore = useNotificationStore()
-    const {t} = useI18n()
 
-    const isAuthenticated = computed(() => !!token.value)
+    const isAuthenticated = computed(() => !!token.value && !!user.value)
     const isAdmin = computed(() => user.value?.role === 'admin')
 
     async function loadUser() {
         if (!token.value) return
 
         isLoading.value = true
+        error.value = null
 
         try {
             const response = await api.get('/auth/user', {
@@ -48,12 +48,13 @@ export const useAuthStore = defineStore('auth', () => {
         } catch (err: any) {
             console.error('Error loading user:', err)
             if (err.response?.status === 401) {
+                logout()
+                error.value = t('errors.auth.sessionExpired')
                 notificationStore.addNotification({
                     type: 'error',
-                    message: t('errors.auth.sessionExpired'),
+                    message: error.value || t('errors.auth.sessionExpired'),
                     duration: 5000
                 })
-                logout()
             }
         } finally {
             isLoading.value = false
@@ -61,6 +62,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function refreshToken() {
+        if (!token.value) return
+
         try {
             const response = await api.post('/auth/refresh', {}, {
                 headers: {
@@ -69,11 +72,9 @@ export const useAuthStore = defineStore('auth', () => {
             })
             token.value = response.data.token
             localStorage.setItem('auth-token', response.data.token)
-            return true
         } catch (err) {
-            console.error('Token refresh error:', err)
+            console.error('Error refreshing token:', err)
             logout()
-            return false
         }
     }
 
@@ -92,7 +93,7 @@ export const useAuthStore = defineStore('auth', () => {
             error.value = err.response?.data?.msg ?? t('errors.auth.loginFailed')
             notificationStore.addNotification({
                 type: 'error',
-                message: error.value,
+                message: error.value || t('errors.auth.loginFailed'),
                 duration: 5000
             })
             return false
@@ -116,7 +117,7 @@ export const useAuthStore = defineStore('auth', () => {
             error.value = err.response?.data?.msg ?? t('errors.auth.registerFailed')
             notificationStore.addNotification({
                 type: 'error',
-                message: error.value,
+                message: error.value || t('errors.auth.registerFailed'),
                 duration: 5000
             })
             return false
@@ -129,6 +130,11 @@ export const useAuthStore = defineStore('auth', () => {
         token.value = null
         user.value = null
         localStorage.removeItem('auth-token')
+        
+        if (refreshInterval) {
+            clearInterval(refreshInterval)
+            refreshInterval = null
+        }
         notificationStore.addNotification({
             type: 'info',
             message: t('auth.logoutSuccess'),
@@ -139,12 +145,12 @@ export const useAuthStore = defineStore('auth', () => {
     let refreshInterval: number | null = null
 
     function startTokenRefresh() {
-        if (refreshInterval) return
-
-        refreshInterval = window.setInterval(async () => {
-            if (token.value) {
-                await refreshToken()
-            }
+        if (refreshInterval) {
+            clearInterval(refreshInterval)
+        }
+        
+        refreshInterval = window.setInterval(() => {
+            refreshToken()
         }, 15 * 60 * 1000)
     }
 

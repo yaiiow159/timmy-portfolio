@@ -2,6 +2,21 @@ import { defineStore } from 'pinia'
 import api from '@/services/api'
 import type { Activity, ActivityResponse } from '@/types/activity'
 
+export interface ActivityPaginationParams {
+  page?: number
+  limit?: number
+}
+
+export interface ActivityPaginatedResponse {
+  activities: Activity[]
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    pages: number
+  }
+}
+
 export const useActivityStore = defineStore('activity', {
   state: () => ({
     activities: [] as Activity[],
@@ -10,30 +25,49 @@ export const useActivityStore = defineStore('activity', {
   }),
 
   actions: {
-    async fetchActivities() {
+    async fetchActivities(params: ActivityPaginationParams = {}): Promise<ActivityPaginatedResponse> {
       this.loading = true
       this.error = null
       try {
-        const response = await api.get<ActivityResponse>('/activities')
+        const token = localStorage.getItem('token')
+        
+        const headers = token ? { 'x-auth-token': token } : undefined
+        
+        const response = await api.get<ActivityResponse>('/activities', {
+          headers,
+          params
+        })
+        
         this.activities = response.data.activities
+        
+        return {
+          activities: response.data.activities,
+          pagination: response.data.pagination || {
+            total: response.data.activities.length,
+            page: params.page || 1,
+            limit: params.limit || 10,
+            pages: Math.ceil(response.data.activities.length / (params.limit || 10))
+          }
+        }
       } catch (error) {
         console.error('Error fetching activities:', error)
         this.error = 'Failed to fetch activities'
+        throw error // Re-throw the error so it can be handled in the component
       } finally {
         this.loading = false
       }
     },
 
     async createActivity(activity: Omit<Activity, 'id' | 'date'>) {
-      const authStore = useAuthStore()
-      if (!authStore.isAuthenticated) {
-        throw new Error('Authentication required')
-      }
-
       try {
+        const token = localStorage.getItem('token') // Get token directly from localStorage
+        if (!token) {
+          throw new Error('Authentication required')
+        }
+
         const response = await api.post<Activity>('/activities', activity, {
           headers: {
-            'x-auth-token': authStore.token
+            'x-auth-token': token
           }
         })
         return response.data
@@ -43,4 +77,4 @@ export const useActivityStore = defineStore('activity', {
       }
     }
   }
-}) 
+})

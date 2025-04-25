@@ -3,8 +3,11 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { contactService } from '../services/contactService'
+import { handleApiError } from '../services/api'
+import { useNotificationStore } from '../store/notificationStore'
 
 const { t } = useI18n()
+const notificationStore = useNotificationStore()
 
 const contactForm = ref({
   name: '',
@@ -71,7 +74,14 @@ async function submitForm() {
     }, 5000)
   } catch (error) {
     console.error('提交表單時出錯:', error)
+    const errorResult = handleApiError(error)
     formError.value = t('contact.sendError') || '發送失敗，請稍後再試'
+    
+    notificationStore.addNotification({
+      type: errorResult.type,
+      message: errorResult.message,
+      duration: 5000
+    })
   } finally {
     isSubmitting.value = false
   }

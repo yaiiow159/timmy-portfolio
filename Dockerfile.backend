@@ -2,21 +2,30 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# 安裝必要的套件
 COPY server/package*.json ./
-RUN apk add --no-cache netcat-openbsd
 RUN npm install
-RUN npm install -g nodemon
+RUN npm install -g prisma
 
+# 複製 Prisma 相關文件
 COPY server/prisma ./prisma/
 RUN npx prisma generate
 
+# 複製腳本和入口點
 COPY server/scripts ./scripts
-
 COPY server/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# 複製所有後端代碼
 COPY server/ ./
+
+# 建立上傳目錄
+RUN mkdir -p ../uploads/images ../uploads/videos ../uploads/files
+
+# 設定環境變數
+ENV NODE_ENV=production
 
 EXPOSE 5000
 
+# 使用新的入口點腳本
 CMD ["/app/entrypoint.sh"]
