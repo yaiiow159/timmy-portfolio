@@ -189,13 +189,13 @@
   },
   "resume": {
     "title": "Resume",
-    "download": "Download Resume",
-    "download.title": "Choose Resume Version",
-    "download.description": "Please select the version of resume you want to download:",
-    "download.chinese": "Chinese Version",
-    "download.english": "English Version",
-    "downloadChinese": "Download Chinese Version",
-    "downloadEnglish": "Download English Version",
+    "downloadPdf": "Download PDF Version",
+    "download": {
+      "title": "Choose Resume Version",
+      "description": "Please select the version of resume you want to download:",
+      "chinese": "Chinese Version",
+      "english": "English Version"
+    },
     "experience": "Work Experience",
     "education": "Education",
     "skills": "Technical Skills",

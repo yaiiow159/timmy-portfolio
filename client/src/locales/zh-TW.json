@@ -71,13 +71,13 @@
   },
   "resume": {
     "title": "履歷",
-    "download": "下載履歷",
-    "download.title": "選擇履歷版本",
-    "download.description": "請選擇您想要下載的履歷版本：",
-    "download.chinese": "中文版",
-    "download.english": "英文版",
-    "downloadChinese": "下載中文版",
-    "downloadEnglish": "下載英文版",
+    "downloadPdf": "下載PDF版本",
+    "download": {
+      "title": "選擇履歷版本",
+      "description": "請選擇您想要下載的履歷版本：",
+      "chinese": "中文版",
+      "english": "英文版"
+    },
     "experience": "工作經驗",
     "education": "教育背景",
     "skills": "技術技能",

@@ -186,14 +186,14 @@
     "commentUpdated": "评论已更新"
   },
   "resume": {
+    "downloadPdf": "下载PDF版本",
     "title": "简历",
-    "download": "下载简历",
-    "download.title": "选择简历版本",
-    "download.description": "请选择您想要下载的简历版本：",
-    "download.chinese": "中文版",
-    "download.english": "英文版",
-    "downloadChinese": "下载中文版",
-    "downloadEnglish": "下载英文版",
+    "download": {
+      "title": "选择简历版本",
+      "description": "请选择您想要下载的简历版本：",
+      "chinese": "中文版",
+      "english": "英文版"
+    },
     "experience": "工作经验",
     "education": "教育背景",
     "skills": "技术技能",

@@ -187,13 +187,13 @@
   },
   "resume": {
     "title": "履歴書",
-    "download": "履歴書をダウンロード",
-    "download.title": "履歴書のバージョンを選択",
-    "download.description": "ダウンロードする履歴書のバージョンを選択してください：",
-    "download.chinese": "中国語版",
-    "download.english": "英語版",
-    "downloadChinese": "中国語版をダウンロード",
-    "downloadEnglish": "英語版をダウンロード",
+    "downloadPdf": "PDF版をダウンロード",
+    "download": {
+      "title": "履歴書のバージョンを選択",
+      "description": "ダウンロードする履歴書のバージョンを選択してください：",
+      "chinese": "中国語版",
+      "english": "英語版"
+    },
     "experience": "職歴",
     "education": "学歴",
     "skills": "技術スキル",

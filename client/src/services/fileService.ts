@@ -14,14 +14,13 @@ export const fileService = {
       }
     })
     
-    // 記錄活動
     const activityStore = useActivityStore()
     const authStore = useAuthStore()
     await activityStore.createActivity({
       type: 'FILE_UPLOADED',
       title: '上傳了新文件',
       description: file.name,
-      userName: authStore.user?.name || 'Anonymous',
+      userName: authStore.user?.name ?? 'Anonymous',
       targetType: 'file'
     })
     

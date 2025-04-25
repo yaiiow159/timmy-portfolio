@@ -114,7 +114,7 @@ function downloadResume(language: 'zh' | 'en') {
           class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-6 rounded-lg transition-colors"
           @click="showDialog = true"
         >
-          {{ t('resume.download') }}
+          {{ t('resume.downloadPdf') }}
         </button>
       </div>
       

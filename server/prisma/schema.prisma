@@ -43,7 +43,7 @@ model Comment {
 
 model User {
   id       String @id @default(uuid())
-  username String @unique
+  name     String @unique
   email    String @unique
   password String
   role     String @default("USER")
@@ -60,11 +60,11 @@ model Contact {
 
 model Activity {
   id          String   @id @default(uuid())
-  type        String   // 'POST_CREATED', 'PROJECT_ADDED', 'COMMENT_ADDED' 等
+  type        String   
   title       String
   description String?
   userName    String
-  targetId    String?  // 關聯的文章、項目或評論的 ID
-  targetType  String?  // 'post', 'project', 'comment' 等
+  targetId    String? 
+  targetType  String?  
   date        DateTime @default(now())
 }

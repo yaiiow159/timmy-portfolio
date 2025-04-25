@@ -18,11 +18,19 @@ export const useActivityStore = defineStore('activity', {
 
   actions: {
     async fetchActivities({ page = 1, limit = 10 } = {}) {
+      const authStore = useAuthStore()
+      if (!authStore.isAuthenticated) {
+        throw new Error('Authentication required')
+      }
+
       try {
         this.loading = true
         this.error = null
         const response = await api.get<ActivityResponse>('/activities', {
-          params: { page, limit }
+          params: { page, limit },
+          headers: {
+            'x-auth-token': authStore.token
+          }
         })
         return response.data
       } catch (error) {

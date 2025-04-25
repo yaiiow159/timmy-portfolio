@@ -62,7 +62,7 @@ router.post('/register', async (req, res) => {
 // @route POST api/health/check
 // @desc Check if the server is running
 // @access Public
-router.post('/health/check', (req, res) => {
+router.post('/health', (req, res) => {
   res.status(200).json({ msg: 'Server is running' });
 });
 
