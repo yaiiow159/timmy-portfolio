@@ -1,41 +1,24 @@
 import { defineStore } from 'pinia'
 import api from '@/services/api'
 import type { Activity, ActivityResponse } from '@/types/activity'
-import { useAuthStore } from '@/store/authStore'
-
-interface ActivityState {
-  activities: Activity[]
-  loading: boolean
-  error: string | null
-}
 
 export const useActivityStore = defineStore('activity', {
-  state: (): ActivityState => ({
-    activities: [],
+  state: () => ({
+    activities: [] as Activity[],
     loading: false,
-    error: null
+    error: null as string | null
   }),
 
   actions: {
-    async fetchActivities({ page = 1, limit = 10 } = {}) {
-      const authStore = useAuthStore()
-      if (!authStore.isAuthenticated) {
-        throw new Error('Authentication required')
-      }
-
+    async fetchActivities() {
+      this.loading = true
+      this.error = null
       try {
-        this.loading = true
-        this.error = null
-        const response = await api.get<ActivityResponse>('/activities', {
-          params: { page, limit },
-          headers: {
-            'x-auth-token': authStore.token
-          }
-        })
-        return response.data
+        const response = await api.get<ActivityResponse>('/activities')
+        this.activities = response.data.activities
       } catch (error) {
-        this.error = '無法加載活動記錄'
-        throw error
+        console.error('Error fetching activities:', error)
+        this.error = 'Failed to fetch activities'
       } finally {
         this.loading = false
       }

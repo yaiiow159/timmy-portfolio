@@ -8,6 +8,7 @@ import type { BlogPost } from '@/store/blogStore'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const authStore = useAuthStore()
 
 const props = defineProps<{
   post?: BlogPost
@@ -23,6 +24,9 @@ const title = ref(props.post?.title || '')
 const selectedTags = ref<string[]>(props.post?.tags || [])
 const newTag = ref('')
 const editorContent = ref(props.post?.content || '')
+const coverImage = ref<File | null>(null)
+const coverImagePreview = ref('')
+const isDragging = ref(false)
 
 const editorOptions = {
   theme: 'snow',
@@ -37,7 +41,13 @@ const editorOptions = {
       ['blockquote', 'code-block'],
       ['link', 'image', 'video'],
       ['clean']
-    ]
+    ],
+    clipboard: {
+      matchVisual: false
+    },
+    keyboard: {
+      bindings: {}
+    }
   },
   placeholder: t('editor.contentPlaceholder')
 }
@@ -65,23 +75,90 @@ async function handleImageUpload(file: File) {
   }
 }
 
-function savePost() {
-  if (!title.value.trim() || !editorContent.value) {
-    alert(t('validation.required'))
-    return
+function handleImageDrop(event: DragEvent) {
+  event.preventDefault()
+  const dataTransfer = event.dataTransfer
+  if (dataTransfer) {
+    const files = dataTransfer.files
+    if (files.length > 0) {
+      handleImageSelect(files[0])
+    }
   }
-
-  const postData: Partial<BlogPost> = {
-    title: title.value.trim(),
-    content: editorContent.value,
-    tags: selectedTags.value
-  }
-
-  emit('save', postData)
 }
 
-function onEditorChange({ html }: { html: string }) {
+function handleImageSelect(file: File) {
+  coverImage.value = file
+  coverImagePreview.value = URL.createObjectURL(file)
+}
+
+async function savePost() {
+  try {
+    const errors = []
+    
+    if (!title.value.trim()) {
+      errors.push(t('editor.titleRequired'))
+    }
+    
+    const contentText = editorContent.value.replace(/<[^>]*>/g, '').trim()
+    if (!contentText) {
+      errors.push(t('editor.contentRequired'))
+    }
+    
+    if (errors.length > 0) {
+      alert(errors.join('\n'))
+      return
+    }
+
+    let coverImageUrl = props.post?.coverImage || ''
+    if (coverImage.value) {
+      try {
+        const result = await blogService.uploadImage(coverImage.value, authStore.token as string)
+        coverImageUrl = result.filePath
+      } catch (error) {
+        console.error('Error uploading cover image:', error)
+        alert(t('editor.imageUploadError'))
+        return
+      }
+    }
+
+    const postData: Partial<BlogPost> = {
+      title: title.value.trim(),
+      content: editorContent.value,
+      tags: selectedTags.value,
+      coverImage: coverImageUrl
+    }
+
+    if (!props.isEditing) {
+      postData.excerpt = contentText.substring(0, 200) + '...'
+      postData.date = new Date().toISOString()
+    }
+
+    emit('save', postData)
+  } catch (error) {
+    console.error('Error saving post:', error)
+    alert(t('errors.blog.updateFailed'))
+  }
+}
+
+function onEditorChange({ html, text }: { html: string; text: string }) {
   editorContent.value = html
+}
+
+function onEditorReady(editor: any) {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        const content = editor.root.innerHTML
+        editorContent.value = content
+      }
+    })
+  })
+
+  observer.observe(editor.root, {
+    childList: true,
+    characterData: true,
+    subtree: true
+  })
 }
 </script>
 
@@ -97,6 +174,60 @@ function onEditorChange({ html }: { html: string }) {
         :placeholder="t('editor.enterTitle')"
         class="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-300 dark:border-gray-700 focus:border-accent dark:focus:border-accent-light outline-none py-2"
       />
+    </div>
+
+    <div class="mb-8">
+      <label class="block text-sm font-medium text-text-secondary dark:text-text-secondary-light mb-2">
+        {{ t('editor.coverImage') }}
+      </label>
+      <div
+        class="relative border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 text-center"
+        :class="{ 'border-accent': isDragging }"
+        @dragenter.prevent="isDragging = true"
+        @dragleave.prevent="isDragging = false"
+        @dragover.prevent
+        @drop="handleImageDrop"
+      >
+        <input
+          type="file"
+          accept="image/*"
+          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          @change="(e: Event) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files?.[0]) {
+              handleImageSelect(target.files[0]);
+            }
+          }"
+        />
+        
+        <div v-if="!coverImagePreview" class="py-8">
+          <div class="text-text-secondary dark:text-text-secondary-light mb-2">
+            {{ t('editor.dragImageHere') }}
+          </div>
+          <div class="text-sm text-text-secondary dark:text-text-secondary-light">
+            {{ t('editor.or') }}
+          </div>
+          <button class="mt-2 px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors">
+            {{ t('editor.selectImage') }}
+          </button>
+        </div>
+        
+        <div v-else class="relative group">
+          <img
+            :src="coverImagePreview"
+            alt="Cover preview"
+            class="max-h-[300px] w-full object-cover rounded-lg"
+          />
+          <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <button
+              @click.prevent="coverImage = null; coverImagePreview = ''"
+              class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+            >
+              {{ t('editor.removeImage') }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="mb-8">
@@ -140,6 +271,7 @@ function onEditorChange({ html }: { html: string }) {
           :options="editorOptions"
           contentType="html"
           @update:content="onEditorChange"
+          @ready="onEditorReady"
           theme="snow"
           toolbar="full"
           class="bg-primary dark:bg-primary-dark text-text-primary dark:text-text-primary-light"
@@ -167,6 +299,8 @@ function onEditorChange({ html }: { html: string }) {
 <style>
 /* 工具欄基礎樣式 */
 .ql-toolbar {
+  position: relative;
+  z-index: 40;
   background-color: var(--color-secondary);
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
@@ -244,13 +378,15 @@ function onEditorChange({ html }: { html: string }) {
   margin-top: 4px;
 }
 
-/* 顏色選擇器 */
+/* 顏色選擇器容器 */
 .ql-snow .ql-color-picker,
 .ql-snow .ql-background {
+  position: relative !important;
   width: 28px;
   height: 28px;
 }
 
+/* 顏色選擇器標籤 */
 .ql-snow .ql-color-picker .ql-picker-label,
 .ql-snow .ql-background .ql-picker-label {
   padding: 0;
@@ -258,19 +394,32 @@ function onEditorChange({ html }: { html: string }) {
   height: 100%;
 }
 
-.ql-snow .ql-color-picker .ql-picker-options {
-  padding: 3px;
-  width: 152px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+/* 顏色選擇器選項面板 */
+.ql-snow .ql-color-picker.ql-expanded .ql-picker-options {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  z-index: 9999 !important;
+  margin-top: 5px;
+  background: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 5px;
+  width: 192px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* 顏色選擇器選項 */
 .ql-snow .ql-color-picker .ql-picker-item {
-  width: 16px !important;
-  height: 16px !important;
-  margin: 2px;
+  width: 20px !important;
+  height: 20px !important;
   border: 1px solid var(--color-border);
+  margin: 0;
+  padding: 0;
+  border-radius: 2px;
 }
 
 /* 暗色主題 */
@@ -333,6 +482,8 @@ function onEditorChange({ html }: { html: string }) {
 
 /* 編輯器容器 */
 .ql-container.ql-snow {
+  position: relative;
+  z-index: 30;
   border: 1px solid var(--color-border);
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
@@ -392,5 +543,10 @@ function onEditorChange({ html }: { html: string }) {
   background-color: #2d3748;
   border-color: #4a5568;
   color: #e2e8f0;
+}
+
+/* 新增的圖片上傳相關樣式 */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
 }
 </style>

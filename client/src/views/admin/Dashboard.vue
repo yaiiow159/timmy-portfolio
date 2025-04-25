@@ -149,8 +149,8 @@ onMounted(async () => {
       comments: response.data.commentsCount
     }
     
-    const activityResponse = await activityStore.fetchActivities()
-    recentActivity.value = activityResponse.activities.slice(0, 5)
+    await activityStore.fetchActivities()
+    recentActivity.value = activityStore.activities.slice(0, 5)
   } catch (error: any) {
     console.error('Error fetching dashboard data:', error)
     notificationStore.addNotification({

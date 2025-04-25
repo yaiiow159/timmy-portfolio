@@ -50,7 +50,12 @@ app.use(cors({
 
 app.options('*', cors());
 
-app.use(json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(json({ 
+  limit: '10mb',
+  type: ['application/json', 'text/plain'],
+  charset: 'utf-8'
+}));
 
 app.use(helmet({
   contentSecurityPolicy: {

@@ -290,12 +290,14 @@
   },
   "editor": {
     "enterTitle": "請輸入標題",
-    "titleLabel": "文章標題",
-    "tagsLabel": "文章標籤",
-    "contentLabel": "文章內容",
+    "titleLabel": "標題",
+    "tagsLabel": "標籤",
+    "contentLabel": "內容",
     "addTag": "新增標籤",
     "add": "新增",
-    "contentPlaceholder": "開始寫作...",
+    "titleRequired": "請輸入文章標題",
+    "contentRequired": "請輸入文章內容",
+    "contentPlaceholder": "請輸入文章內容...",
     "uploadImage": "上傳圖片",
     "imageUploading": "圖片上傳中...",
     "imageUploadError": "圖片上傳失敗",
@@ -326,7 +328,11 @@
     "alignJustify": "兩端對齊",
     "blockquote": "引用",
     "codeBlock": "程式碼區塊",
-    "clean": "清除格式"
+    "clean": "清除格式",
+    "coverImage": "封面圖片",
+    "dragImageHere": "拖曳圖片至此處",
+    "selectImage": "選擇圖片",
+    "removeImage": "移除圖片"
   },
   "blogPost": {
     "readingTime": "閱讀時間",
@@ -346,10 +352,10 @@
     "deletePost": "刪除文章"
   },
   "validation": {
-    "required": "此欄位為必填",
+    "required": "標題和內容為必填欄位",
     "email": "請輸入有效的電子郵件地址",
-    "minLength": "最少需要 {min} 個字元",
-    "maxLength": "最多只能有 {max} 個字元",
+    "minLength": "至少需要 {min} 個字元",
+    "maxLength": "不能超過 {max} 個字元",
     "passwordMatch": "密碼不一致",
     "url": "請輸入有效的網址"
   }

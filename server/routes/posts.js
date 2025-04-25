@@ -5,6 +5,12 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// 設定 Prisma 的編碼
+prisma.$use(async (params, next) => {
+  const result = await next(params);
+  return result;
+});
+
 // @route   GET api/posts
 // @desc    Get all posts with pagination
 // @access  Public
@@ -98,8 +104,11 @@ router.post('/', auth, async (req, res) => {
     
     res.json(post);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error creating post:', err);
+    res.status(500).json({ 
+      error: 'Server Error',
+      message: err.message 
+    });
   }
 });
 
