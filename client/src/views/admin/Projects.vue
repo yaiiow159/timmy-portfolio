@@ -557,7 +557,21 @@ async function saveProject() {
         duration: 5000
       })
     } else {
-      await api.post('/projects', currentProject.value, {
+      const response = await api.post('/projects', currentProject.value, {
+        headers: {
+          'x-auth-token': authStore.token as string
+        }
+      })
+      
+      // 創建活動記錄
+      await api.post('/activities', {
+        type: 'PROJECT_ADDED',
+        title: '添加了新專案',
+        description: `《${currentProject.value.title}》`,
+        userName: authStore.user?.name ?? 'Anonymous',
+        targetId: response.data.id,
+        targetType: 'project'
+      }, {
         headers: {
           'x-auth-token': authStore.token as string
         }
@@ -624,7 +638,7 @@ async function deleteProject() {
 
 function handleImageError(event: Event) {
   const img = event.target as HTMLImageElement
-  img.src = '/placeholder-image.png' // 替換為預設圖片
+  img.src = '/placeholder-image.png' 
 }
 
 function previewImage(imageUrl: string) {

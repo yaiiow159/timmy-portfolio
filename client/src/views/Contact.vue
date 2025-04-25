@@ -41,7 +41,7 @@ onMounted(() => {
 
 async function submitForm() {
   if (!contactForm.value.name || !contactForm.value.email || !contactForm.value.message) {
-    formError.value = t('contact.requiredFields') || 'Please fill in all required fields'
+    formError.value = t('contact.requiredFields') || '請填寫所有必填欄位'
     return
   }
   
@@ -56,7 +56,7 @@ async function submitForm() {
       message: contactForm.value.message
     })
     
-    console.log('Form submitted successfully:', response)
+    console.log('表單提交成功:', response)
     
     contactForm.value = {
       name: '',
@@ -70,8 +70,8 @@ async function submitForm() {
       formSuccess.value = false
     }, 5000)
   } catch (error) {
-    console.error('Error submitting form:', error)
-    formError.value = t('contact.sendError') || 'Failed to send message. Please try again.'
+    console.error('提交表單時出錯:', error)
+    formError.value = t('contact.sendError') || '發送失敗，請稍後再試'
   } finally {
     isSubmitting.value = false
   }
@@ -118,7 +118,7 @@ async function submitForm() {
                   />
                 </div>
               </div>
-                
+              
               <div>
                 <label for="subject" class="block text-sm font-medium text-text-secondary mb-1">
                   {{ t('contact.subject') }}
@@ -149,7 +149,7 @@ async function submitForm() {
               </div>
               
               <div v-if="formSuccess" class="bg-green-900/20 border border-green-500 text-green-500 px-4 py-3 rounded-lg">
-                Your message has been sent successfully! I'll get back to you as soon as possible.
+                {{ t('contact.sendSuccess') || '訊息已成功發送！我會盡快回覆您。' }}
               </div>
               
               <div>
@@ -158,7 +158,7 @@ async function submitForm() {
                   class="w-full px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="isSubmitting"
                 >
-                  <span v-if="isSubmitting">Sending...</span>
+                  <span v-if="isSubmitting">{{ t('contact.sending') || '發送中...' }}</span>
                   <span v-else>{{ t('contact.send') }}</span>
                 </button>
               </div>
@@ -168,7 +168,7 @@ async function submitForm() {
         
         <div class="contact-info">
           <div class="bg-secondary rounded-lg p-6 shadow-lg mb-8">
-            <h3 class="text-xl font-semibold mb-6 text-accent">Contact Information</h3>
+            <h3 class="text-xl font-semibold mb-6 text-accent">{{ t('contact.info') || '聯絡資訊' }}</h3>
             <div class="space-y-6">
               <div class="flex items-start gap-4">
                 <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
@@ -178,7 +178,7 @@ async function submitForm() {
                 </div>
                 <div>
                   <h4 class="font-medium text-text-primary mb-1">{{ t('contact.emailAddress') }}</h4>
-                  <a href="mailto:timmy@example.com" class="text-text-secondary hover:text-accent transition-colors">
+                  <a href="mailto:examyou076@gmail.com" class="text-text-secondary hover:text-accent transition-colors">
                     examyou076@gmail.com
                   </a>
                 </div>
@@ -192,7 +192,7 @@ async function submitForm() {
                 </div>
                 <div>
                   <h4 class="font-medium text-text-primary mb-1">{{ t('contact.phone') }}</h4>
-                  <a href="tel:+886123456789" class="text-text-secondary hover:text-accent transition-colors">
+                  <a href="tel:+886920778600" class="text-text-secondary hover:text-accent transition-colors">
                     +886 092 077 8600
                   </a>
                 </div>
@@ -216,7 +216,7 @@ async function submitForm() {
           </div>
           
           <div class="bg-secondary rounded-lg p-6 shadow-lg">
-            <h3 class="text-xl font-semibold mb-6 text-accent">Follow Me</h3>
+            <h3 class="text-xl font-semibold mb-6 text-accent">{{ t('contact.social') || '社群媒體' }}</h3>
             <div class="flex flex-wrap gap-4">
               <a href="#" class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center text-accent hover:bg-accent hover:text-white transition-colors" aria-label="GitHub">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

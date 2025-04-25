@@ -62,48 +62,10 @@
           <div v-html="renderedContent"></div>
         </div>
         
-        <div class="mt-12 border-t border-secondary dark:border-secondary-light pt-8">
-          <h2 class="text-2xl font-bold mb-6">{{ t('blog.comments') }} ({{ post.comments.length }})</h2>
+        <div class="max-w-4xl mx-auto mt-12">
+          <h3 class="text-xl font-semibold mb-4">{{ t('blog.comments') }}</h3>
           
-          <div v-if="post.comments.length > 0" class="space-y-6 mb-8">
-            <div 
-              v-for="comment in post.comments" 
-              :key="comment.id"
-              class="bg-secondary dark:bg-secondary-light p-4 rounded-lg"
-            >
-              <div class="flex items-start justify-between mb-2">
-                <div>
-                  <h4 class="font-semibold">{{ comment.name }}</h4>
-                  <p class="text-sm text-text-secondary dark:text-text-secondary-light">
-                    {{ new Date(comment.date).toLocaleDateString() }}
-                  </p>
-                </div>
-                <div class="flex space-x-2">
-                  <button class="text-text-secondary dark:text-text-secondary-light hover:text-accent dark:hover:text-accent-light">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                    </svg>
-                  </button>
-                  <button class="text-text-secondary dark:text-text-secondary-light hover:text-accent dark:hover:text-accent-light">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <p>{{ comment.content }}</p>
-            </div>
-          </div>
-          <div v-else class="text-center py-8 text-text-secondary dark:text-text-secondary-light">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <p class="text-lg">{{ t('blog.noComments') }}</p>
-            <p>{{ t('blog.beFirstToComment') }}</p>
-          </div>
-          
-          <div class="mt-8">
-            <h3 class="text-xl font-semibold mb-4">{{ t('blog.leaveComment') }}</h3>
+          <div class="bg-white dark:bg-secondary p-6 rounded-lg shadow-sm">
             <form @submit.prevent="submitComment" class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -224,11 +186,13 @@ import { marked } from 'marked'
 import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
 import gsap from 'gsap'
+import { useNotificationStore } from '../store/notificationStore'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const blogStore = useBlogStore()
+const notificationStore = useNotificationStore()
 
 const post = ref<BlogPost | null>(null)
 const isLoading = ref(true)
@@ -306,11 +270,24 @@ async function submitComment() {
       content: ''
     }
     
+    notificationStore.addNotification({
+      type: 'success',
+      message: t('blog.commentSuccess'),
+      duration: 3000
+    })
+    
     const updatedPost = await blogStore.fetchPostById(post.value.id)
-    post.value = updatedPost
-  } catch (error) {
+    if (updatedPost) {
+      post.value = updatedPost
+    }
+  } catch (error: any) {
     console.error('Error submitting comment:', error)
-    alert(t('blog.commentError'))
+    const errorMessage = error?.message || t('blog.commentError')
+    notificationStore.addNotification({
+      type: 'error',
+      message: errorMessage,
+      duration: 5000
+    })
   } finally {
     isSubmitting.value = false
   }

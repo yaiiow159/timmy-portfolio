@@ -2,7 +2,6 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs/promises');
-const { fileURLToPath } = require('url');
 const auth = require('../middleware/auth');
 const winston = require('winston');
 

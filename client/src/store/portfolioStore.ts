@@ -48,21 +48,6 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       isLoading.value = false
     }
   }
-
-  async function fetchLatestProjects() {
-    isLoading.value = true
-    error.value = null
-      try {
-        const response = await api.get('/projects/latest')
-        projects.value = response.data
-    } catch (err) {
-      console.error('Error fetching latest projects:', err)
-      error.value = 'Failed to load latest projects'
-    } finally {
-      isLoading.value = false
-    }
-  }
-
   async function fetchProjectById(id: string) {
     isLoading.value = true
     error.value = null

@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
 
 await transporter.sendMail({
   from: process.env.EMAIL_USER,
-  to: process.env.EMAIL_RECIPIENT || process.env.EMAIL_USER,
+  to: `${ email }`,
   subject: `新的聯絡訊息 - 來自 ${name}`,
   html: `
     <!DOCTYPE html>

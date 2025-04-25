@@ -1,7 +1,5 @@
 import api from './api'
 import type { BlogPost, Comment } from '../store/blogStore'
-import { useActivityStore } from '@/store/activityStore'
-import { useAuthStore } from '@/store/authStore'
 
 export interface PaginationParams {
   page?: number
@@ -42,18 +40,6 @@ export const blogService = {
         'x-auth-token': token
       }
     })
-    
-    const activityStore = useActivityStore()
-    const authStore = useAuthStore()
-    await activityStore.createActivity({
-      type: 'POST_CREATED',
-      title: '發布了新文章',
-      description: `《${post.title}》`,
-      userName: authStore.user?.name ?? 'Anonymous',
-      targetId: response.data.id,
-      targetType: 'post'
-    })
-    
     return response.data
   },
 
@@ -74,25 +60,24 @@ export const blogService = {
     })
   },
 
-  addComment: async (postId: string, comment: Omit<Comment, 'id' | 'date'>, token: string): Promise<Comment[]> => {
-    const response = await api.post(`/posts/${postId}/comments`, comment, {
-      headers: {
-        'x-auth-token': token
+  addComment: async (postId: string, comment: Omit<Comment, 'id' | 'date'>): Promise<Comment[]> => {
+    try {
+      const response = await api.post(`/posts/${postId}/comments`, {
+        name: comment.name,
+        email: comment.email,
+        content: comment.content,
+        postId: postId
+      })
+      
+      if (!response.data) {
+        throw new Error('No data received from server')
       }
-    })
-    
-    // 記錄活動
-    const activityStore = useActivityStore()
-    await activityStore.createActivity({
-      type: 'COMMENT_ADDED',
-      title: '發表了評論',
-      description: comment.content.substring(0, 50) + (comment.content.length > 50 ? '...' : ''),
-      userName: comment.name,
-      targetId: postId,
-      targetType: 'post'
-    })
-    
-    return response.data
+      
+      return response.data
+    } catch (error) {
+      console.error('Error adding comment:', error)
+      throw error
+    }
   },
 
   uploadImage: async (file: File, token: string): Promise<{ fileName: string; filePath: string }> => {

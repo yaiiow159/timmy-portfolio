@@ -60,7 +60,9 @@
     "commentError": "Failed to submit comment. Please try again later.",
     "createPost": "Create Post",
     "editPost": "Edit Post",
-    "deletePost": "Delete Post"
+    "deletePost": "Delete Post",
+    "commentSuccess": "Comment posted successfully!",
+    "loginToComment": "Please login to leave a comment"
   },
   "portfolio": {
     "title": "Portfolio",
@@ -233,13 +235,23 @@
     "general": {
       "title": "Error",
       "message": "An error occurred, please try again later",
-      "retry": "Retry"
+      "retry": "Retry",
+      "badRequest": "Invalid request",
+      "notFound": "Resource not found",
+      "serverError": "Server error, please try again later",
+      "validationError": "Invalid input data",
+      "tooManyRequests": "Too many requests, please try again later",
+      "offline": "Network connection lost, please check your network settings"
     },
     "auth": {
       "loginFailed": "Login failed",
       "registerFailed": "Registration failed",
       "sessionExpired": "Session expired, please login again",
-      "unauthorized": "Unauthorized access"
+      "unauthorized": "Unauthorized access",
+      "forbidden": "Access forbidden",
+      "loginSuccess": "Login successful",
+      "registerSuccess": "Registration successful",
+      "logoutSuccess": "Logout successful"
     },
     "blog": {
       "createFailed": "Failed to create article",
@@ -259,7 +271,9 @@
     "contact": {
       "sendFailed": "Failed to send message",
       "invalidEmail": "Invalid email address",
-      "messageTooShort": "Message is too short"
+      "messageTooShort": "Message is too short",
+      "social": "Social Media",
+      "info": "Information"
     }
   },
   "activity": {

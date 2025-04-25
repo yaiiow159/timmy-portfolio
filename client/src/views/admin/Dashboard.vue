@@ -117,17 +117,20 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useBlogStore } from '@/store/blogStore'
 import { useActivityStore } from '@/store/activityStore'
+import { useNotificationStore } from '@/store/notificationStore'
+import { useAuthStore } from '@/store/authStore'
 import type { Activity } from '@/types/activity'
+import api from '@/services/api'
 
 const { t } = useI18n()
-const blogStore = useBlogStore()
 const activityStore = useActivityStore()
+const notificationStore = useNotificationStore()
+const authStore = useAuthStore()
 
 const stats = ref({
   posts: 0,
-  projects: 1,
+  projects: 0,
   comments: 0
 })
 
@@ -135,14 +138,26 @@ const recentActivity = ref<Activity[]>([])
 
 onMounted(async () => {
   try {
-    await blogStore.fetchPosts()
-    stats.value.posts = blogStore.posts.length
+    const response = await api.get('/admin/stats', {
+      headers: {
+        'x-auth-token': authStore.token
+      }
+    })
+    stats.value = {
+      posts: response.data.postsCount,
+      projects: response.data.projectsCount,
+      comments: response.data.commentsCount
+    }
     
-    // 獲取活動記錄
-    const response = await activityStore.fetchActivities()
-    recentActivity.value = response.activities.slice(0, 5)
-  } catch (error) {
+    const activityResponse = await activityStore.fetchActivities()
+    recentActivity.value = activityResponse.activities.slice(0, 5)
+  } catch (error: any) {
     console.error('Error fetching dashboard data:', error)
+    notificationStore.addNotification({
+      type: 'error',
+      message: t('errors.general.message'),
+      duration: 5000
+    })
   }
 })
 </script>

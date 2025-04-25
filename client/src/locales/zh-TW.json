@@ -59,7 +59,9 @@
     "commentError": "評論提交失敗，請稍後再試",
     "createPost": "建立文章",
     "editPost": "編輯文章",
-    "deletePost": "刪除文章"
+    "deletePost": "刪除文章",
+    "loginToComment": "請登入後發表評論",
+    "commentSuccess": "評論發表成功！"
   },
   "portfolio": {
     "title": "作品集",
@@ -211,7 +213,9 @@
     "phone": "電話",
     "emailAddress": "電子郵件",
     "requiredFields": "請填寫所有必填欄位",
-    "sendError": "發送失敗，請稍後再試"
+    "sendError": "發送失敗，請稍後再試",
+    "social": "社群媒體",
+    "info": "資訊"
   },
   "footer": {
     "copyright": " 2025 Timmy. 版權所有。",
@@ -224,19 +228,30 @@
     "save": "儲存",
     "delete": "刪除",
     "edit": "編輯",
-    "close": "關閉"
+    "close": "關閉",
+    "login": "登入"
   },
   "errors": {
     "general": {
       "title": "錯誤",
       "message": "發生錯誤，請稍後再試",
-      "retry": "重試"
+      "retry": "重試",
+      "badRequest": "請求無效",
+      "notFound": "找不到資源",
+      "serverError": "伺服器錯誤，請稍後再試",
+      "validationError": "輸入資料無效",
+      "tooManyRequests": "請求過於頻繁，請稍後再試",
+      "offline": "網路連線中斷，請檢查網路設定"
     },
     "auth": {
       "loginFailed": "登入失敗",
       "registerFailed": "註冊失敗",
       "sessionExpired": "登入已過期，請重新登入",
-      "unauthorized": "未授權訪問"
+      "unauthorized": "未授權訪問",
+      "forbidden": "無權限訪問此資源",
+      "loginSuccess": "登入成功",
+      "registerSuccess": "註冊成功",
+      "logoutSuccess": "登出成功"
     },
     "blog": {
       "createFailed": "文章創建失敗",

@@ -35,7 +35,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { type, title, description, userName, targetId, targetType } = req.body;
     

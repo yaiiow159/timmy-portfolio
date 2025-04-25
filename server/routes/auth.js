@@ -11,14 +11,14 @@ const prisma = new PrismaClient();
 // @desc    Register user
 // @access  Public
 router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     let user = await prisma.user.findFirst({
       where: {
         OR: [
           { email },
-          { username }
+          { name }
         ]
       }
     });
@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
 
     user = await prisma.user.create({
       data: {
-        username,
+        name,
         email,
         password: hashedPassword
       }
@@ -117,7 +117,7 @@ router.get('/user', auth, async (req, res) => {
       where: { id: req.user.id },
       select: {
         id: true,
-        username: true,
+        name: true,
         email: true
       }
     });

@@ -60,7 +60,9 @@
     "commentError": "评论提交失败，请稍后再试",
     "createPost": "创建文章",
     "editPost": "编辑文章",
-    "deletePost": "删除文章"
+    "deletePost": "删除文章",
+    "commentSuccess": "评论发表成功！",
+    "loginToComment": "请登录后发表评论"
   },
   "portfolio": {
     "title": "作品集",
@@ -212,7 +214,9 @@
     "phone": "电话",
     "emailAddress": "电子邮件",
     "requiredFields": "请填写所有必填字段",
-    "sendError": "发送失败，请稍后再试"
+    "sendError": "发送失败，请稍后再试",
+    "social": "社交媒体",
+    "info": "信息"
   },
   "footer": {
     "copyright": " 2025 Timmy. 版权所有。",
@@ -310,5 +314,48 @@
     "delete": "删除",
     "edit": "编辑",
     "close": "关闭"
+  },
+  "errors": {
+    "general": {
+      "title": "错误",
+      "message": "发生错误，请稍后再试",
+      "retry": "重试",
+      "badRequest": "请求无效",
+      "notFound": "找不到资源",
+      "serverError": "服务器错误，请稍后再试",
+      "validationError": "输入数据无效",
+      "tooManyRequests": "请求过于频繁，请稍后再试",
+      "offline": "网络连接中断，请检查网络设置"
+    },
+    "auth": {
+      "loginFailed": "登录失败",
+      "registerFailed": "注册失败",
+      "sessionExpired": "登录已过期，请重新登录",
+      "unauthorized": "未授权访问",
+      "forbidden": "无权限访问此资源",
+      "loginSuccess": "登录成功",
+      "registerSuccess": "注册成功",
+      "logoutSuccess": "登出成功"
+    },
+    "blog": {
+      "createFailed": "文章创建失败",
+      "updateFailed": "文章更新失败",
+      "deleteFailed": "文章删除失败",
+      "uploadFailed": "文件上传失败",
+      "invalidFileType": "不支持的文件类型",
+      "fileTooLarge": "文件大小超过限制",
+      "videoUploadFailed": "视频上传失败",
+      "videoProcessingFailed": "视频处理失败"
+    },
+    "portfolio": {
+      "createFailed": "作品创建失败",
+      "updateFailed": "作品更新失败",
+      "deleteFailed": "作品删除失败"
+    },
+    "contact": {
+      "sendFailed": "消息发送失败",
+      "invalidEmail": "无效的电子邮件地址",
+      "messageTooShort": "消息太短"
+    }
   }
 }

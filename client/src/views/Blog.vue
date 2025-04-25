@@ -4,12 +4,8 @@ import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '../store/blogStore'
 import gsap from 'gsap'
 import { blogService } from '../services/blogService'
-import { useAuthStore } from '../store/authStore'
-import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
-const router = useRouter()
-const authStore = useAuthStore()
 
 const searchQuery = ref('')
 const selectedCategory = ref('')
@@ -152,15 +148,6 @@ function selectCategory(category: string) {
         <p class="text-lg text-text-secondary max-w-2xl mx-auto">
           {{ t('blog.subtitle') }}
         </p>
-        <div v-if="authStore.isAuthenticated" class="mt-4">
-          <button
-            @click="router.push('/admin/posts/new')"
-            class="inline-flex items-center px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
-          >
-            <span class="material-icons mr-2">add</span>
-            {{ t('blog.createPost') }}
-          </button>
-        </div>
       </div>
       
       <div class="flex flex-col lg:flex-row gap-8">

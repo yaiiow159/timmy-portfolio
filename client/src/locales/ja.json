@@ -57,10 +57,12 @@
     "postNotFoundMessage": "申し訳ありません。お探しの記事は存在しないか、削除された可能性があります。",
     "noComments": "コメントはまだありません",
     "beFirstToComment": "最初のコメントを残しましょう",
-    "commentError": "コメントの送信に失敗しました。後でもう一度お試しください。",
+    "commentError": "コメントの投稿に失敗しました。後でもう一度お試しください。",
     "createPost": "記事を作成",
     "editPost": "記事を編集",
-    "deletePost": "記事を削除"
+    "deletePost": "記事を削除",
+    "commentSuccess": "コメントを投稿しました！",
+    "loginToComment": "コメントを投稿するにはログインしてください"
   },
   "portfolio": {
     "title": "ポートフォリオ",
@@ -212,7 +214,9 @@
     "emailAddress": "メールアドレス",
     "subject": "件名",
     "requiredFields": "必須項目をすべて入力してください",
-    "sendError": "送信に失敗しました。後でもう一度お試しください。"
+    "sendError": "送信に失敗しました。後でもう一度お試しください。",
+    "social": "ソーシャルメディア",
+    "info": "情報"
   },
   "footer": {
     "copyright": " 2025 Timmy. All Rights Reserved.",
@@ -231,13 +235,23 @@
     "general": {
       "title": "エラー",
       "message": "エラーが発生しました。後でもう一度お試しください",
-      "retry": "再試行"
+      "retry": "再試行",
+      "badRequest": "無効なリクエスト",
+      "notFound": "リソースが見つかりません",
+      "serverError": "サーバーエラー。後でもう一度お試しください",
+      "validationError": "入力データが無効です",
+      "tooManyRequests": "リクエストが多すぎます。後でもう一度お試しください",
+      "offline": "ネットワーク接続が失われました。ネットワーク設定を確認してください"
     },
     "auth": {
       "loginFailed": "ログインに失敗しました",
       "registerFailed": "登録に失敗しました",
-      "sessionExpired": "セッションが切れました。再度ログインしてください",
-      "unauthorized": "権限がありません"
+      "sessionExpired": "セッションが期限切れです。再度ログインしてください",
+      "unauthorized": "未認証のアクセス",
+      "forbidden": "アクセスが禁止されています",
+      "loginSuccess": "ログインに成功しました",
+      "registerSuccess": "登録に成功しました",
+      "logoutSuccess": "ログアウトしました"
     },
     "blog": {
       "createFailed": "記事の作成に失敗しました",

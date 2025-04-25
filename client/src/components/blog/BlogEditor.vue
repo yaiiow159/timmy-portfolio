@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useAuthStore } from '@/store/authStore'
@@ -165,6 +165,7 @@ function onEditorChange({ html }: { html: string }) {
 </template>
 
 <style>
+/* 工具欄基礎樣式 */
 .ql-toolbar {
   background-color: var(--color-secondary);
   border-top-left-radius: 0.5rem;
@@ -174,41 +175,152 @@ function onEditorChange({ html }: { html: string }) {
   border-width: 0 0 2px 0 !important;
 }
 
-.ql-container {
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-  border: none !important;
-  min-height: 400px;
-  background-color: var(--color-primary);
+/* 工具欄按鈕組 */
+.ql-toolbar.ql-snow .ql-formats {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 8px 0 0 !important;
 }
 
-.ql-editor {
-  font-size: 1.1rem;
-  line-height: 1.75;
-  padding: 24px !important;
-  color: var(--color-text-primary);
-}
-
-.ql-editor.ql-blank::before {
-  color: var(--color-text-secondary);
-  font-style: normal;
-  left: 24px;
-  right: 24px;
-}
-
+/* 按鈕基礎樣式 */
 .ql-snow.ql-toolbar button {
-  padding: 6px !important;
-  margin: 2px;
+  height: 28px;
+  width: 28px;
+  padding: 4px !important;
+  margin: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  transition: all 0.2s;
+  background: var(--color-primary);
 }
 
-.ql-snow.ql-toolbar button:hover {
+/* 下拉選單容器 */
+.ql-snow .ql-picker {
+  height: 28px;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 下拉選單標籤 */
+.ql-snow .ql-picker-label {
+  padding: 0 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+/* 字體大小選擇器 */
+.ql-snow .ql-picker.ql-size {
+  width: 98px;
+}
+
+/* 字體選擇器 */
+.ql-snow .ql-picker.ql-font {
+  width: 108px;
+}
+
+/* 標題選擇器 */
+.ql-snow .ql-picker.ql-header {
+  width: 98px;
+}
+
+/* 下拉選單選項 */
+.ql-snow .ql-picker-options {
+  padding: 4px 8px;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  white-space: nowrap;
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
+}
+
+/* 顏色選擇器 */
+.ql-snow .ql-color-picker,
+.ql-snow .ql-background {
+  width: 28px;
+  height: 28px;
+}
+
+.ql-snow .ql-color-picker .ql-picker-label,
+.ql-snow .ql-background .ql-picker-label {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ql-snow .ql-color-picker .ql-picker-options {
+  padding: 3px;
+  width: 152px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.ql-snow .ql-color-picker .ql-picker-item {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 2px;
+  border: 1px solid var(--color-border);
+}
+
+/* 暗色主題 */
+.dark .ql-snow.ql-toolbar {
+  background-color: #2d3748;
+}
+
+.dark .ql-snow.ql-toolbar button,
+.dark .ql-snow .ql-picker-label {
+  background-color: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark .ql-snow .ql-stroke {
+  stroke: #e2e8f0;
+}
+
+.dark .ql-snow .ql-fill {
+  fill: #e2e8f0;
+}
+
+.dark .ql-snow .ql-picker {
+  color: #e2e8f0;
+}
+
+.dark .ql-snow .ql-picker-options {
+  background-color: #1a202c;
+  border-color: #4a5568;
+}
+
+/* 懸停和激活狀態 */
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-picker-label:hover {
   background-color: var(--color-accent-light);
+  color: white;
 }
 
-.ql-snow.ql-toolbar button.ql-active {
+.ql-snow.ql-toolbar button:hover .ql-stroke {
+  stroke: white;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill {
+  fill: white;
+}
+
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-picker-label.ql-active,
+.ql-snow .ql-picker-item.ql-selected {
   background-color: var(--color-accent);
+  color: white;
 }
 
 .ql-snow.ql-toolbar button.ql-active .ql-stroke {
@@ -219,140 +331,66 @@ function onEditorChange({ html }: { html: string }) {
   fill: white;
 }
 
-.dark .ql-snow .ql-stroke {
-  stroke: var(--color-text-primary);
-}
-
-.dark .ql-snow .ql-fill {
-  fill: var(--color-text-primary);
-}
-
-.dark .ql-snow .ql-picker {
-  color: var(--color-text-primary);
-}
-
-.ql-snow .ql-picker-options {
-  background-color: var(--color-secondary);
-  border-radius: 0.5rem;
-  border-color: var(--color-border);
-  padding: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.ql-snow .ql-picker-label {
-  border-color: var(--color-border);
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.ql-toolbar.ql-snow .ql-formats {
-  border-right: 1px solid var(--color-border);
-  margin-right: 8px;
-  padding-right: 8px;
-}
-
-.ql-toolbar.ql-snow .ql-formats:last-child {
-  border-right: none;
-}
-
-.ql-snow.ql-toolbar button:hover .ql-stroke {
-  stroke: var(--color-accent);
-}
-
-.ql-snow.ql-toolbar button:hover .ql-fill {
-  fill: var(--color-accent);
-}
-
-.ql-snow .ql-picker-item {
-  color: var(--color-text-primary);
-  padding: 4px 8px;
-}
-
-.ql-snow .ql-picker-item:hover {
-  color: var(--color-accent);
-  background-color: var(--color-accent-light);
-  border-radius: 4px;
-}
-
-.ql-snow .ql-picker-item.ql-selected {
-  color: var(--color-accent);
-}
-
-.ql-snow .ql-tooltip {
-  background-color: var(--color-secondary);
+/* 編輯器容器 */
+.ql-container.ql-snow {
   border: 1px solid var(--color-border);
-  color: var(--color-text-primary);
-  border-radius: 0.5rem;
-  padding: 8px 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  background-color: var(--color-primary);
 }
 
-.ql-snow .ql-tooltip input[type=text] {
+.dark .ql-container.ql-snow {
+  background-color: #1a202c;
+  border-color: #4a5568;
+}
+
+/* 編輯區域 */
+.ql-editor {
+  min-height: 400px;
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: var(--color-text-primary);
+  padding: 24px !important;
+}
+
+.dark .ql-editor {
+  color: #e2e8f0;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--color-text-secondary);
+  font-style: normal;
+  left: 24px;
+  right: 24px;
+}
+
+/* 工具提示 */
+.ql-tooltip {
   background-color: var(--color-primary);
   border: 1px solid var(--color-border);
-  color: var(--color-text-primary);
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .ql-tooltip {
+  background-color: #1a202c;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.ql-tooltip input[type="text"] {
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 4px 8px;
   margin: 0 8px;
-}
-
-.ql-snow .ql-tooltip input[type=text]:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent-light);
-}
-
-.ql-snow.ql-toolbar button + button {
-  margin-left: 4px;
-}
-
-.ql-snow .ql-picker.ql-header {
-  width: auto;
-  min-width: 120px;
-}
-
-.ql-snow .ql-picker.ql-size {
-  width: auto;
-  min-width: 100px;
-}
-
-.ql-snow .ql-color-picker .ql-picker-label {
-  padding: 4px;
-}
-
-.ql-snow .ql-color-picker .ql-picker-options {
-  padding: 8px;
-  width: 192px;
-}
-
-.ql-snow .ql-tooltip[data-mode="link"]::before {
-  content: "輸入連結:";
-  margin-right: 8px;
-}
-
-.ql-editor {
+  background-color: var(--color-primary);
   color: var(--color-text-primary);
 }
 
-.ql-editor blockquote {
-  border-left: 4px solid var(--color-accent);
-  padding-left: 16px;
-  color: var(--color-text-secondary);
-}
-
-.ql-editor pre.ql-syntax {
-  background-color: var(--color-secondary);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-}
-
-.ql-editor a {
-  color: var(--color-accent);
-  text-decoration: none;
-}
-
-.ql-editor a:hover {
-  text-decoration: underline;
+.dark .ql-tooltip input[type="text"] {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
 }
 </style>

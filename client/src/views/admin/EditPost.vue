@@ -31,6 +31,7 @@ import { useNotificationStore } from '@/store/notificationStore'
 import BlogEditor from '@/components/blog/BlogEditor.vue'
 import type { BlogPost } from '@/store/blogStore'
 import { useAuthStore } from '@/store/authStore'
+import api from '@/services/api'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -51,6 +52,7 @@ const currentPost = ref<Partial<BlogPost>>({
 })
 
 onMounted(async () => {
+
   if (isEditing.value) {
     try {
       isLoading.value = true
@@ -103,7 +105,22 @@ async function handleSave(postData: Partial<BlogPost>) {
         duration: 3000
       })
     } else {
-      await blogStore.createPost(completePostData)
+      const response = await blogStore.createPost(completePostData)
+      
+      // 創建活動記錄
+      await api.post('/activities', {
+        type: 'POST_CREATED',
+        title: '發布了新文章',
+        description: `《${completePostData.title}》`,
+        userName: authStore.user?.name ?? 'Anonymous',
+        targetId: response.id,
+        targetType: 'post'
+      }, {
+        headers: {
+          'x-auth-token': authStore.token as string
+        }
+      })
+      
       notificationStore.addNotification({
         type: 'success',
         message: t('admin.postCreated'),
