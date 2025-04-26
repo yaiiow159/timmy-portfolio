@@ -12,6 +12,7 @@ export interface BlogPost {
   author: string
   tags: string[]
   coverImage?: string
+  coverImagePublicId?: string
   comments: Comment[]
 }
 

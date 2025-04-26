@@ -8,12 +8,13 @@
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
 </div>
 
 ## 📋 Overview
 
-The backend is built with Node.js and Express, using PostgreSQL as the database and Prisma as the ORM. It provides a RESTful API for the portfolio website with robust authentication, data validation, and error handling.
+The backend is built with Node.js and Express, using PostgreSQL as the database and Prisma as the ORM. It provides a RESTful API for the portfolio website with robust authentication, data validation, and error handling. Images are stored and served via Cloudinary for optimized delivery and performance.
 
 ## 🚀 Features
 
@@ -23,7 +24,7 @@ The backend is built with Node.js and Express, using PostgreSQL as the database 
 - 📧 **Email Notifications** - Send emails via SMTP
 - 📊 **Analytics** - Track page views and user engagement
 - 🔍 **Search Functionality** - Full-text search for blog posts
-- 📄 **File Uploads** - Store and serve images and documents
+- 📄 **File Uploads** - Store and serve images and documents via Cloudinary
 - 🌐 **CORS Support** - Secure cross-origin requests
 - 🔒 **Rate Limiting** - Prevent abuse and DDoS attacks
 - 📝 **Logging** - Comprehensive logging for debugging and monitoring
@@ -57,6 +58,9 @@ EMAIL_PORT=587
 EMAIL_SECURE=false
 EMAIL_USER=your_email@example.com
 EMAIL_PASS=your_password
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 3. Set up the database:
@@ -103,7 +107,10 @@ server/
 │   ├── blog.js          # Blog routes
 │   ├── projects.js      # Project routes
 │   ├── contact.js       # Contact form routes
+│   ├── uploads.js       # File upload routes with Cloudinary integration
 │   └── index.js         # Route aggregator
+├── config/              # Configuration files
+│   └── cloudinary.js    # Cloudinary configuration
 ├── scripts/             # Utility scripts
 │   └── init-db.js       # Database initialization
 ├── .env                 # Environment variables
@@ -122,6 +129,8 @@ server/
 - **Bcrypt** - Password hashing
 - **Nodemailer** - Email sending
 - **Multer** - File uploads
+- **Cloudinary** - Cloud image storage and management
+- **Streamifier** - Stream conversion for Cloudinary uploads
 - **Winston** - Logging
 - **Joi** - Request validation
 - **Cors** - CORS middleware
@@ -146,7 +155,9 @@ server/
 | `EMAIL_USER` | SMTP username | For email |
 | `EMAIL_PASS` | SMTP password | For email |
 | `LOG_LEVEL` | Winston log level | No |
-| `UPLOAD_DIR` | File upload directory | No |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Yes |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
 
 ## 🔒 API Security
 
@@ -189,6 +200,8 @@ API documentation is available at `/api-docs` when running the server in develop
 | DELETE | `/api/blog/:id` | Delete blog post | Yes |
 | GET | `/api/projects` | Get all projects | No |
 | POST | `/api/contact` | Send contact message | No |
+| POST | `/api/uploads` | Upload file to Cloudinary | Yes |
+| DELETE | `/api/uploads/:publicId` | Delete file from Cloudinary | Yes |
 
 ## 📝 License
 

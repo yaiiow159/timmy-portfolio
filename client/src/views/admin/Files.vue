@@ -181,11 +181,12 @@ const notificationStore = useNotificationStore()
 const router = useRouter()
 
 interface File {
-  name: string
-  path: string
-  size: number
-  url: string
-  type: string
+  name: string;
+  path: string;
+  size: number;
+  url: string;
+  type: string;
+  publicId?: string;
 }
 
 const files = ref<File[]>([])
@@ -249,11 +250,21 @@ async function deleteFile() {
   
   try {
     isSubmitting.value = true
-    await api.delete(`/files/${encodeURIComponent(fileToDelete.value.path)}`, {
-      headers: {
-        'x-auth-token': authStore.token as string
-      }
-    })
+    
+    if (fileToDelete.value.publicId) {
+      await api.delete(`/uploads/${encodeURIComponent(fileToDelete.value.publicId)}`, {
+        headers: {
+          'x-auth-token': authStore.token as string
+        }
+      })
+    } else {
+      // Fallback to old method
+      await api.delete(`/files/${encodeURIComponent(fileToDelete.value.path)}`, {
+        headers: {
+          'x-auth-token': authStore.token as string
+        }
+      })
+    }
     
     files.value = files.value.filter(f => f.path !== fileToDelete.value?.path)
     notificationStore.addNotification({
@@ -385,4 +396,4 @@ onMounted(() => {
   bottom: 0;
   left: 0;
 }
-</style> 
+</style>

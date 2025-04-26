@@ -29,12 +29,7 @@ export const useActivityStore = defineStore('activity', {
       this.loading = true
       this.error = null
       try {
-        const token = localStorage.getItem('token')
-        
-        const headers = token ? { 'x-auth-token': token } : undefined
-        
         const response = await api.get<ActivityResponse>('/activities', {
-          headers,
           params
         })
         
@@ -60,16 +55,7 @@ export const useActivityStore = defineStore('activity', {
 
     async createActivity(activity: Omit<Activity, 'id' | 'date'>) {
       try {
-        const token = localStorage.getItem('token') // Get token directly from localStorage
-        if (!token) {
-          throw new Error('Authentication required')
-        }
-
-        const response = await api.post<Activity>('/activities', activity, {
-          headers: {
-            'x-auth-token': token
-          }
-        })
+        const response = await api.post<Activity>('/activities', activity)
         return response.data
       } catch (error) {
         this.error = '無法創建活動記錄'

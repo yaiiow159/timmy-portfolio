@@ -63,13 +63,13 @@ function removeTag(tag: string) {
   selectedTags.value = selectedTags.value.filter(t => t !== tag)
 }
 
-async function handleImageUpload(file: File): Promise<string> {
+async function handleImageUpload(file: File): Promise<{ filePath: string; publicId: string }> {
   try {
     const result = await blogService.uploadImage(file, authStore.token as string)
-    return result.filePath
+    return result
   } catch (error) {
     console.error('Error uploading image:', error)
-    return '' // Return empty string instead of null
+    return { filePath: '', publicId: '' } // Return empty values instead of null
   }
 }
 
@@ -108,11 +108,14 @@ async function savePost() {
     }
 
     let coverImageUrl = props.post?.coverImage || ''
+    let coverImagePublicId = props.post?.coverImagePublicId || ''
+    
     if (coverImage.value) {
       try {
         const result = await handleImageUpload(coverImage.value)
         if (result) {
-          coverImageUrl = result
+          coverImageUrl = result.filePath
+          coverImagePublicId = result.publicId
         }
       } catch (error) {
         console.error('Error uploading cover image:', error)
@@ -125,7 +128,8 @@ async function savePost() {
       title: title.value.trim(),
       content: editorContent.value,
       tags: selectedTags.value,
-      coverImage: coverImageUrl
+      coverImage: coverImageUrl,
+      coverImagePublicId: coverImagePublicId
     }
 
     if (!props.isEditing) {
@@ -394,7 +398,6 @@ function onEditorReady(editor: any) {
   height: 100%;
 }
 
-/* 顏色選擇器選項面板 */
 .ql-snow .ql-color-picker.ql-expanded .ql-picker-options {
   position: absolute !important;
   top: 100% !important;
@@ -412,7 +415,6 @@ function onEditorReady(editor: any) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* 顏色選擇器選項 */
 .ql-snow .ql-color-picker .ql-picker-item {
   width: 20px !important;
   height: 20px !important;
@@ -450,7 +452,6 @@ function onEditorReady(editor: any) {
   border-color: #4a5568;
 }
 
-/* 懸停和激活狀態 */
 .ql-snow.ql-toolbar button:hover,
 .ql-snow .ql-picker-label:hover {
   background-color: var(--color-accent-light);
@@ -480,7 +481,6 @@ function onEditorReady(editor: any) {
   fill: white;
 }
 
-/* 編輯器容器 */
 .ql-container.ql-snow {
   position: relative;
   z-index: 30;

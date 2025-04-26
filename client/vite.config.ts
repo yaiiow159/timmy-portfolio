@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// Get environment variables with fallbacks
 const API_URL = process.env.VITE_API_URL || 'http://localhost:5000'
 
 export default defineConfig({

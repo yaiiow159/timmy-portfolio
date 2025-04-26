@@ -7,12 +7,13 @@
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Pinia](https://img.shields.io/badge/Pinia-F7D336?style=for-the-badge&logo=vue.js&logoColor=black)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
 </div>
 
 ## 📋 Overview
 
-The frontend is built with Vue.js 3 and TypeScript, using Vite as the build tool and TailwindCSS for styling. It provides a modern, responsive user interface for the portfolio website with a focus on performance and user experience.
+The frontend is built with Vue.js 3 and TypeScript, using Vite as the build tool and TailwindCSS for styling. It provides a modern, responsive user interface for the portfolio website with a focus on performance and user experience. Images are stored and served via Cloudinary for optimized delivery and performance.
 
 ## 🚀 Features
 
@@ -26,6 +27,7 @@ The frontend is built with Vue.js 3 and TypeScript, using Vite as the build tool
 - 🌙 **Dark Mode** support
 - 🌐 **i18n Support** for multiple languages
 - 🔍 **SEO Optimization** for better discoverability
+- 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
 
 ## 💻 Development
 
@@ -103,6 +105,7 @@ client/
 - **Highlight.js** - Syntax highlighting
 - **Day.js** - Date manipulation library
 - **Vee-Validate** - Form validation
+- **Cloudinary** - Cloud image management
 
 ## 🔧 Configuration
 
@@ -113,6 +116,7 @@ client/
 | `VITE_API_URL` | Backend API URL | http://localhost:5000 |
 | `VITE_ENABLE_ANALYTICS` | Enable analytics | false |
 | `VITE_I18N_LOCALE` | Default locale | en |
+| `VITE_CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name (optional) | - |
 
 ### Customization
 

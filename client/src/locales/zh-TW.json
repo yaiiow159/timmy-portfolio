@@ -363,5 +363,14 @@
     "language": "語言",
     "madeWith": "Made with",
     "developerDescription": "這個網站是用 Vue.js、Nuxt.js 和 Tailwind CSS 開發的"
+  },
+  "common": {
+    "close": "關閉",
+    "back": "返回",
+    "save": "儲存",
+    "cancel": "取消",
+    "confirm": "確認",
+    "success": "成功",
+    "error": "錯誤"
   }
 }

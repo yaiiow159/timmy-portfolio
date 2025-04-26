@@ -80,7 +80,7 @@ export const blogService = {
     }
   },
 
-  uploadImage: async (file: File, token: string): Promise<{ fileName: string; filePath: string }> => {
+  uploadImage: async (file: File, token: string): Promise<{ fileName: string; filePath: string; publicId: string }> => {
     const formData = new FormData()
     formData.append('file', file)
     

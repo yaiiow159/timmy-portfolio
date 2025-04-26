@@ -4,7 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const auth = require('../middleware/auth');
 const prisma = new PrismaClient();
 
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { limit = 10, page = 1 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -14,7 +14,7 @@ router.get('/', auth, async (req, res) => {
         skip,
         take: parseInt(limit),
         orderBy: {
-          createdAt: 'desc'
+          date: 'desc'
         }
       }),
       prisma.activity.count()

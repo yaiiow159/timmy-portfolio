@@ -27,11 +27,11 @@ export const fileService = {
     return response.data
   },
   
-  async deleteFile(filePath: string, token: string) {
-    await api.delete(`/files/${encodeURIComponent(filePath)}`, {
+  async deleteFile(publicId: string, token: string) {
+    await api.delete(`/uploads/${encodeURIComponent(publicId)}`, {
       headers: {
         'x-auth-token': token
       }
     })
   }
-} 
+}

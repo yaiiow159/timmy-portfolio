@@ -14,6 +14,7 @@
     "@tiptap/extension-heading": "^2.11.7",
     "@tiptap/extension-italic": "^2.11.7",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.18.3",
@@ -23,9 +24,11 @@
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.1",
     "pg": "^8.8.0",
+    "streamifier": "^0.1.1",
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/streamifier": "^0.1.2",
     "nodemon": "^3.1.9",
     "prisma": "^5.10.0"
   }

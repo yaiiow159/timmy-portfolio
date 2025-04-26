@@ -9,11 +9,12 @@
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
 </div>
 
 <p align="center">
-A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment and scalability.
+A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment and scalability. Uses Cloudinary for optimized image storage and delivery.
 </p>
 
 ---
@@ -93,6 +94,7 @@ timmy-portfolio/
 - 🌐 **SEO Optimized** - Structured for better search engine visibility
 - 🔄 **Real-time Updates** - Dynamic content updates without page reloads
 - 🌙 **Dark Mode** - Toggle between light and dark themes
+- 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
 
 ---
 
@@ -162,6 +164,9 @@ EMAIL_SECURE=false
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 EMAIL_RECIPIENT=your-email@gmail.com
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 4. Set up database:
@@ -317,6 +322,9 @@ pm2 start server.js --name timmy-portfolio-backend
 | `EMAIL_USER` | SMTP username | For email |
 | `EMAIL_PASS` | SMTP password | For email |
 | `EMAIL_RECIPIENT` | Contact form recipient | For email |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Yes |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
 
 </details>
 

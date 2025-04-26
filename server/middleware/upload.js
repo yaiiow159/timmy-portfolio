@@ -2,36 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const UPLOAD_DIRS = {
-  images: path.join(__dirname, '../../uploads/images'),
-  videos: path.join(__dirname, '../../uploads/videos'),
-  files: path.join(__dirname, '../../uploads/files')
-};
-
-Object.values(UPLOAD_DIRS).forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
-
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    let uploadPath;
-    
-    if (file.mimetype.startsWith('image/')) {
-      uploadPath = UPLOAD_DIRS.images;
-    } else if (file.mimetype.startsWith('video/')) {
-      uploadPath = UPLOAD_DIRS.videos;
-    } else {
-      uploadPath = UPLOAD_DIRS.files;
-    }
-    
-    cb(null, uploadPath);
-  },
-  filename: function(req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`);
-  }
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|webm|pdf|doc|docx|txt|md/;

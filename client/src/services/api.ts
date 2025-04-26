@@ -1,13 +1,10 @@
 import axios from 'axios'
-
 type NotificationType = 'error' | 'success' | 'info' | 'warning'
 
 const baseURL = '/api'
 
-// Create a state to store the current language without relying on Composition API
-let currentLanguage = 'en' // Default language
+let currentLanguage = 'en'
 
-// Function to update the current language - can be called from setup functions
 export function updateApiLanguage(lang: string) {
   currentLanguage = lang
 }
@@ -89,7 +86,21 @@ api.interceptors.response.use(
 )
 
 export function getStaticUrl(path: string): string {
-  return path 
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path
+  }
+  
+  if (path.startsWith('//res.cloudinary.com')) {
+    return `https:${path}`
+  }
+
+  if (path.startsWith('/uploads/') || path.startsWith('uploads/')) {
+    const baseUrl = import.meta.env.VITE_API_URL || ''
+    return `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`
+  }
+
+
+  return path
 }
 
 export default api

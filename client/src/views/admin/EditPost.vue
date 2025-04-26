@@ -115,10 +115,6 @@ async function handleSave(postData: Partial<BlogPost>) {
         userName: authStore.user?.name ?? 'Anonymous',
         targetId: response.id,
         targetType: 'post'
-      }, {
-        headers: {
-          'x-auth-token': authStore.token as string
-        }
       })
       
       notificationStore.addNotification({
