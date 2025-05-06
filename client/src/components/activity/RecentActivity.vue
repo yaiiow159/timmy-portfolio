@@ -69,8 +69,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useActivityStore } from '../../store/activityStore'
-import type { Activity } from '../../types/activity'
+import { useActivityStore } from '@/store/activityStore.ts'
+import type { Activity } from '@/types/activity.ts'
 import IconComponent from '../common/IconComponent.vue'
 import { formatDate } from '@/utils/dateUtils'
 
