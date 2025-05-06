@@ -9,6 +9,8 @@ import {
   createFileURL,
   revokeFileURL
 } from '@/utils/fileUpload.ts'
+import { fileService, type CloudinaryUploadResponse } from '@/services/fileService'
+import { useAuthStore } from '@/store/authStore'
 
 const props = defineProps<{
   accept?: string
@@ -17,10 +19,12 @@ const props = defineProps<{
   maxFiles?: number
   label?: string
   helpText?: string
+  autoUpload?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'upload', files: File[]): void
+  (e: 'uploaded', results: CloudinaryUploadResponse[]): void
   (e: 'error', message: string): void
 }>()
 
@@ -28,7 +32,10 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const dragActive = ref(false)
 const selectedFiles = ref<File[]>([])
 const previewUrls = ref<string[]>([])
+const uploadedFiles = ref<CloudinaryUploadResponse[]>([])
+const uploading = ref(false)
 const error = ref('')
+const authStore = useAuthStore()
 
 const maxSizeBytes = computed(() => props.maxSize || 5 * 1024 * 1024) // 5MB default
 const maxSizeFormatted = computed(() => formatFileSize(maxSizeBytes.value))
@@ -70,7 +77,7 @@ function handleDrop(event: DragEvent) {
   processFiles(files)
 }
 
-function processFiles(files: File[]) {
+async function processFiles(files: File[]) {
   error.value = ''
   
   if (selectedFiles.value.length + files.length > maxFilesCount.value) {
@@ -125,8 +132,39 @@ function processFiles(files: File[]) {
   
   emit('upload', validFiles)
   
+  if (props.autoUpload) {
+    await uploadToCloudinary(validFiles)
+  }
+  
   if (fileInput.value) {
     fileInput.value.value = ''
+  }
+}
+
+async function uploadToCloudinary(files: File[]) {
+  if (!authStore.token) {
+    error.value = 'Authentication required for upload'
+    emit('error', error.value)
+    return
+  }
+  
+  uploading.value = true
+  const results: CloudinaryUploadResponse[] = []
+  
+  try {
+    for (const file of files) {
+      const result = await fileService.uploadFile(file, authStore.token)
+      results.push(result)
+    }
+    
+    uploadedFiles.value = [...uploadedFiles.value, ...results]
+    emit('uploaded', results)
+  } catch (err) {
+    console.error('Upload error:', err)
+    error.value = 'Failed to upload files to Cloudinary'
+    emit('error', error.value)
+  } finally {
+    uploading.value = false
   }
 }
 
@@ -146,11 +184,19 @@ function clearFiles() {
   
   selectedFiles.value = []
   previewUrls.value = []
+  uploadedFiles.value = []
   
   if (fileInput.value) {
     fileInput.value.value = ''
   }
 }
+
+defineExpose({
+  uploadToCloudinary,
+  clearFiles,
+  selectedFiles,
+  uploadedFiles
+})
 </script>
 
 <template>
@@ -204,48 +250,55 @@ function clearFiles() {
         </button>
       </div>
       
-      <ul class="space-y-2">
-        <li 
+      <div class="space-y-2">
+        <div 
           v-for="(file, index) in selectedFiles" 
           :key="index"
-          class="flex items-center bg-primary rounded-lg p-3"
+          class="flex items-center p-2 bg-surface-secondary rounded-lg"
         >
-          <div v-if="isImageFile(file) && previewUrls[index]" class="w-12 h-12 mr-3 flex-shrink-0">
-            <img 
-              :src="previewUrls[index]" 
-              :alt="file.name" 
-              class="w-full h-full object-cover rounded"
-            />
-          </div>
-          
-          <div v-else-if="isVideoFile(file)" class="w-12 h-12 mr-3 flex-shrink-0 bg-gray-700 rounded flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          
-          <div v-else class="w-12 h-12 mr-3 flex-shrink-0 bg-gray-700 rounded flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+          <div class="flex-shrink-0 mr-3">
+            <div v-if="previewUrls[index] && isImageFile(file)" class="w-12 h-12 rounded overflow-hidden bg-surface">
+              <img :src="previewUrls[index]" class="w-full h-full object-cover" alt="Preview" />
+            </div>
+            <div v-else-if="previewUrls[index] && isVideoFile(file)" class="w-12 h-12 rounded overflow-hidden bg-surface flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div v-else class="w-12 h-12 rounded overflow-hidden bg-surface flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
           </div>
           
           <div class="flex-grow min-w-0">
-            <p class="text-text-primary truncate">{{ file.name }}</p>
+            <p class="text-text-primary font-medium truncate">{{ file.name }}</p>
             <p class="text-text-secondary text-xs">{{ formatFileSize(file.size) }}</p>
           </div>
           
           <button 
             @click="removeFile(index)" 
-            class="ml-2 text-text-secondary hover:text-red-500 transition-colors"
+            class="flex-shrink-0 ml-2 p-1 text-text-secondary hover:text-accent transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        </li>
-      </ul>
+        </div>
+      </div>
+      
+      <div v-if="!props.autoUpload && selectedFiles.length > 0" class="mt-4">
+        <button 
+          @click="uploadToCloudinary(selectedFiles)" 
+          class="px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors w-full"
+          :disabled="uploading"
+        >
+          <span v-if="uploading">Uploading...</span>
+          <span v-else>Upload to Cloudinary</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>

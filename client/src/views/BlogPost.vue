@@ -319,7 +319,6 @@ async function submitComment() {
   border-radius: 0.25rem;
 }
 
-/* Blockquote styling */
 .blog-content blockquote {
   border-left: 4px solid var(--accent);
   padding: 0.5rem 0 0.5rem 1.5rem;
@@ -329,7 +328,6 @@ async function submitComment() {
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
-/* Image styling */
 .blog-content img {
   border-radius: 0.5rem;
   max-width: 100%;
@@ -338,7 +336,6 @@ async function submitComment() {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Headings styling */
 .blog-content h1,
 .blog-content h2,
 .blog-content h3,
@@ -369,7 +366,6 @@ async function submitComment() {
   font-size: 1.25rem;
 }
 
-/* List styling */
 .blog-content ul,
 .blog-content ol {
   padding-left: 1.5rem;
@@ -388,7 +384,6 @@ async function submitComment() {
   list-style-type: decimal;
 }
 
-/* Table styling */
 .blog-content table {
   width: 100%;
   border-collapse: collapse;

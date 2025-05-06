@@ -91,13 +91,14 @@ try {
   }
 });
 
-app.use('/uploads', express.static(uploadsDir, {
-  setHeaders: (res, path, stat) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-  }
-}));
+// Remove the static file serving for uploads directory since we're using Cloudinary now
+// app.use('/uploads', express.static(uploadsDir, {
+//   setHeaders: (res, path, stat) => {
+//     res.set('Access-Control-Allow-Origin', '*');
+//     res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+//     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+//   }
+// }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postsRoutes);

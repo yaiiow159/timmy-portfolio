@@ -9,6 +9,7 @@ RUN apk add --no-cache openssl openssl-dev libc6-compat
 COPY server/package*.json ./
 RUN npm install
 RUN npm install -g prisma
+RUN npm install streamifier
 
 # 複製 Prisma 相關文件
 COPY server/prisma ./prisma/
@@ -17,8 +18,8 @@ RUN npx prisma generate
 # 複製所有後端代碼
 COPY server/ ./
 
-# 建立上傳目錄和日誌目錄
-RUN mkdir -p ../uploads/images ../uploads/videos ../uploads/files logs
+# 建立日誌目錄
+RUN mkdir -p logs
 
 # 設定環境變數
 ENV NODE_ENV=production
@@ -32,4 +33,4 @@ RUN chmod +x ./entrypoint.sh
 EXPOSE 5000
 
 # 使用入口點腳本
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

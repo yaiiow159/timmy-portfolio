@@ -36,7 +36,7 @@ async function main() {
       update: {},
       create: {
         email: adminEmail,
-        username: 'timmy',
+        name: 'Timmy',  
         password: hashedPassword,
         role: 'ADMIN'
       },
