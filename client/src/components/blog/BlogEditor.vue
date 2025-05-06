@@ -69,7 +69,7 @@ async function handleImageUpload(file: File): Promise<{ filePath: string; public
     return result
   } catch (error) {
     console.error('Error uploading image:', error)
-    return { filePath: '', publicId: '' } // Return empty values instead of null
+    return { filePath: '', publicId: '' }
   }
 }
 

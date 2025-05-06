@@ -2,7 +2,10 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# 安裝必要的套件
+# 安裝必要的套件和 SSL 庫（Prisma 需要）
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
+# 安裝依賴
 COPY server/package*.json ./
 RUN npm install
 RUN npm install -g prisma
@@ -11,21 +14,22 @@ RUN npm install -g prisma
 COPY server/prisma ./prisma/
 RUN npx prisma generate
 
-# 複製腳本和入口點
-COPY server/scripts ./scripts
-COPY server/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
 # 複製所有後端代碼
 COPY server/ ./
 
-# 建立上傳目錄
-RUN mkdir -p ../uploads/images ../uploads/videos ../uploads/files
+# 建立上傳目錄和日誌目錄
+RUN mkdir -p ../uploads/images ../uploads/videos ../uploads/files logs
 
 # 設定環境變數
 ENV NODE_ENV=production
+ENV PORT=5000
+
+# 複製腳本和入口點
+COPY server/scripts ./scripts
+COPY server/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 EXPOSE 5000
 
-# 使用新的入口點腳本
-CMD ["/app/entrypoint.sh"]
+# 使用入口點腳本
+CMD ["./entrypoint.sh"]

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineExpose } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/store/authStore.ts'
 import { useNotificationStore } from '@/store/notificationStore.ts'
@@ -259,5 +259,18 @@ function previewImage(imageUrl: string) {
 
 onMounted(() => {
   fetchProjects()
+})
+
+// Export the functions to prevent TypeScript unused variable warnings
+defineExpose({
+  openProjectModal,
+  addTechnology,
+  removeTechnology,
+  uploadProjectImage,
+  saveProject,
+  confirmDelete,
+  deleteProject,
+  handleImageError,
+  previewImage
 })
 </script>
