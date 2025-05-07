@@ -17,6 +17,10 @@
 A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment and scalability. Uses Cloudinary for optimized image storage and delivery.
 </p>
 
+<p align="center">
+<i>Last updated: May 8, 2025</i>
+</p>
+
 ---
 
 ## 📋 Table of Contents
@@ -95,6 +99,7 @@ timmy-portfolio/
 - 🔄 **Real-time Updates** - Dynamic content updates without page reloads
 - 🌙 **Dark Mode** - Toggle between light and dark themes
 - 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
+- 🔍 **Full-text Search** - Search functionality for blog posts and projects
 
 ---
 

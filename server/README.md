@@ -12,6 +12,10 @@
 
 </div>
 
+<p align="center">
+<i>Last updated: May 8, 2025</i>
+</p>
+
 ## 📋 Overview
 
 The backend is built with Node.js and Express, using PostgreSQL as the database and Prisma as the ORM. It provides a RESTful API for the portfolio website with robust authentication, data validation, and error handling. Images are stored and served via Cloudinary for optimized delivery and performance.
@@ -28,6 +32,8 @@ The backend is built with Node.js and Express, using PostgreSQL as the database 
 - 🌐 **CORS Support** - Secure cross-origin requests
 - 🔒 **Rate Limiting** - Prevent abuse and DDoS attacks
 - 📝 **Logging** - Comprehensive logging for debugging and monitoring
+- 🔄 **Caching** - Performance optimization with Redis (optional)
+- 🧠 **AI Integration** - Content suggestion and auto-tagging capabilities
 
 ## 💻 Development
 
@@ -136,6 +142,7 @@ server/
 - **Cors** - CORS middleware
 - **Helmet** - Security headers
 - **Express-rate-limit** - Rate limiting
+- **Redis** - Caching (optional)
 
 ## 🔧 Configuration
 
@@ -158,6 +165,7 @@ server/
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes |
 | `CLOUDINARY_API_KEY` | Cloudinary API key | Yes |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
+| `REDIS_URL` | Redis connection string | For caching |
 
 ## 🔒 API Security
 
@@ -199,9 +207,33 @@ API documentation is available at `/api-docs` when running the server in develop
 | PUT | `/api/blog/:id` | Update blog post | Yes |
 | DELETE | `/api/blog/:id` | Delete blog post | Yes |
 | GET | `/api/projects` | Get all projects | No |
+| GET | `/api/projects/:id` | Get project by ID | No |
+| POST | `/api/projects` | Create project | Yes |
+| PUT | `/api/projects/:id` | Update project | Yes |
+| DELETE | `/api/projects/:id` | Delete project | Yes |
 | POST | `/api/contact` | Send contact message | No |
-| POST | `/api/uploads` | Upload file to Cloudinary | Yes |
-| DELETE | `/api/uploads/:publicId` | Delete file from Cloudinary | Yes |
+| POST | `/api/uploads` | Upload file | Yes |
+| GET | `/api/analytics` | Get analytics data | Yes |
+
+## 🚀 Performance Optimization
+
+The backend implements several performance optimizations:
+
+- Database indexing for faster queries
+- Query optimization with Prisma
+- Response caching with Redis (optional)
+- Pagination for large data sets
+- Cloudinary for optimized image delivery
+- Compression middleware
+
+## 📈 Scalability
+
+The application is designed to be scalable:
+
+- Stateless authentication with JWT
+- Containerized with Docker for easy horizontal scaling
+- Database connection pooling
+- Efficient query optimization
 
 ## 📝 License
 

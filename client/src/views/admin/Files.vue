@@ -63,7 +63,7 @@
             v-if="isImageFile(file.path)"
             :src="file.url"
             :alt="file.name"
-            class="w-full h-full object-contain opacity-0 transition-opacity duration-300"
+            class="w-full h-full object-contain transition-opacity duration-300"
             @error="handleImageError"
             @load="handleImageLoad"
             crossorigin="anonymous"
@@ -325,7 +325,6 @@ function handleImageError(event: Event) {
 function handleImageLoad(event: Event) {
   const img = event.target as HTMLImageElement;
   console.log('Image loaded successfully:', img.src);
-  img.classList.remove('opacity-0');
   img.classList.add('opacity-100');
 }
 

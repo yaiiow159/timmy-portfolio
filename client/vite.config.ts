@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-const API_URL = 'http://localhost:5000'
+// Use environment variable if available, otherwise use the backend container name
+const API_URL = process.env.VITE_API_URL || 'http://backend-dev:5000'
 
 export default defineConfig({
   plugins: [vue()],
@@ -19,11 +20,13 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: API_URL,
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false
       },
       '/uploads': {
         target: API_URL,
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false
       }
     },
     allowedHosts: [

@@ -25,7 +25,7 @@ const selectedTags = ref<string[]>(props.post?.tags || [])
 const newTag = ref('')
 const editorContent = ref(props.post?.content || '')
 const coverImage = ref<File | null>(null)
-const coverImagePreview = ref('')
+const coverImagePreview = ref(props.post?.coverImage || '')
 const isDragging = ref(false)
 
 const editorOptions = {
@@ -169,24 +169,24 @@ function onEditorReady(editor: any) {
 <template>
   <div class="bg-secondary dark:bg-secondary-dark rounded-lg p-8 shadow-lg">
     <div class="mb-8">
-      <label class="block text-sm font-medium text-text-secondary dark:text-text-secondary-light mb-2">
+      <label class="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2">
         {{ t('editor.titleLabel') }}
       </label>
       <input
         v-model="title"
         type="text"
         :placeholder="t('editor.enterTitle')"
-        class="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-300 dark:border-gray-700 focus:border-accent dark:focus:border-accent-light outline-none py-2"
+        class="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-300 dark:border-gray-700 focus:border-accent dark:focus:border-accent-light outline-none py-2 text-text-primary dark:text-text-primary-dark"
       />
     </div>
 
     <div class="mb-8">
-      <label class="block text-sm font-medium text-text-secondary dark:text-text-secondary-light mb-2">
+      <label class="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2">
         {{ t('editor.coverImage') }}
       </label>
       <div
         class="relative border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 text-center"
-        :class="{ 'border-accent': isDragging }"
+        :class="{ 'border-accent dark:border-accent-light': isDragging }"
         @dragenter.prevent="isDragging = true"
         @dragleave.prevent="isDragging = false"
         @dragover.prevent
@@ -205,10 +205,10 @@ function onEditorReady(editor: any) {
         />
         
         <div v-if="!coverImagePreview" class="py-8">
-          <div class="text-text-secondary dark:text-text-secondary-light mb-2">
+          <div class="text-text-primary dark:text-text-primary-dark mb-2">
             {{ t('editor.dragImageHere') }}
           </div>
-          <div class="text-sm text-text-secondary dark:text-text-secondary-light">
+          <div class="text-sm text-text-secondary dark:text-text-secondary-dark">
             {{ t('editor.or') }}
           </div>
           <button class="mt-2 px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors">
@@ -235,7 +235,7 @@ function onEditorReady(editor: any) {
     </div>
 
     <div class="mb-8">
-      <label class="block text-sm font-medium text-text-secondary dark:text-text-secondary-light mb-2">
+      <label class="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2">
         {{ t('editor.tagsLabel') }}
       </label>
       <div class="flex flex-wrap gap-2 mb-3">
@@ -254,7 +254,7 @@ function onEditorReady(editor: any) {
           @keyup.enter="addTag"
           type="text"
           :placeholder="t('editor.addTag')"
-          class="flex-1 px-4 py-2 bg-primary dark:bg-primary-dark border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light"
+          class="flex-1 px-4 py-2 bg-primary dark:bg-primary-dark border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light text-text-primary dark:text-text-primary-dark"
         />
         <button
           @click="addTag"
@@ -266,7 +266,7 @@ function onEditorReady(editor: any) {
     </div>
 
     <div class="mb-8">
-      <label class="block text-sm font-medium text-text-secondary dark:text-text-secondary-light mb-2">
+      <label class="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2">
         {{ t('editor.contentLabel') }}
       </label>
       <div class="border-2 border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -278,7 +278,7 @@ function onEditorReady(editor: any) {
           @ready="onEditorReady"
           theme="snow"
           toolbar="full"
-          class="bg-primary dark:bg-primary-dark text-text-primary dark:text-text-primary-light"
+          class="bg-primary dark:bg-primary-dark text-text-primary dark:text-text-primary-dark editor-container"
         />
       </div>
     </div>
@@ -286,7 +286,7 @@ function onEditorReady(editor: any) {
     <div class="flex justify-end gap-3">
       <button
         @click="emit('cancel')"
-        class="px-6 py-2.5 border-2 border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium"
+        class="px-6 py-2.5 border-2 border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium text-text-primary dark:text-text-primary-dark"
       >
         {{ t('common.cancel') }}
       </button>
@@ -332,6 +332,7 @@ function onEditorReady(editor: any) {
   border: 1px solid var(--color-border);
   border-radius: 4px;
   background: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 /* 下拉選單容器 */
@@ -353,6 +354,7 @@ function onEditorReady(editor: any) {
   align-items: center;
   height: 100%;
   background: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 /* 字體大小選擇器 */
@@ -370,183 +372,200 @@ function onEditorReady(editor: any) {
   width: 98px;
 }
 
-/* 下拉選單選項 */
+/* 下拉選單選項容器 */
 .ql-snow .ql-picker-options {
-  padding: 4px 8px;
-  background-color: var(--color-primary);
+  background-color: var(--color-secondary);
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  white-space: nowrap;
-  position: absolute;
-  top: 100%;
-  margin-top: 4px;
-}
-
-/* 顏色選擇器容器 */
-.ql-snow .ql-color-picker,
-.ql-snow .ql-background {
-  position: relative !important;
-  width: 28px;
-  height: 28px;
-}
-
-/* 顏色選擇器標籤 */
-.ql-snow .ql-color-picker .ql-picker-label,
-.ql-snow .ql-background .ql-picker-label {
-  padding: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.ql-snow .ql-color-picker.ql-expanded .ql-picker-options {
-  position: absolute !important;
-  top: 100% !important;
-  left: 0 !important;
-  z-index: 9999 !important;
-  margin-top: 5px;
-  background: var(--color-primary);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  padding: 5px;
-  width: 192px;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  width: 100%;
+  color: var(--color-text-primary);
 }
 
-.ql-snow .ql-color-picker .ql-picker-item {
-  width: 20px !important;
-  height: 20px !important;
-  border: 1px solid var(--color-border);
-  margin: 0;
-  padding: 0;
+/* 下拉選單選項 */
+.ql-snow .ql-picker-item {
+  padding: 4px 8px;
   border-radius: 2px;
+  cursor: pointer;
+  color: var(--color-text-primary);
 }
 
-/* 暗色主題 */
-.dark .ql-snow.ql-toolbar {
-  background-color: #2d3748;
+/* 下拉選單選項懸停 */
+.ql-snow .ql-picker-item:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
-.dark .ql-snow.ql-toolbar button,
-.dark .ql-snow .ql-picker-label {
-  background-color: #1a202c;
-  border-color: #4a5568;
-}
-
-.dark .ql-snow .ql-stroke {
-  stroke: #e2e8f0;
-}
-
-.dark .ql-snow .ql-fill {
-  fill: #e2e8f0;
-}
-
-.dark .ql-snow .ql-picker {
-  color: #e2e8f0;
-}
-
-.dark .ql-snow .ql-picker-options {
-  background-color: #1a202c;
-  border-color: #4a5568;
-}
-
-.ql-snow.ql-toolbar button:hover,
-.ql-snow .ql-picker-label:hover {
-  background-color: var(--color-accent-light);
-  color: white;
-}
-
-.ql-snow.ql-toolbar button:hover .ql-stroke {
-  stroke: white;
-}
-
-.ql-snow.ql-toolbar button:hover .ql-fill {
-  fill: white;
-}
-
-.ql-snow.ql-toolbar button.ql-active,
-.ql-snow .ql-picker-label.ql-active,
-.ql-snow .ql-picker-item.ql-selected {
-  background-color: var(--color-accent);
-  color: white;
-}
-
-.ql-snow.ql-toolbar button.ql-active .ql-stroke {
-  stroke: white;
-}
-
-.ql-snow.ql-toolbar button.ql-active .ql-fill {
-  fill: white;
-}
-
-.ql-container.ql-snow {
-  position: relative;
-  z-index: 30;
-  border: 1px solid var(--color-border);
+/* 編輯器容器 */
+.ql-container {
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  background-color: var(--color-primary);
+  border-color: var(--color-border) !important;
+  border-width: 0 !important;
+  font-family: inherit;
+  font-size: 1rem;
+  height: 300px;
+  overflow-y: auto;
 }
 
-.dark .ql-container.ql-snow {
-  background-color: #1a202c;
-  border-color: #4a5568;
-}
-
-/* 編輯區域 */
+/* 編輯器內容區 */
 .ql-editor {
-  min-height: 400px;
-  font-size: 1.1rem;
-  line-height: 1.75;
+  padding: 16px !important;
+  min-height: 300px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.6;
   color: var(--color-text-primary);
-  padding: 24px !important;
 }
 
-.dark .ql-editor {
-  color: #e2e8f0;
-}
-
+/* 編輯器內容區佔位符 */
 .ql-editor.ql-blank::before {
-  color: var(--color-text-secondary);
   font-style: normal;
-  left: 24px;
-  right: 24px;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  left: 16px;
+  right: 16px;
 }
 
-/* 工具提示 */
-.ql-tooltip {
-  background-color: var(--color-primary);
-  border: 1px solid var(--color-border);
+/* 編輯器內容區塊元素 */
+.ql-editor p, .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6, .ql-editor blockquote, .ql-editor pre {
+  margin-bottom: 1rem;
+}
+
+/* 編輯器標題樣式 */
+.ql-editor h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.ql-editor h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.ql-editor h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.ql-editor h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.ql-editor h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.ql-editor h6 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* 編輯器引用樣式 */
+.ql-editor blockquote {
+  border-left: 4px solid var(--color-accent);
+  padding-left: 16px;
+  color: var(--color-text-secondary);
+}
+
+/* 編輯器代碼塊樣式 */
+.ql-editor pre {
+  background-color: var(--color-primary-dark);
   border-radius: 4px;
   padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: monospace;
+  white-space: pre-wrap;
+  color: var(--color-text-primary-dark);
 }
 
-.dark .ql-tooltip {
-  background-color: #1a202c;
-  border-color: #4a5568;
-  color: #e2e8f0;
+/* 編輯器列表樣式 */
+.ql-editor ol, .ql-editor ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.ql-tooltip input[type="text"] {
-  border: 1px solid var(--color-border);
+.ql-editor li {
+  margin-bottom: 0.5rem;
+}
+
+/* 編輯器圖片樣式 */
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
   border-radius: 4px;
-  padding: 4px 8px;
-  margin: 0 8px;
-  background-color: var(--color-primary);
-  color: var(--color-text-primary);
 }
 
-.dark .ql-tooltip input[type="text"] {
-  background-color: #2d3748;
-  border-color: #4a5568;
-  color: #e2e8f0;
+/* 編輯器連結樣式 */
+.ql-editor a {
+  color: var(--color-accent);
+  text-decoration: none;
 }
 
-/* 新增的圖片上傳相關樣式 */
+.ql-editor a:hover {
+  text-decoration: underline;
+}
+
+/* 編輯器表格樣式 */
+.ql-editor table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.ql-editor th, .ql-editor td {
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.ql-editor th {
+  background-color: var(--color-secondary);
+  font-weight: 600;
+}
+
+/* 懸停效果 */
 .group:hover .group-hover\:opacity-100 {
   opacity: 1;
+}
+
+/* 暗黑模式變數 */
+:root {
+  --color-primary: #ffffff;
+  --color-primary-dark: #1a1a1a;
+  --color-secondary: #f8f9fa;
+  --color-secondary-dark: #2a2a2a;
+  --color-accent: #3b82f6;
+  --color-accent-light: #60a5fa;
+  --color-border: #e2e8f0;
+  --color-text-primary: #1a1a1a;
+  --color-text-primary-dark: #f8f9fa;
+  --color-text-secondary: #4b5563;
+  --color-text-secondary-dark: #9ca3af;
+}
+
+.dark {
+  --color-primary: #1a1a1a;
+  --color-primary-dark: #0f0f0f;
+  --color-secondary: #2a2a2a;
+  --color-secondary-dark: #333333;
+  --color-accent: #3b82f6;
+  --color-accent-light: #60a5fa;
+  --color-border: #4b5563;
+  --color-text-primary: #f8f9fa;
+  --color-text-primary-dark: #ffffff;
+  --color-text-secondary: #9ca3af;
+  --color-text-secondary-dark: #d1d5db;
+}
+
+/* 編輯器容器 */
+.editor-container {
+  color: var(--color-text-primary) !important;
+}
+
+.editor-container .ql-editor {
+  color: var(--color-text-primary) !important;
 }
 </style>

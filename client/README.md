@@ -11,6 +11,10 @@
 
 </div>
 
+<p align="center">
+<i>Last updated: May 8, 2025</i>
+</p>
+
 ## 📋 Overview
 
 The frontend is built with Vue.js 3 and TypeScript, using Vite as the build tool and TailwindCSS for styling. It provides a modern, responsive user interface for the portfolio website with a focus on performance and user experience. Images are stored and served via Cloudinary for optimized delivery and performance.
@@ -28,6 +32,8 @@ The frontend is built with Vue.js 3 and TypeScript, using Vite as the build tool
 - 🌐 **i18n Support** for multiple languages
 - 🔍 **SEO Optimization** for better discoverability
 - 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
+- 🚀 **Performance Optimized** - Lazy loading and code splitting
+- 🧩 **Component Library** - Reusable UI components
 
 ## 💻 Development
 
@@ -149,6 +155,23 @@ npm run preview
 ```
 
 The build output will be in the `dist` directory, which can be deployed to any static hosting service.
+
+## 📱 Responsive Design
+
+The application is fully responsive and optimized for the following breakpoints:
+
+- **Mobile**: < 640px
+- **Tablet**: 640px - 1024px
+- **Desktop**: > 1024px
+
+## 🌐 Browser Support
+
+The application is tested and supported on the following browsers:
+
+- Chrome (latest 2 versions)
+- Firefox (latest 2 versions)
+- Safari (latest 2 versions)
+- Edge (latest 2 versions)
 
 ## 📝 License
 

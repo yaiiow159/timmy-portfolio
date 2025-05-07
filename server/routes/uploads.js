@@ -60,7 +60,6 @@ router.delete('/:publicId', auth, async (req, res) => {
   try {
     const publicId = req.params.publicId;
     
-    // Delete the file from Cloudinary
     const result = await cloudinary.uploader.destroy(publicId);
     
     if (result.result === 'ok') {
