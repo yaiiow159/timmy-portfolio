@@ -22,19 +22,17 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-// Use memory storage instead of disk storage
 const storage = multer.memoryStorage();
 
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 10 * 1024 * 1024
   }
 });
 
 const router = express.Router();
 
-// Helper function to get folder name based on file type
 function getFolderName(mimetype) {
   if (mimetype.startsWith('image/')) {
     return 'images';
@@ -50,17 +48,19 @@ function getFolderName(mimetype) {
 // @access  Private
 router.get('/', auth, async (req, res) => {
   try {
-    // Get files from Cloudinary instead of local storage
+    console.log('Fetching files from Cloudinary...');
+    
     const result = await cloudinary.api.resources({
       type: 'upload',
-      prefix: 'portfolio/',
       max_results: 500
     });
+    
+    console.log(`Found ${result.resources.length} resources in Cloudinary`);
     
     const files = result.resources.map(resource => {
       const pathParts = resource.public_id.split('/');
       const fileName = pathParts[pathParts.length - 1];
-      const folderName = pathParts[pathParts.length - 2];
+      const folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'root';
       
       return {
         name: fileName,
@@ -76,7 +76,21 @@ router.get('/', auth, async (req, res) => {
     res.json(files);
   } catch (error) {
     logger.error('Error fetching files from Cloudinary:', error);
-    res.status(500).json({ message: 'Error fetching files' });
+    console.error('Cloudinary API Error:', error);
+    
+    console.log('Cloudinary Config:', {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY ? '***' : 'undefined',
+      api_secret: process.env.CLOUDINARY_API_SECRET ? '***' : 'undefined'
+    });
+    
+    const errorMessage = error.message || 'Error fetching files';
+    const statusCode = error.http_code || 500;
+    
+    res.status(statusCode).json({ 
+      message: errorMessage,
+      error: process.env.NODE_ENV === 'production' ? undefined : error
+    });
   }
 });
 
@@ -91,7 +105,6 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
 
     const folder = getFolderName(req.file.mimetype);
     
-    // Upload to Cloudinary
     const uploadPromise = new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -132,7 +145,6 @@ router.delete('/:publicId', auth, async (req, res) => {
   try {
     const publicId = req.params.publicId;
     
-    // Delete the file from Cloudinary
     const result = await cloudinary.uploader.destroy(publicId);
     
     if (result.result === 'ok') {

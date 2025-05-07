@@ -31,7 +31,6 @@ export const createExcerpt = (markdown: string, length: number = 150): string =>
     .replace(/\s+/g, ' ') // Replace multiple spaces with single space
     .trim()
   
-  // Create excerpt
   if (plainText.length <= length) {
     return plainText
   }

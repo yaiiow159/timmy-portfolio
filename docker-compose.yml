@@ -31,6 +31,14 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-portfolio}
       - CORS_ORIGIN=http://localhost
       - JWT_SECRET=${JWT_SECRET:-4f3edf4fce6411a3813ad7c933757b424df3f4e00b2a8e78e193a1ff6b217ebd}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME:-dn4rfjyva}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY:-831168614959354}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET:-YOSKTU893-FcGVSFQ6EAKZQK}
+      - EMAIL_HOST=${EMAIL_HOST:-smtp.gmail.com}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_SECURE=${EMAIL_SECURE:-true}
+      - EMAIL_USER=${EMAIL_USER:-examyou076@gmail.com}
+      - EMAIL_PASS=${EMAIL_PASS:-bclr hmql svwx nmwd}
     depends_on:
       - postgres
     networks:

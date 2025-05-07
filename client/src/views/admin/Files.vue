@@ -215,8 +215,10 @@ async function fetchFiles() {
     const response = await api.get<File[]>('/files', {
       headers: {
         'x-auth-token': authStore.token
-      }
+      },
+      timeout: 15000
     })
+    
     console.log('Files response:', response.data)
     files.value = Array.isArray(response.data) 
       ? response.data.map((file: File) => ({
@@ -224,13 +226,21 @@ async function fetchFiles() {
           url: getStaticUrl(file.url)
         }))
       : []
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching files:', error)
+    
+    if (error.response) {
+      console.error('Error response data:', error.response.data)
+      console.error('Error response status:', error.response.status)
+    }
+    
     notificationStore.addNotification({
       type: 'error',
       message: t('admin.fetchFilesError'),
       duration: 5000
     })
+    
+    files.value = []
   } finally {
     isLoading.value = false
   }
