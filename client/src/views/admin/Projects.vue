@@ -65,7 +65,10 @@
     <div v-if="showProjectModal" class="modal-overlay" @click.self="showProjectModal = false">
       <div class="modal-container">
         <div class="modal-header">
-          <h2>{{ isEditing ? t('admin.editProject') : t('admin.addProject') }}</h2>
+          <h2>
+            <i class="fas fa-{{ isEditing ? 'edit' : 'plus-circle' }} mr-2"></i>
+            {{ isEditing ? t('admin.editProject') : t('admin.addProject') }}
+          </h2>
           <button @click="showProjectModal = false" class="close-btn">
             <i class="fas fa-times"></i>
           </button>
@@ -73,7 +76,10 @@
         
         <div class="modal-body">
           <div class="form-group">
-            <label for="title">{{ t('admin.projectTitle') }}</label>
+            <label for="title" class="form-label">
+              <i class="fas fa-heading mr-2"></i>
+              {{ t('admin.projectTitle') }}
+            </label>
             <input 
               type="text" 
               id="title" 
@@ -84,7 +90,10 @@
           </div>
           
           <div class="form-group">
-            <label for="description">{{ t('admin.projectDescription') }}</label>
+            <label for="description" class="form-label">
+              <i class="fas fa-align-left mr-2"></i>
+              {{ t('admin.projectDescription') }}
+            </label>
             <textarea 
               id="description" 
               v-model="currentProject.description" 
@@ -95,7 +104,10 @@
           </div>
           
           <div class="form-group">
-            <label>{{ t('admin.technologies') }}</label>
+            <label class="form-label">
+              <i class="fas fa-tags mr-2"></i>
+              {{ t('admin.technologies') }}
+            </label>
             <div class="tech-input-container">
               <input 
                 type="text" 
@@ -104,7 +116,7 @@
                 class="form-input"
                 @keyup.enter="addTechnology"
               />
-              <button @click="addTechnology" class="btn btn-sm btn-primary">
+              <button @click="addTechnology" class="btn btn-sm btn-primary tech-add-btn">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
@@ -116,7 +128,7 @@
                 class="tech-tag"
               >
                 {{ tech }}
-                <button @click="removeTechnology(index)" class="remove-tech">
+                <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
                   <i class="fas fa-times"></i>
                 </button>
               </span>
@@ -124,7 +136,10 @@
           </div>
           
           <div class="form-group">
-            <label for="image">{{ t('admin.projectImage') }}</label>
+            <label for="image" class="form-label">
+              <i class="fas fa-image mr-2"></i>
+              {{ t('admin.projectImage') }}
+            </label>
             <div class="image-upload-container">
               <input 
                 type="file" 
@@ -137,18 +152,31 @@
                 <i class="fas fa-cloud-upload-alt mr-2"></i>
                 {{ t('admin.chooseImage') }}
               </label>
+              <span v-if="isSubmitting" class="ml-2 uploading-indicator">
+                <span class="spinner-sm"></span>
+                {{ t('common.uploading') }}...
+              </span>
             </div>
             
             <div v-if="currentProject.imageUrl" class="image-preview">
-              <img :src="currentProject.imageUrl" alt="Project preview" class="preview-img" />
-              <button @click="currentProject.imageUrl = ''; currentProject.imagePublicId = ''" class="remove-image">
+              <img 
+                :src="currentProject.imageUrl" 
+                alt="Project preview" 
+                class="preview-img" 
+                @error="handleImageError"
+                @load="imageLoaded = true"
+              />
+              <button @click="removeProjectImage" class="remove-image">
                 <i class="fas fa-times"></i>
               </button>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="githubUrl">{{ t('admin.githubUrl') }}</label>
+            <label for="githubUrl" class="form-label">
+              <i class="fab fa-github mr-2"></i>
+              {{ t('admin.githubUrl') }}
+            </label>
             <input 
               type="text" 
               id="githubUrl" 
@@ -159,7 +187,10 @@
           </div>
           
           <div class="form-group">
-            <label for="liveUrl">{{ t('admin.liveUrl') }}</label>
+            <label for="liveUrl" class="form-label">
+              <i class="fas fa-globe mr-2"></i>
+              {{ t('admin.liveUrl') }}
+            </label>
             <input 
               type="text" 
               id="liveUrl" 
@@ -169,10 +200,11 @@
             />
           </div>
           
-          <div class="form-group">
+          <div class="form-group featured-checkbox">
             <label class="checkbox-container">
               <input type="checkbox" v-model="currentProject.featured" />
               <span class="checkmark"></span>
+              <i class="fas fa-star mr-2 featured-icon"></i>
               {{ t('admin.featured') }}
             </label>
           </div>
@@ -180,21 +212,22 @@
         
         <div class="modal-footer">
           <button @click="showProjectModal = false" class="btn btn-secondary">
+            <i class="fas fa-times mr-1"></i>
             {{ t('common.cancel') }}
           </button>
           <button 
             @click="saveProject" 
-            class="btn btn-primary" 
+            class="btn btn-primary save-btn" 
             :disabled="isSubmitting"
           >
-            <span v-if="isSubmitting" class="spinner-sm"></span>
+            <span v-if="isSubmitting" class="spinner-sm mr-1"></span>
+            <i v-else class="fas fa-{{ isEditing ? 'save' : 'plus' }} mr-1"></i>
             {{ isEditing ? t('common.update') : t('common.save') }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 刪除確認模態框 -->
     <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
       <div class="modal-container modal-sm">
         <div class="modal-header">
@@ -271,6 +304,8 @@ const currentProject = ref({
   liveUrl: '',
   featured: false
 })
+
+const imageLoaded = ref(false)
 
 async function fetchProjects() {
   isLoading.value = true
@@ -476,6 +511,18 @@ async function deleteProject() {
 function handleImageError(event: Event) {
   const img = event.target as HTMLImageElement
   img.src = '/placeholder-image.png' 
+  console.error('Failed to load image:', currentProject.value.imageUrl)
+  notificationStore.addNotification({
+    type: 'error',
+    message: t('admin.imageLoadError'),
+    duration: 5000
+  })
+}
+
+function removeProjectImage() {
+  currentProject.value.imageUrl = ''
+  currentProject.value.imagePublicId = ''
+  imageLoaded.value = false
 }
 
 function previewImage(imageUrl: string) {
@@ -496,6 +543,7 @@ defineExpose({
   confirmDelete,
   deleteProject,
   handleImageError,
+  removeProjectImage,
   previewImage
 })
 </script>
@@ -556,7 +604,7 @@ defineExpose({
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  background-color: white;
+  background-color: var(--bg-secondary);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -593,7 +641,7 @@ defineExpose({
 }
 
 .project-description {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 1rem;
   line-height: 1.5;
 }
@@ -606,22 +654,35 @@ defineExpose({
 }
 
 .tech-tag {
-  background-color: #e9ecef;
-  color: #495057;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
   display: flex;
   align-items: center;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .remove-tech {
   background: none;
   border: none;
-  color: #dc3545;
+  color: var(--text-secondary);
   margin-left: 0.25rem;
   cursor: pointer;
   font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.remove-tech:hover {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 .project-actions {
@@ -632,78 +693,196 @@ defineExpose({
 
 .btn {
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s ease;
   border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover::before {
+  opacity: 1;
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+  border-radius: 6px;
 }
 
 .btn-primary {
-  background-color: #3498db;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #2980b9;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 .btn-secondary {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
   color: white;
 }
 
 .btn-secondary:hover {
-  background-color: #5a6268;
+  background: linear-gradient(135deg, #6b7280, #4b5563);
 }
 
 .btn-danger {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #f87171, #ef4444);
   color: white;
 }
 
 .btn-danger:hover {
-  background-color: #c82333;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .btn-edit {
-  background-color: #17a2b8;
+  background: linear-gradient(135deg, #67e8f9, #06b6d4);
   color: white;
 }
 
 .btn-edit:hover {
-  background-color: #138496;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
 }
 
 .btn-delete {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #f87171, #ef4444);
   color: white;
 }
 
 .btn-delete:hover {
-  background-color: #c82333;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .btn-view {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
   color: white;
 }
 
 .btn-view:hover {
-  background-color: #5a6268;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
 .btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+  background: linear-gradient(135deg, #d1d5db, #9ca3af);
+  color: #f3f4f6;
+  box-shadow: none;
+}
+
+.btn:disabled::before {
+  display: none;
+}
+
+.tech-add-btn {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  color: white;
+  border-radius: 6px;
+}
+
+.tech-add-btn:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.file-label::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.file-label:hover::before {
+  opacity: 1;
+}
+
+.file-label:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.remove-image {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-image:hover {
+  background: rgba(239, 68, 68, 0.8);
 }
 
 .no-projects {
@@ -730,13 +909,25 @@ defineExpose({
 }
 
 .modal-container {
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: 8px;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: modal-appear 0.3s ease-out;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-sm {
@@ -744,63 +935,73 @@ defineExpose({
 }
 
 .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--bg-secondary);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  background-color: var(--bg-secondary);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .modal-header h2 {
-  font-size: 1.25rem;
-  font-weight: bold;
   margin: 0;
-}
-
-.close-btn {
-  background: none;
-  border: none;
   font-size: 1.25rem;
-  cursor: pointer;
-  color: #6c757d;
-}
-
-.close-btn:hover {
-  color: #343a40;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
 }
 
 .modal-body {
-  padding: 1rem;
+  padding: 1.5rem;
+  color: var(--text-primary);
 }
 
 .modal-footer {
-  padding: 1rem;
-  border-top: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--bg-secondary);
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  background-color: var(--bg-primary);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.form-group label {
-  display: block;
+.form-label {
+  display: flex;
+  align-items: center;
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
 }
 
 .form-input, .form-textarea {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
+  padding: 0.75rem;
+  border: 1px solid var(--bg-secondary);
+  border-radius: 6px;
   font-size: 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
 }
 
 .form-textarea {
   resize: vertical;
+  min-height: 100px;
 }
 
 .tech-input-container {
@@ -813,21 +1014,80 @@ defineExpose({
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.tech-tag {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.tech-tag:hover {
+  background-color: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.remove-tech {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  margin-left: 0.5rem;
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.remove-tech:hover {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 .checkbox-container {
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.checkbox-container:hover {
+  background-color: var(--bg-secondary);
 }
 
 .checkbox-container input {
   margin-right: 0.5rem;
+  width: 18px;
+  height: 18px;
+}
+
+.featured-checkbox {
+  margin-top: 1rem;
+}
+
+.featured-icon {
+  color: #ffc107;
 }
 
 .image-upload-container {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .file-input {
@@ -835,48 +1095,97 @@ defineExpose({
 }
 
 .file-label {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.5rem 1rem;
-  background-color: #e9ecef;
-  color: #495057;
-  border-radius: 4px;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  color: white;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.file-label::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.file-label:hover::before {
+  opacity: 1;
 }
 
 .file-label:hover {
-  background-color: #dde2e6;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 .image-preview {
   position: relative;
   display: inline-block;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  max-width: 100%;
+  border: 2px solid var(--bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.image-preview:hover {
+  transform: scale(1.02);
 }
 
 .preview-img {
   max-width: 100%;
   max-height: 200px;
-  border-radius: 4px;
+  display: block;
+  object-fit: contain;
+  background-color: var(--bg-secondary);
 }
 
 .remove-image {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: rgba(220, 53, 69, 0.8);
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
   color: white;
-  border: none;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .remove-image:hover {
-  background-color: rgba(220, 53, 69, 1);
+  background: rgba(239, 68, 68, 0.8);
+}
+
+.save-btn {
+  min-width: 100px;
+}
+
+:root {
+  --border-color: rgba(125, 125, 125, 0.2);
+  --accent-light: rgba(var(--accent-rgb), 0.1);
+  --accent-rgb: 59, 130, 246;
+}
+
+.dark-mode {
+  --border-color: rgba(125, 125, 125, 0.3);
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useAuthStore } from '@/store/authStore'
@@ -148,14 +148,28 @@ function onEditorChange({ html }: { html: string }) {
   editorContent.value = html
 }
 
+let observer: MutationObserver | null = null
+
 function onEditorReady(editor: any) {
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList' || mutation.type === 'characterData') {
-        const content = editor.root.innerHTML
+  if (observer) {
+    observer.disconnect()
+  }
+  
+  let updateTimeout: ReturnType<typeof setTimeout> | null = null
+  const debouncedUpdate = (content: string) => {
+    if (updateTimeout) clearTimeout(updateTimeout)
+    updateTimeout = setTimeout(() => {
+      if (editorContent.value !== content) {
         editorContent.value = content
       }
-    })
+    }, 100)
+  }
+
+  observer = new MutationObserver((mutations) => {
+    if (mutations.length > 0) {
+      const content = editor.root.innerHTML
+      debouncedUpdate(content)
+    }
   })
 
   observer.observe(editor.root, {
@@ -163,6 +177,18 @@ function onEditorReady(editor: any) {
     characterData: true,
     subtree: true
   })
+  
+  const cleanup = () => {
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
+    if (updateTimeout) {
+      clearTimeout(updateTimeout)
+    }
+  }
+  
+  onUnmounted(cleanup)
 }
 </script>
 
@@ -279,6 +305,9 @@ function onEditorReady(editor: any) {
           theme="snow"
           toolbar="full"
           class="bg-primary dark:bg-primary-dark text-text-primary dark:text-text-primary-dark editor-container"
+          :enable-image-resize="true"
+          :enable-image-drop="true"
+          :enable-image-paste="true"
         />
       </div>
     </div>

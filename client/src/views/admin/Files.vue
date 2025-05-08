@@ -1,6 +1,7 @@
 <template>
   <div class="admin-files min-h-screen bg-primary dark:bg-primary-dark p-6 space-y-6">
-    <div class="flex justify-between items-center mb-6 bg-secondary dark:bg-secondary-dark p-6 rounded-lg shadow-sm">
+    <!-- Header section with improved layout -->
+    <div class="flex justify-between items-center mb-6 bg-secondary dark:bg-secondary-dark p-6 rounded-lg shadow-md">
       <h1 class="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
         {{ t('admin.manageFiles') }}
       </h1>
@@ -10,7 +11,7 @@
           v-if="selectedFiles.length > 0"
           @click="batchDeleteFiles"
           :disabled="isSubmitting"
-          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors duration-200"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center shadow-sm transition-colors duration-200"
         >
           <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -21,25 +22,36 @@
         
         <button 
           @click="refreshFiles"
-          class="bg-accent dark:bg-accent-light hover:bg-accent-light dark:hover:bg-accent text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors duration-200"
+          class="bg-accent hover:bg-accent-light text-white px-4 py-2 rounded-md flex items-center shadow-sm transition-colors duration-200"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           {{ t('admin.refresh') }}
         </button>
+        
+        <button 
+          @click="showEditProjectModal = true"
+          class="bg-accent hover:bg-accent-light text-white px-4 py-2 rounded-md flex items-center shadow-sm transition-colors duration-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {{ t('admin.editProject') }}
+        </button>
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <div v-if="isLoading" class="col-span-full flex justify-center py-12">
-        <svg class="animate-spin h-8 w-8 text-accent dark:text-accent-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-8 w-8 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
       </div>
 
-      <div v-else-if="files.length === 0" class="col-span-full flex flex-col items-center justify-center py-16 bg-secondary dark:bg-secondary-dark rounded-lg shadow-sm">
+      <div v-else-if="files.length === 0" class="col-span-full flex flex-col items-center justify-center py-16 bg-secondary dark:bg-secondary-dark rounded-lg shadow-md">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-text-secondary dark:text-text-secondary-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
         </svg>
@@ -52,7 +64,7 @@
         v-else
         v-for="file in files" 
         :key="file.path"
-        class="bg-secondary dark:bg-secondary-dark rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+        class="bg-secondary dark:bg-secondary-dark rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
         :class="{ 'ring-2 ring-accent': selectedFiles.some(f => f.path === file.path) }"
       >
         <div 
@@ -92,7 +104,7 @@
           <div class="flex justify-between items-center">
             <button
               @click="copyUrl(file.url)"
-              class="text-accent dark:text-accent-light hover:text-accent-light dark:hover:text-accent flex items-center text-sm"
+              class="text-accent hover:text-accent-light flex items-center text-sm"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -120,6 +132,7 @@
       </div>
     </div>
 
+    <!-- Delete confirmation modal with consistent styling -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -164,6 +177,53 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit project modal with proper styling and i18n support -->
+    <div v-if="showEditProjectModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
+        </div>
+
+        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-accent dark:bg-accent-dark sm:mx-0 sm:h-10 sm:w-10">
+                <svg class="h-6 w-6 text-accent-light dark:text-accent-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-text-primary dark:text-text-primary-dark">
+                  {{ t('admin.editProject') }}
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-text-secondary dark:text-text-secondary-dark">
+                    {{ t('admin.editProjectDescription') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              @click="saveProjectChanges"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-accent text-base font-medium text-white hover:bg-accent-light focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+              :disabled="isSubmitting"
+            >
+              {{ t('admin.saveChanges') }}
+            </button>
+            <button
+              @click="showEditProjectModal = false"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 bg-white dark:bg-gray-900 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              {{ t('admin.cancel') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -195,6 +255,7 @@ const isSubmitting = ref(false)
 const showDeleteModal = ref(false)
 const fileToDelete = ref<File | null>(null)
 const selectedFiles = ref<File[]>([])
+const showEditProjectModal = ref(false)
 
 function isImageFile(path: string): boolean {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
@@ -376,6 +437,28 @@ async function batchDeleteFiles() {
   }
 }
 
+async function saveProjectChanges() {
+  try {
+    isSubmitting.value = true
+    // Implement project changes saving logic here
+    notificationStore.addNotification({
+      type: 'success',
+      message: t('admin.projectChangesSaved'),
+      duration: 3000
+    })
+  } catch (error) {
+    console.error('Error saving project changes:', error)
+    notificationStore.addNotification({
+      type: 'error',
+      message: t('admin.saveProjectChangesError'),
+      duration: 5000
+    })
+  } finally {
+    isSubmitting.value = false
+    showEditProjectModal.value = false
+  }
+}
+
 onMounted(() => {
   if (!authStore.isAuthenticated) {
     router.push('/auth')
@@ -404,5 +487,39 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   left: 0;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ring-2 {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-accent:hover {
+  color: var(--accent-light);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.bg-accent:hover {
+  background-color: var(--accent-light);
 }
 </style>

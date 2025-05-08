@@ -33,22 +33,46 @@
           />
         </div>
 
-        <select
-          v-model="sortBy"
-          class="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-700 rounded-md bg-secondary dark:bg-secondary-dark text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light focus:border-accent dark:focus:border-accent-light"
-        >
-          <option value="title">{{ t('admin.sortByTitle') }}</option>
-          <option value="date">{{ t('admin.sortByDate') }}</option>
-          <option value="comments">{{ t('admin.sortByComments') }}</option>
-        </select>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-text-secondary dark:text-text-secondary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <select
+            v-model="sortBy"
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-secondary dark:bg-secondary-dark text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light focus:border-accent dark:focus:border-accent-light appearance-none"
+          >
+            <option value="title">{{ t('admin.sortByTitle') }}</option>
+            <option value="date">{{ t('admin.sortByDate') }}</option>
+            <option value="comments">{{ t('admin.sortByComments') }}</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <svg class="h-4 w-4 text-text-secondary dark:text-text-secondary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
 
-        <select
-          v-model="sortOrder"
-          class="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-700 rounded-md bg-secondary dark:bg-secondary-dark text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light focus:border-accent dark:focus:border-accent-light"
-        >
-          <option value="asc">{{ t('admin.ascending') }}</option>
-          <option value="desc">{{ t('admin.descending') }}</option>
-        </select>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-text-secondary dark:text-text-secondary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+          </div>
+          <select
+            v-model="sortOrder"
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-secondary dark:bg-secondary-dark text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light focus:border-accent dark:focus:border-accent-light appearance-none"
+          >
+            <option value="asc">{{ t('admin.ascending') }}</option>
+            <option value="desc">{{ t('admin.descending') }}</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <svg class="h-4 w-4 text-text-secondary dark:text-text-secondary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
 

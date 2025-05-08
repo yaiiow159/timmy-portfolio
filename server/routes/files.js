@@ -138,6 +138,47 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
   }
 });
 
+// @route   DELETE api/files/batch
+// @desc    Delete multiple files from Cloudinary
+// @access  Private
+router.delete('/batch', auth, async (req, res) => {
+  try {
+    const { files } = req.body;
+    
+    if (!Array.isArray(files) || files.length === 0) {
+      return res.status(400).json({ message: 'Invalid files array' });
+    }
+
+    const results = await Promise.allSettled(files.map(async (publicId) => {
+      try {
+        const result = await cloudinary.uploader.destroy(publicId);
+        return { 
+          status: result.result === 'ok' ? 'success' : 'failed',
+          filename: publicId,
+          result
+        };
+      } catch (error) {
+        return { 
+          status: 'failed', 
+          filename: publicId,
+          error: error.message 
+        };
+      }
+    }));
+    
+    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.status === 'success').length;
+    const failCount = files.length - successCount;
+    
+    res.json({
+      message: `Successfully deleted ${successCount} files. Failed to delete ${failCount} files.`,
+      results: results.map(r => r.status === 'fulfilled' ? r.value : { status: 'failed', error: r.reason })
+    });
+  } catch (error) {
+    logger.error('Error batch deleting files from Cloudinary:', error);
+    res.status(500).json({ message: 'Error batch deleting files' });
+  }
+});
+
 // @route   DELETE api/files/:publicId
 // @desc    Delete a file from Cloudinary
 // @access  Private
@@ -155,38 +196,6 @@ router.delete('/:publicId', auth, async (req, res) => {
   } catch (error) {
     logger.error('Error deleting file from Cloudinary:', error);
     res.status(500).json({ message: 'Error deleting file' });
-  }
-});
-
-// @route   DELETE api/files/batch
-// @desc    Delete multiple files from Cloudinary
-// @access  Private
-router.delete('/batch', auth, async (req, res) => {
-  try {
-    const { files } = req.body;
-    
-    if (!Array.isArray(files) || files.length === 0) {
-      return res.status(400).json({ message: 'Invalid files array' });
-    }
-
-    const results = await Promise.allSettled(files.map(async (publicId) => {
-      try {
-        return await cloudinary.uploader.destroy(publicId);
-      } catch (error) {
-        return { error: `Failed to delete ${publicId}: ${error.message}` };
-      }
-    }));
-    
-    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.result === 'ok').length;
-    const failCount = files.length - successCount;
-    
-    res.json({
-      message: `Successfully deleted ${successCount} files. Failed to delete ${failCount} files.`,
-      results
-    });
-  } catch (error) {
-    logger.error('Error batch deleting files from Cloudinary:', error);
-    res.status(500).json({ message: 'Error batch deleting files' });
   }
 });
 
