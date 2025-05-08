@@ -11,8 +11,8 @@ RUN npm install --save-dev @types/node
 COPY client/ ./
 
 # 設定環境變數 - 確保API指向後端服務
-ENV VITE_API_URL=http://localhost:5000/api
-
+ARG VITE_API_URL=http://localhost:5000/api
+ENV VITE_API_URL=${VITE_API_URL}
 
 # 構建前端應用
 RUN npm run build || (echo "Build failed but continuing" && mkdir -p dist)
