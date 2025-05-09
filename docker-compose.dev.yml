@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: frontend-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.dev
+    container_name: backend-dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - ./server/node_modules:/app/node_modules
+      - ./uploads:/app/uploads
+      - ./server/prisma:/app/prisma
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-dev:5432/portfolio?schema=public
+      - CORS_ORIGIN=http://localhost:3000
+      - JWT_SECRET=pK8tQ7zX3vB2nM5cR9fE6hJ1yG4dL0sA
+      - CLOUDINARY_CLOUD_NAME=dl4nfjvva
+      - CLOUDINARY_API_KEY=831168614959354
+      - CLOUDINARY_API_SECRET=Y0SKTUij893-FoSVSFQb6EAK2Ok
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_SECURE=false
+      - EMAIL_USER=examyou076@gmail.com
+      - EMAIL_PASS=fahx rdrh xcur wbul
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=portfolio
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-dev-data:
+    driver: local

@@ -40,8 +40,18 @@ config();
 
 const app = express();
 
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',') 
+  : ['http://localhost:3000'];
+
 app.use(cors({
-  origin: true,
+  origin: function(origin, callback) {
+    if (!origin || corsOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'Accept-Language'],

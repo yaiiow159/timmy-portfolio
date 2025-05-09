@@ -88,8 +88,8 @@ function animateLanguageSkills() {
 
 function downloadResume(language: 'zh' | 'en') {
   const resumeUrl = language === 'zh'
-    ? './public/resume_zh.pdf'
-    : './public/resume_en.pdf'
+    ? '/resume_zh.pdf'
+    : '/resume_en.pdf'
 
   const link = document.createElement('a')
   link.href = resumeUrl
@@ -289,7 +289,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Managed over 30 proxy units, each handling 10,000+ sensors, 10,000+ devices, and 500+ equipment, ensuring real-time data processing and frontend visualization.</span>
+              <span>Managed over 30 proxy units, each handling 10,0000+ sensors, 10,000+ devices, and 500+ equipment, ensuring real-time data processing and frontend visualization.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -306,6 +306,46 @@ function downloadResume(language: 'zh' | 'en') {
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
               <span>Applied Observer and Singleton patterns to decouple modules and implement real-time state propagation.</span>
+            </li>
+          </ul>
+
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">FarEasTone HEMS-Server (Independent Development)</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Developed a residential energy management system with scheduled data processing and Redis-based multi-level caching (by year, month, week, day).</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Designed complete API layers and integrated crontab scheduling to handle time-series IoT data aggregation and statistics.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Implemented efficient data processing pipelines for real-time energy consumption monitoring and analytics.</span>
+            </li>
+          </ul>
+
+          <h4 class="font-semibold mt-4 mb-2 text-text-primary job-detail">Cathay FM-Server Refactoring Project (Architecture & API Design)</h4>
+          <ul class="space-y-2 text-text-secondary">
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Led the transition from a monolithic architecture to a modular, distributed system (Portal Server + multiple FM services).</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Implemented dynamic multi-datasource switching based on different buildings, optimizing database access and improving system performance.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Collaborated with PMs to design system architecture diagrams and refactor legacy functionality for improved scalability and maintainability.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Handled 80M+ annual IoT records, integrating Kafka and local message tables for reliable synchronization and compensation in high-load scenarios.</span>
+            </li>
+            <li class="flex items-start job-detail">
+              <span class="text-accent mr-2">•</span>
+              <span>Resolved real-time synchronization and broadcast performance across multi-building environments using WebSocket.</span>
             </li>
           </ul>
         </div>
