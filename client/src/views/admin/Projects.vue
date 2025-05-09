@@ -18,12 +18,51 @@
     <div v-else-if="projects.length > 0" class="projects-grid">
       <div v-for="project in projects" :key="project.id" class="project-card">
         <div class="project-image">
-          <img 
-            :src="project.imageUrl || '/placeholder-image.png'" 
+          <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel">
+            <div class="carousel-images" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
+              <img 
+                v-for="(imageUrl, index) in project.imageUrls" 
+                :key="`${project.id}-img-${index}`"
+                :src="imageUrl" 
+                :alt="`${project.title} - Image ${index + 1}`"
+                @error="handleImageError"
+                class="w-full h-48 object-cover"
+              />
+            </div>
+            
+            <div v-if="project.imageUrls.length > 1" class="carousel-controls">
+              <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button @click.prevent="nextProjectImage(project.id)" class="carousel-control carousel-next">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              
+              <div class="carousel-indicators">
+                <button 
+                  v-for="(_, index) in project.imageUrls" 
+                  :key="`${project.id}-indicator-${index}`"
+                  @click="setProjectCarouselIndex(project.id, index)"
+                  class="carousel-indicator"
+                  :class="{ active: getProjectCarouselIndex(project.id) === index }"
+                ></button>
+              </div>
+            </div>
+          </div>
+          
+          <img
+            v-else-if="project.imageUrl" 
+            :src="project.imageUrl" 
             :alt="project.title"
             @error="handleImageError"
             class="w-full h-48 object-cover rounded-t-lg"
           />
+          
+          <div v-else class="no-image-placeholder">
+            <i class="fas fa-image"></i>
+            <span>{{ t('admin.noImage') }}</span>
+          </div>
+          
           <div class="featured-badge" v-if="project.featured">
             <i class="fas fa-star mr-1"></i> {{ t('admin.featured') }}
           </div>
@@ -46,7 +85,18 @@
             <button @click="confirmDelete(project)" class="btn btn-delete">
               <i class="fas fa-trash"></i> {{ t('common.delete') }}
             </button>
-            <button v-if="project.imageUrl" @click="previewImage(project.imageUrl)" class="btn btn-view">
+            <button 
+              v-if="project.imageUrls && project.imageUrls.length > 0" 
+              @click="previewImage(project.imageUrls[getProjectCarouselIndex(project.id)])" 
+              class="btn btn-view"
+            >
+              <i class="fas fa-eye"></i> {{ t('admin.viewImage') }}
+            </button>
+            <button 
+              v-else-if="project.imageUrl" 
+              @click="previewImage(project.imageUrl)" 
+              class="btn btn-view"
+            >
               <i class="fas fa-eye"></i> {{ t('admin.viewImage') }}
             </button>
           </div>
@@ -137,8 +187,8 @@
           
           <div class="form-group">
             <label for="image" class="form-label">
-              <i class="fas fa-image mr-2"></i>
-              {{ t('admin.projectImage') }}
+              <i class="fas fa-images mr-2"></i>
+              {{ t('admin.projectImages') }}
             </label>
             <div class="image-upload-container">
               <input 
@@ -147,10 +197,11 @@
                 @change="uploadProjectImage" 
                 accept="image/*"
                 class="file-input"
+                multiple
               />
               <label for="image" class="file-label">
                 <i class="fas fa-cloud-upload-alt mr-2"></i>
-                {{ t('admin.chooseImage') }}
+                {{ t('admin.chooseImages') }}
               </label>
               <span v-if="isSubmitting" class="ml-2 uploading-indicator">
                 <span class="spinner-sm"></span>
@@ -158,7 +209,31 @@
               </span>
             </div>
             
-            <div v-if="currentProject.imageUrl" class="image-preview">
+            <div v-if="currentProject.imageUrls && currentProject.imageUrls.length > 0" class="images-preview">
+              <div v-for="(imageUrl, index) in currentProject.imageUrls" :key="index" class="image-preview-item">
+                <img 
+                  :src="imageUrl" 
+                  alt="Project preview" 
+                  class="preview-img" 
+                  @error="handleImageError"
+                  @load="imageLoaded = true"
+                />
+                <div class="image-actions">
+                  <button @click="removeProjectImage(index)" class="remove-image" title="Remove image">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <button v-if="index > 0" @click="moveImageUp(index)" class="move-image" title="Move up">
+                    <i class="fas fa-arrow-up"></i>
+                  </button>
+                  <button v-if="index < currentProject.imageUrls.length - 1" @click="moveImageDown(index)" class="move-image" title="Move down">
+                    <i class="fas fa-arrow-down"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- For backward compatibility - show single image if using old format -->
+            <div v-else-if="currentProject.imageUrl" class="image-preview">
               <img 
                 :src="currentProject.imageUrl" 
                 alt="Project preview" 
@@ -166,7 +241,7 @@
                 @error="handleImageError"
                 @load="imageLoaded = true"
               />
-              <button @click="removeProjectImage" class="remove-image">
+              <button @click="removeProjectImage(-1)" class="remove-image">
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -200,13 +275,17 @@
             />
           </div>
           
-          <div class="form-group featured-checkbox">
-            <label class="checkbox-container">
-              <input type="checkbox" v-model="currentProject.featured" />
-              <span class="checkmark"></span>
-              <i class="fas fa-star mr-2 featured-icon"></i>
+          <div class="form-group">
+            <label for="featured" class="form-label">
+              <i class="fas fa-star mr-2"></i>
               {{ t('admin.featured') }}
             </label>
+            <input 
+              type="checkbox" 
+              id="featured" 
+              v-model="currentProject.featured" 
+              class="form-checkbox"
+            />
           </div>
         </div>
         
@@ -276,8 +355,10 @@ interface Project {
   title: string
   description: string
   technologies: string[]
+  imageUrls?: string[]
   imageUrl?: string
   imagePublicId?: string
+  imagePublicIds?: string[]
   githubUrl?: string
   liveUrl?: string
   featured: boolean
@@ -298,7 +379,9 @@ const currentProject = ref({
   title: '',
   description: '',
   technologies: [] as string[],
+  imageUrls: [] as string[],
   imageUrl: '',
+  imagePublicIds: [] as string[],
   imagePublicId: '',
   githubUrl: '',
   liveUrl: '',
@@ -306,6 +389,34 @@ const currentProject = ref({
 })
 
 const imageLoaded = ref(false)
+
+const projectCarouselIndices = ref<Record<string, number>>({})
+
+function getProjectCarouselIndex(projectId: string): number {
+  return projectCarouselIndices.value[projectId] || 0;
+}
+
+function setProjectCarouselIndex(projectId: string, index: number): void {
+  projectCarouselIndices.value[projectId] = index;
+}
+
+function nextProjectImage(projectId: string): void {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return;
+  
+  const currentIndex = getProjectCarouselIndex(projectId);
+  const nextIndex = (currentIndex + 1) % project.imageUrls.length;
+  setProjectCarouselIndex(projectId, nextIndex);
+}
+
+function prevProjectImage(projectId: string): void {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return;
+  
+  const currentIndex = getProjectCarouselIndex(projectId);
+  const prevIndex = (currentIndex - 1 + project.imageUrls.length) % project.imageUrls.length;
+  setProjectCarouselIndex(projectId, prevIndex);
+}
 
 async function fetchProjects() {
   isLoading.value = true
@@ -333,11 +444,20 @@ function openProjectModal(project?: Project) {
         title: project.title,
         description: project.description,
         technologies: [...project.technologies],
+        imageUrls: project.imageUrls || [],
         imageUrl: project.imageUrl || '',
+        imagePublicIds: project.imagePublicIds || [],
         imagePublicId: project.imagePublicId || '',
         githubUrl: project.githubUrl || '',
         liveUrl: project.liveUrl || '',
         featured: project.featured
+      }
+      
+      if (!project.imageUrls && project.imageUrl) {
+        currentProject.value.imageUrls = [project.imageUrl];
+        if (project.imagePublicId) {
+          currentProject.value.imagePublicIds = [project.imagePublicId];
+        }
       }
     } else {
       isEditing.value = false
@@ -346,7 +466,9 @@ function openProjectModal(project?: Project) {
         title: '',
         description: '',
         technologies: [],
+        imageUrls: [],
         imageUrl: '',
+        imagePublicIds: [],
         imagePublicId: '',
         githubUrl: '',
         liveUrl: '',
@@ -370,40 +492,126 @@ function removeTechnology(index: number) {
 
 async function uploadProjectImage(event: Event) {
   const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
+  const files = target.files
   
-  if (!file) return
+  if (!files || files.length === 0) return
   
-  try {
-    isSubmitting.value = true
-    
+  isSubmitting.value = true
+  
+  if (!currentProject.value.imageUrls) {
+    currentProject.value.imageUrls = [];
+  }
+  
+  if (!currentProject.value.imagePublicIds) {
+    currentProject.value.imagePublicIds = [];
+  }
+  
+  let uploadedCount = 0;
+  const totalFiles = files.length;
+  
+  const uploadPromises = [];
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     const formData = new FormData()
     formData.append('file', file)
     
-    const response = await api.post('/uploads', formData, {
+    const uploadPromise = api.post('/uploads', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'x-auth-token': authStore.token as string
       }
-    })
+    }).then(response => {
+      currentProject.value.imageUrls.push(response.data.filePath);
+      currentProject.value.imagePublicIds.push(response.data.publicId);
+      
+      if (currentProject.value.imageUrls.length === 1) {
+        currentProject.value.imageUrl = response.data.filePath;
+        currentProject.value.imagePublicId = response.data.publicId;
+      }
+      
+      uploadedCount++;
+      
+      if (uploadedCount === totalFiles) {
+        notificationStore.addNotification({
+          type: 'success',
+          message: files.length > 1 ? t('admin.imagesUploaded') : t('admin.imageUploaded'),
+          duration: 3000
+        });
+      }
+    }).catch(error => {
+      console.error('Error uploading image:', error);
+      notificationStore.addNotification({
+        type: 'error',
+        message: t('admin.imageUploadError'),
+        duration: 5000
+      });
+    });
     
-    currentProject.value.imageUrl = response.data.filePath
-    currentProject.value.imagePublicId = response.data.publicId
-    
-    notificationStore.addNotification({
-      type: 'success',
-      message: t('admin.imageUploaded'),
-      duration: 3000
-    })
-  } catch (error) {
-    console.error('Error uploading project image:', error)
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('admin.imageUploadError'),
-      duration: 5000
-    })
+    uploadPromises.push(uploadPromise);
+  }
+  
+  try {
+    await Promise.all(uploadPromises);
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
+    (event.target as HTMLInputElement).value = '';
+  }
+}
+
+function removeProjectImage(index: number) {
+  if (index === -1) {
+    currentProject.value.imageUrl = '';
+    currentProject.value.imagePublicId = '';
+    currentProject.value.imageUrls = [];
+    currentProject.value.imagePublicIds = [];
+  } else {
+    currentProject.value.imageUrls.splice(index, 1);
+    if (currentProject.value.imagePublicIds && currentProject.value.imagePublicIds.length > index) {
+      currentProject.value.imagePublicIds.splice(index, 1);
+    }
+    
+    if (index === 0 && currentProject.value.imageUrls.length > 0) {
+      currentProject.value.imageUrl = currentProject.value.imageUrls[0];
+      currentProject.value.imagePublicId = currentProject.value.imagePublicIds?.[0] || '';
+    } else if (currentProject.value.imageUrls.length === 0) {
+      currentProject.value.imageUrl = '';
+      currentProject.value.imagePublicId = '';
+    }
+  }
+}
+
+function moveImageUp(index: number) {
+  if (index <= 0 || index >= currentProject.value.imageUrls.length) return;
+  
+  [currentProject.value.imageUrls[index], currentProject.value.imageUrls[index - 1]] =
+  [currentProject.value.imageUrls[index - 1], currentProject.value.imageUrls[index]];
+  
+  if (currentProject.value.imagePublicIds && currentProject.value.imagePublicIds.length > index) {
+    [currentProject.value.imagePublicIds[index], currentProject.value.imagePublicIds[index - 1]] = 
+    [currentProject.value.imagePublicIds[index - 1], currentProject.value.imagePublicIds[index]];
+  }
+  
+  if (index === 1) {
+    currentProject.value.imageUrl = currentProject.value.imageUrls[0];
+    currentProject.value.imagePublicId = currentProject.value.imagePublicIds?.[0] || '';
+  }
+}
+
+function moveImageDown(index: number) {
+  if (index < 0 || index >= currentProject.value.imageUrls.length - 1) return;
+  
+  [currentProject.value.imageUrls[index], currentProject.value.imageUrls[index + 1]] =
+  [currentProject.value.imageUrls[index + 1], currentProject.value.imageUrls[index]];
+  
+  if (currentProject.value.imagePublicIds && currentProject.value.imagePublicIds.length > index + 1) {
+    [currentProject.value.imagePublicIds[index], currentProject.value.imagePublicIds[index + 1]] = 
+    [currentProject.value.imagePublicIds[index + 1], currentProject.value.imagePublicIds[index]];
+  }
+  
+  if (index === 0) {
+    currentProject.value.imageUrl = currentProject.value.imageUrls[0];
+    currentProject.value.imagePublicId = currentProject.value.imagePublicIds?.[0] || '';
   }
 }
 
@@ -439,7 +647,6 @@ async function saveProject() {
         }
       })
       
-      // 創建活動記錄
       await api.post('/activities', {
         type: 'PROJECT_ADDED',
         title: '添加了新專案',
@@ -519,12 +726,6 @@ function handleImageError(event: Event) {
   })
 }
 
-function removeProjectImage() {
-  currentProject.value.imageUrl = ''
-  currentProject.value.imagePublicId = ''
-  imageLoaded.value = false
-}
-
 function previewImage(imageUrl: string) {
   window.open(imageUrl, '_blank')
 }
@@ -533,7 +734,6 @@ onMounted(() => {
   fetchProjects()
 })
 
-// Export the functions to prevent TypeScript unused variable warnings
 defineExpose({
   openProjectModal,
   addTechnology,
@@ -615,19 +815,114 @@ defineExpose({
 
 .project-image {
   position: relative;
-  height: 200px;
+  height: 12rem;
+  overflow: hidden;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
-.featured-badge {
+.project-image-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-images {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease;
+}
+
+.carousel-images img {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.carousel-controls {
   position: absolute;
-  top: 10px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.project-image-carousel:hover .carousel-control {
+  opacity: 1;
+}
+
+.carousel-prev {
+  left: 10px;
+}
+
+.carousel-next {
   right: 10px;
-  background-color: #ffc107;
-  color: #000;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
+}
+
+.carousel-control:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: auto;
+}
+
+.carousel-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.carousel-indicator.active {
+  background-color: white;
+}
+
+.no-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.no-image-placeholder i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .project-content {
@@ -663,21 +958,29 @@ defineExpose({
   align-items: center;
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.tech-tag:hover {
+  background-color: var(--accent-light);
+  border-color: var(--accent);
 }
 
 .remove-tech {
   background: none;
   border: none;
   color: var(--text-secondary);
-  margin-left: 0.25rem;
+  margin-left: 0.5rem;
   cursor: pointer;
   font-size: 0.7rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .remove-tech:hover {
@@ -1130,49 +1433,53 @@ defineExpose({
   background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
-.image-preview {
+.images-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image-preview-item {
   position: relative;
-  display: inline-block;
-  margin-top: 0.75rem;
-  max-width: 100%;
-  border: 2px solid var(--bg-secondary);
+  width: 150px;
+  height: 150px;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.image-preview:hover {
-  transform: scale(1.02);
+.image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.preview-img {
-  max-width: 100%;
-  max-height: 200px;
-  display: block;
-  object-fit: contain;
-  background-color: var(--bg-secondary);
-}
-
-.remove-image {
+.image-actions {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.move-image {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
   border: none;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s;
 }
 
-.remove-image:hover {
-  background: rgba(239, 68, 68, 0.8);
+.move-image:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .save-btn {

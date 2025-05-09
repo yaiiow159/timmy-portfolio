@@ -7,7 +7,8 @@ export interface Project {
   title: string
   description: string
   technologies: string[]
-  imageUrl: string
+  imageUrls?: string[]  // New format: array of image URLs
+  imageUrl?: string     // Old format: single image URL (for backward compatibility)
   liveUrl?: string
   codeUrl?: string
   featured: boolean

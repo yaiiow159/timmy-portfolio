@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { Project } from '@/store/portfolioStore.ts'
+import { ref, onMounted, computed } from 'vue'
 
 const { t } = useI18n()
 
@@ -10,17 +11,95 @@ const props = defineProps<{
 
 const displayTechnologies = props.project.technologies.slice(0, 4)
 const hasMoreTechnologies = props.project.technologies.length > 4
+
+// Handle both old imageUrl and new imageUrls format
+const projectImages = computed(() => {
+  // If project has imageUrls array, use it
+  if (props.project.imageUrls && props.project.imageUrls.length > 0) {
+    return props.project.imageUrls;
+  }
+  // For backward compatibility: if project has imageUrl (old format), create a single-item array
+  else if (props.project.imageUrl) {
+    return [props.project.imageUrl];
+  }
+  // No images
+  return [];
+});
+
+// Carousel functionality
+const currentImageIndex = ref(0)
+const carouselInterval = ref<number | null>(null)
+
+const nextImage = () => {
+  if (projectImages.value.length <= 1) return
+  currentImageIndex.value = (currentImageIndex.value + 1) % projectImages.value.length
+}
+
+const prevImage = () => {
+  if (projectImages.value.length <= 1) return
+  currentImageIndex.value = (currentImageIndex.value - 1 + projectImages.value.length) % projectImages.value.length
+}
+
+const startCarousel = () => {
+  if (projectImages.value.length > 1) {
+    carouselInterval.value = window.setInterval(nextImage, 5000) // Change image every 5 seconds
+  }
+}
+
+const stopCarousel = () => {
+  if (carouselInterval.value) {
+    clearInterval(carouselInterval.value)
+    carouselInterval.value = null
+  }
+}
+
+onMounted(() => {
+  startCarousel()
+})
 </script>
 
 <template>
-  <div class="project-card bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow h-full flex flex-col group">
+  <div class="project-card bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow h-full flex flex-col group"
+       @mouseenter="stopCarousel" 
+       @mouseleave="startCarousel">
     <div class="h-48 bg-gray-700 relative overflow-hidden">
-      <div v-if="project.imageUrl" class="h-full w-full">
-        <img 
-          :src="project.imageUrl" 
-          :alt="project.title" 
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+      <!-- Carousel for multiple images -->
+      <div v-if="projectImages.length > 0" class="h-full w-full relative">
+        <transition-group name="carousel" tag="div" class="h-full w-full">
+          <img 
+            v-for="(imageUrl, index) in projectImages" 
+            :key="imageUrl"
+            v-show="index === currentImageIndex"
+            :src="imageUrl" 
+            :alt="`${project.title} - Image ${index + 1}`" 
+            class="h-full w-full object-cover absolute top-0 left-0 transition-transform duration-500 group-hover:scale-110"
+          />
+        </transition-group>
+        
+        <!-- Carousel controls (only show if there are multiple images) -->
+        <div v-if="projectImages.length > 1" class="absolute inset-0 flex items-center justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button @click.prevent="prevImage" class="bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button @click.prevent="nextImage" class="bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Carousel indicators -->
+        <div v-if="projectImages.length > 1" class="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+          <button 
+            v-for="(_, index) in projectImages" 
+            :key="index"
+            @click="currentImageIndex = index"
+            class="w-2 h-2 rounded-full transition-colors focus:outline-none"
+            :class="index === currentImageIndex ? 'bg-white' : 'bg-white bg-opacity-50'"
+          ></button>
+        </div>
       </div>
       <div v-else class="h-full w-full bg-gray-700 flex items-center justify-center text-gray-500">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,3 +166,15 @@ const hasMoreTechnologies = props.project.technologies.length > 4
     </div>
   </div>
 </template>
+
+<style scoped>
+.carousel-enter-active,
+.carousel-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.carousel-enter-from,
+.carousel-leave-to {
+  opacity: 0;
+}
+</style>

@@ -2,32 +2,25 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# 安裝必要的套件和 SSL 庫（Prisma 需要）
 RUN apk add --no-cache openssl openssl-dev libc6-compat bash
 
-# 安裝依賴
 COPY server/package*.json ./
 RUN npm install
 RUN npm install -g prisma
 RUN npm install streamifier
 
-# 複製 Prisma 相關文件
 COPY server/prisma ./prisma/
 RUN npx prisma generate
 
-# 複製腳本和入口點
 COPY server/scripts ./scripts/
 COPY server/dev-entrypoint.sh ./dev-entrypoint.sh
 RUN chmod +x ./dev-entrypoint.sh
 
-# 設定環境變數
 ENV NODE_ENV=development
 ENV PORT=5000
 
-# 建立日誌和上傳目錄
 RUN mkdir -p logs uploads/images uploads/videos uploads/files
 
 EXPOSE 5000
 
-# 使用開發環境入口點腳本
 ENTRYPOINT ["./dev-entrypoint.sh"]

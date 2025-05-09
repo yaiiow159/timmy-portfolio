@@ -1,18 +1,98 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import gsap from 'gsap'
 import { usePortfolioStore } from '@/store/portfolioStore'
 import { useBlogStore } from '@/store/blogStore'
 
-
 const { t } = useI18n()
 const router = useRouter()
 const portfolioStore = usePortfolioStore()
 const blogStore = useBlogStore()
 const isLoaded = ref(false)
+const projectCarouselIndices = ref<Record<string, number>>({})
+const activeSkillCategory = ref('all')
 
+function getProjectCarouselIndex(projectId: string): number {
+  return projectCarouselIndices.value[projectId] || 0
+}
+
+function setProjectCarouselIndex(projectId: string, index: number): void {
+  projectCarouselIndices.value[projectId] = index
+}
+
+function nextProjectImage(projectId: string): void {
+  const project = portfolioStore.featuredProjects.find(p => p.id === projectId)
+  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return
+  
+  const currentIndex = getProjectCarouselIndex(projectId)
+  const nextIndex = (currentIndex + 1) % project.imageUrls.length
+  setProjectCarouselIndex(projectId, nextIndex)
+}
+
+function prevProjectImage(projectId: string): void {
+  const project = portfolioStore.featuredProjects.find(p => p.id === projectId)
+  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return
+  
+  const currentIndex = getProjectCarouselIndex(projectId)
+  const prevIndex = (currentIndex - 1 + project.imageUrls.length) % project.imageUrls.length
+  setProjectCarouselIndex(projectId, prevIndex)
+}
+
+const skillCategories = [
+  {
+    id: 'frontend',
+    skills: [
+      { name: 'Vue.js', icon: 'devicon-vuejs-plain colored' },
+      { name: 'React', icon: 'devicon-react-original colored' },
+      { name: 'TypeScript', icon: 'devicon-typescript-plain colored' },
+      { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain colored' }
+    ]
+  },
+  {
+    id: 'backend',
+    skills: [
+      { name: 'Java', icon: 'devicon-java-plain colored' },
+      { name: 'Spring Boot', icon: 'devicon-spring-plain colored' },
+      { name: 'Node.js', icon: 'devicon-nodejs-plain colored' },
+      { name: 'Express', icon: 'devicon-express-original' }
+    ]
+  },
+  {
+    id: 'database',
+    skills: [
+      { name: 'MongoDB', icon: 'devicon-mongodb-plain colored' },
+      { name: 'MySQL', icon: 'devicon-mysql-plain colored' },
+      { name: 'PostgreSQL', icon: 'devicon-postgresql-plain colored' }
+    ]
+  },
+  {
+    id: 'devops',
+    skills: [
+      { name: 'AWS', icon: 'devicon-amazonwebservices-original colored' },
+      { name: 'Docker', icon: 'devicon-docker-plain colored' },
+      { name: 'Git', icon: 'devicon-git-plain colored' }
+    ]
+  }
+]
+
+watch(activeSkillCategory, () => {
+  setTimeout(() => {
+    const skillItems = document.querySelectorAll('.skill-item')
+    skillItems.forEach(item => {
+      gsap.set(item, { opacity: 0, y: 20 })
+    })
+    
+    gsap.to('.skill-item', {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      stagger: 0.1,
+      ease: 'power2.out'
+    })
+  }, 50)
+})
 
 onMounted(async () => {
   isLoaded.value = true
@@ -20,8 +100,51 @@ onMounted(async () => {
   try {
     await Promise.all([
       portfolioStore.fetchFeaturedProjects(),
-      blogStore.fetchPosts({ page: 1, limit: 3 })
+      blogStore.fetc
     ])
+    
+    portfolioStore.featuredProjects.forEach(project => {
+      projectCarouselIndices.value[project.id] = 0
+    })
+    
+    gsap.from('.hero-title', {
+      opacity: 0, 
+      y: 30, 
+      duration: 0.8,
+      ease: 'power2.out'
+    })
+    
+    gsap.from('.hero-subtitle', { 
+      opacity: 0, 
+      y: 20, 
+      duration: 0.8,
+      delay: 0.2,
+      ease: 'power2.out'
+    })
+    
+    gsap.from('.hero-cta', { 
+      opacity: 0, 
+      y: 20, 
+      duration: 0.8,
+      delay: 0.4,
+      ease: 'power2.out'
+    })
+    
+    setTimeout(() => {
+      const skillItems = document.querySelectorAll('.skill-item')
+      skillItems.forEach(item => {
+        gsap.set(item, { opacity: 0, y: 20 })
+      })
+      
+      gsap.to('.skill-item', {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        stagger: 0.1,
+        ease: 'power2.out'
+      })
+    }, 500)
+    
   } catch (error) {
     console.error('Error fetching data:', error)
   }
@@ -52,6 +175,12 @@ onMounted(async () => {
     duration: 0.6,
     ease: 'power3.out'
   }, '-=0.3')
+  .from('.skill-category-tabs', {
+    y: 20,
+    opacity: 0,
+    duration: 0.5,
+    ease: 'power2.out'
+  }, '-=0.2')
   .from('.skill-item', {
     y: 20,
     opacity: 0,
@@ -60,25 +189,6 @@ onMounted(async () => {
     ease: 'power2.out'
   }, '-=0.2')
 })
-
-const skills = [
-  { name: 'Java', icon: 'devicon-java-plain' },
-  { name: 'Spring Boot', icon: 'devicon-spring-plain' },
-  { name: 'Vue.js', icon: 'devicon-vuejs-plain' },
-  { name: 'JavaScript', icon: 'devicon-javascript-plain' },
-  { name: 'TypeScript', icon: 'devicon-typescript-plain' },
-  { name: 'Node.js', icon: 'devicon-nodejs-plain' },
-  { name: 'MongoDB', icon: 'devicon-mongodb-plain' },
-  { name: 'MySQL', icon: 'devicon-mysql-plain' },
-  { name: 'AWS', icon: 'devicon-amazonwebservices-plain' },
-  { name: 'Google Cloud', icon: 'devicon-googlecloud-plain' },
-  { name: 'Git', icon: 'devicon-git-plain' },
-  { name: 'Linux', icon: 'devicon-linux-plain' },
-  { name: 'Docker', icon: 'devicon-docker-plain' },
-  { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain' },
-  { name: 'HTML', icon: 'devicon-html5-plain' },
-  { name: 'CSS', icon: 'devicon-css3-plain' }
-]
 
 function navigateTo(path: string) {
   router.push(path)
@@ -123,20 +233,50 @@ function navigateTo(path: string) {
     
     <section class="py-16 bg-secondary">
       <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12 text-text-primary">
+        <h2 class="text-3xl font-bold text-center mb-8 text-text-primary">
           {{ t('resume.skills') }}
         </h2>
-        <div class="grid grid-cols-3 md:grid-cols-9 gap-6 justify-items-center">
-          <div 
-            v-for="(skill, index) in skills" 
-            :key="index"
-            class="skill-item flex flex-col items-center"
+        
+        <!-- Skill Category Tabs -->
+        <div class="flex flex-wrap justify-center gap-4 mb-10">
+          <button 
+            v-for="category in ['all', 'frontend', 'backend', 'database', 'devops']" 
+            :key="category"
+            @click="activeSkillCategory = category"
+            class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+            :class="activeSkillCategory === category ? 'bg-primary text-white' : 'bg-background-secondary text-text-primary hover:bg-primary/20'"
           >
-            <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3">
-              <i :class="[skill.icon, 'text-3xl text-accent']"></i>
+            {{ t(`skills.categories.${category}`) }}
+          </button>
+        </div>
+        
+        <!-- Skills Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
+          <template v-if="activeSkillCategory === 'all'">
+            <div 
+              v-for="skill in skillCategories.flatMap(category => category.skills)"
+              :key="`all-${skill.name}`"
+              class="skill-item flex flex-col items-center transform hover:scale-110 transition-transform duration-300"
+            >
+              <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
+                <i :class="[skill.icon, 'text-3xl']"></i>
+              </div>
+              <span class="text-sm text-text-secondary font-medium">{{ skill.name }}</span>
             </div>
-            <span class="text-sm text-text-secondary">{{ skill.name }}</span>
-          </div>
+          </template>
+          
+          <template v-else>
+            <div 
+              v-for="skill in skillCategories.find(c => c.id === activeSkillCategory)?.skills || []"
+              :key="`cat-${activeSkillCategory}-${skill.name}`"
+              class="skill-item flex flex-col items-center transform hover:scale-110 transition-transform duration-300"
+            >
+              <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
+                <i :class="[skill.icon, 'text-3xl']"></i>
+              </div>
+              <span class="text-sm text-text-secondary font-medium">{{ skill.name }}</span>
+            </div>
+          </template>
         </div>
       </div>
     </section>
@@ -174,12 +314,52 @@ function navigateTo(path: string) {
           
           <div v-else v-for="project in portfolioStore.featuredProjects" :key="project.id" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <div class="h-48 relative overflow-hidden">
+              <!-- Image carousel for multiple images -->
+              <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel h-full">
+                <div class="carousel-images h-full" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
+                  <img 
+                    v-for="(imageUrl, index) in project.imageUrls" 
+                    :key="`${project.id}-img-${index}`"
+                    :src="imageUrl" 
+                    :alt="`${project.title} - Image ${index + 1}`"
+                    class="w-full h-full object-cover absolute top-0 left-0"
+                    :style="{ left: `${index * 100}%` }"
+                  />
+                </div>
+                
+                <div v-if="project.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between">
+                  <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev ml-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button @click.prevent="nextProjectImage(project.id)" class="carousel-control carousel-next mr-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div v-if="project.imageUrls.length > 1" class="carousel-indicators absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                  <button 
+                    v-for="(_, index) in project.imageUrls" 
+                    :key="`${project.id}-indicator-${index}`"
+                    @click="setProjectCarouselIndex(project.id, index)"
+                    class="carousel-indicator w-2 h-2 rounded-full bg-white/50 hover:bg-white"
+                    :class="{ 'bg-white': getProjectCarouselIndex(project.id) === index }"
+                  ></button>
+                </div>
+              </div>
+              
+              <!-- Single image fallback -->
               <img 
-                v-if="project.imageUrl" 
+                v-else-if="project.imageUrl" 
                 :src="project.imageUrl" 
                 :alt="project.title"
                 class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
               />
+              
+              <!-- No image placeholder -->
               <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -200,21 +380,28 @@ function navigateTo(path: string) {
               </div>
               <div class="flex gap-4">
                 <a 
-                  v-if="project.liveUrl"
+                  v-if="project.liveUrl" 
                   :href="project.liveUrl" 
-                  target="_blank"
-                  class="flex-1 px-4 py-2 bg-accent text-white text-center rounded hover:bg-accent-light transition-colors"
+                  target="_blank" 
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
                 >
                   {{ t('portfolio.viewLive') }}
                 </a>
                 <a 
-                  v-if="project.codeUrl"
+                  v-if="project.codeUrl" 
                   :href="project.codeUrl" 
-                  target="_blank"
-                  class="flex-1 px-4 py-2 border border-accent text-accent text-center rounded hover:bg-accent hover:text-white transition-colors"
+                  target="_blank" 
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors"
                 >
                   {{ t('portfolio.viewCode') }}
                 </a>
+                <router-link 
+                  v-if="!project.liveUrl && !project.codeUrl" 
+                  :to="`/portfolio`" 
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+                >
+                  {{ t('portfolio.viewProject') }}
+                </router-link>
               </div>
             </div>
           </div>
@@ -232,7 +419,7 @@ function navigateTo(path: string) {
             to="/blog" 
             class="text-accent hover:text-accent-light transition-colors flex items-center gap-1"
           >
-            {{ t('blog.readMore') }}
+            {{ t('blog.viewAll') }}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -243,16 +430,14 @@ function navigateTo(path: string) {
           <div v-if="blogStore.isLoading" v-for="i in 3" :key="i" class="bg-primary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <div class="h-48 bg-gray-700 animate-pulse"></div>
             <div class="p-6">
-              <div class="h-6 bg-gray-700 rounded w-3/4 mb-2 animate-pulse"></div>
-              <div class="h-4 bg-gray-700 rounded w-1/3 mb-4 animate-pulse"></div>
+              <div class="h-6 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
               <div class="h-4 bg-gray-700 rounded w-full mb-2 animate-pulse"></div>
-              <div class="h-4 bg-gray-700 rounded w-full mb-2 animate-pulse"></div>
-              <div class="h-4 bg-gray-700 rounded w-2/3 mb-4 animate-pulse"></div>
-              <div class="h-8 bg-gray-700 rounded w-1/3 animate-pulse"></div>
+              <div class="h-4 bg-gray-700 rounded w-5/6 mb-6 animate-pulse"></div>
+              <div class="h-10 bg-gray-700 rounded w-full animate-pulse"></div>
             </div>
           </div>
           
-          <div v-else v-for="post in blogStore.posts" :key="post.id" class="bg-primary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+          <div v-else-if="blogStore.posts.length > 0" v-for="post in blogStore.posts.slice(0, 3)" :key="post.id" class="bg-primary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <div class="h-48 relative overflow-hidden">
               <img 
                 v-if="post.coverImage" 
@@ -262,28 +447,34 @@ function navigateTo(path: string) {
               />
               <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M5 14h5m5-4h5M5 8h5" />
                 </svg>
+              </div>
+              <div class="absolute top-2 right-2 bg-accent text-white text-xs px-2 py-1 rounded-full">
+                {{ new Date(post.date).toLocaleDateString() }}
               </div>
             </div>
             <div class="p-6">
               <h3 class="text-xl font-semibold mb-2 text-text-primary">{{ post.title }}</h3>
-              <div class="flex items-center gap-2 text-text-secondary text-sm mb-4">
-                <span>{{ post.author }}</span>
-                <span>•</span>
-                <span>{{ new Date(post.date).toLocaleDateString() }}</span>
-              </div>
               <p class="text-text-secondary mb-4">{{ post.excerpt }}</p>
               <router-link 
-                :to="`/blog/${post.id}`"
+                :to="`/blog/${post.id}`" 
                 class="inline-flex items-center text-accent hover:text-accent-light transition-colors"
               >
                 {{ t('blog.readMore') }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </router-link>
             </div>
+          </div>
+          
+          <div v-else class="col-span-3 text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M5 14h5m5-4h5M5 8h5" />
+            </svg>
+            <h3 class="text-xl font-semibold text-text-primary mb-2">{{ t('blog.noPosts') }}</h3>
+            <p class="text-text-secondary">{{ t('blog.checkBack') }}</p>
           </div>
         </div>
       </div>
@@ -297,19 +488,47 @@ function navigateTo(path: string) {
   line-height: 1.2;
 }
 
-.hero-subtitle {
-  font-size: 1.5rem;
-  line-height: 1.2;
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 3.5rem;
+  }
 }
 
-.hero-description {
-  font-size: 1.2rem;
-  line-height: 1.5;
+.project-image-carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
 }
 
-.hero-cta {
-  font-size: 1.2rem;
-  line-height: 1.5;
+.carousel-images {
+  display: flex;
+  transition: transform 0.3s ease;
+  position: relative;
+  width: 100%;
 }
 
+.carousel-controls {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.project-card:hover .carousel-controls {
+  opacity: 1;
+}
+
+.carousel-indicator {
+  transition: background-color 0.2s ease;
+}
+
+.skill-item {
+  opacity: 0;
+}
+
+.skill-item i {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.skill-item:hover i {
+  transform: scale(1.2);
+}
 </style>

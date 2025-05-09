@@ -47,7 +47,7 @@ export const useActivityStore = defineStore('activity', {
       } catch (error) {
         console.error('Error fetching activities:', error)
         this.error = 'Failed to fetch activities'
-        throw error // Re-throw the error so it can be handled in the component
+        throw error
       } finally {
         this.loading = false
       }

@@ -5,7 +5,6 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// 設定 Prisma 的編碼
 prisma.$use(async (params, next) => {
   const result = await next(params);
   return result;

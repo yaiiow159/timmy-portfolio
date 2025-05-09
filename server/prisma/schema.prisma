@@ -12,7 +12,7 @@ model Project {
   title        String
   description  String
   technologies String[]
-  imageUrl     String?
+  imageUrls    String[]
   liveUrl      String?
   codeUrl      String?
   featured     Boolean  @default(false)
