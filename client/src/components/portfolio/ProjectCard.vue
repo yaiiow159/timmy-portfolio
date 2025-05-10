@@ -18,9 +18,14 @@ const projectImages = computed(() => {
   if (props.project.imageUrls && props.project.imageUrls.length > 0) {
     return props.project.imageUrls;
   }
-  // For backward compatibility: if project has imageUrl (old format), create a single-item array
+  // For backward compatibility: if project has imageUrl (old format)
   else if (props.project.imageUrl) {
-    return [props.project.imageUrl];
+    // If imageUrl is a string, create a single-item array
+    if (typeof props.project.imageUrl === 'string') {
+      return [props.project.imageUrl];
+    }
+    // If imageUrl is already an array, use it directly
+    return props.project.imageUrl;
   }
   // No images
   return [];

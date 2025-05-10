@@ -7,7 +7,7 @@ export interface Project {
   title: string
   description: string
   technologies: string[]
-  imageUrl?: string[]
+  imageUrl?: string | string[]
   imageUrls?: string[]
   liveUrl?: string
   codeUrl?: string
@@ -22,7 +22,11 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   function normalizeProjectImages(project: any): Project {
     if (project.imageUrl && !project.imageUrls) {
-      project.imageUrls = project.imageUrl;
+      if (typeof project.imageUrl === 'string') {
+        project.imageUrls = [project.imageUrl];
+      } else {
+        project.imageUrls = project.imageUrl;
+      }
     }
     return project as Project;
   }

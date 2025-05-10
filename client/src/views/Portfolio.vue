@@ -208,12 +208,39 @@ function selectCategory(category: string) {
             </div>
             
             <!-- Single image fallback -->
-            <img
-              v-else-if="project.imageUrl" 
-              :src="project.imageUrl" 
-              :alt="project.title"
-              class="w-full h-full object-cover"
-            />
+            <template v-else-if="project.imageUrl">
+              <img
+                v-if="typeof project.imageUrl === 'string'"
+                :src="project.imageUrl" 
+                :alt="project.title"
+                class="w-full h-full object-cover"
+              />
+              <div v-else-if="Array.isArray(project.imageUrl) && project.imageUrl.length > 0" class="project-image-carousel h-full">
+                <div class="carousel-images h-full" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
+                  <img 
+                    v-for="(url, index) in project.imageUrl" 
+                    :key="`${project.id}-img-${index}`"
+                    :src="url" 
+                    :alt="`${project.title} - Image ${index + 1}`"
+                    class="w-full h-full object-cover absolute top-0 left-0"
+                    :style="{ left: `${index * 100}%` }"
+                  />
+                </div>
+                
+                <div v-if="project.imageUrl.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between">
+                  <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev ml-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button @click.prevent="nextProjectImage(project.id)" class="carousel-control carousel-next mr-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </template>
             
             <!-- No image placeholder -->
             <div v-else class="h-full w-full bg-gray-700 flex items-center justify-center text-gray-500">
