@@ -207,13 +207,13 @@ function navigateTo(path: string) {
           <div class="hero-cta flex flex-col sm:flex-row justify-center gap-4">
             <button 
               @click="navigateTo('/portfolio')" 
-              class="px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+              class="px-8 py-4 bg-accent hover:bg-accent-light text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl text-lg"
             >
               {{ t('home.cta') }}
             </button>
             <button 
               @click="navigateTo('/contact')" 
-              class="px-6 py-3 border-2 border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+              class="px-8 py-4 border-2 border-accent text-accent hover:bg-accent/10 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl text-lg"
             >
               {{ t('contact.title') }}
             </button>
@@ -221,10 +221,9 @@ function navigateTo(path: string) {
         </div>
       </div>
       
-      <!-- Enhanced background effects -->
-      <div class="absolute -top-24 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-slow"></div>
-      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-slow"></div>
-      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-6xl max-h-96 bg-gradient-to-r from-accent/5 to-accent-light/5 rounded-full blur-3xl"></div>
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-6xl max-h-96 bg-gradient-to-r from-accent/10 to-accent-light/10 rounded-full blur-3xl"></div>
     </section>
     
     <section class="py-16 bg-secondary">
@@ -238,8 +237,12 @@ function navigateTo(path: string) {
             v-for="category in ['all', 'frontend', 'backend', 'database', 'devops', 'monitoring', 'systems']" 
             :key="category"
             @click="activeSkillCategory = category"
-            class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-            :class="activeSkillCategory === category ? 'bg-primary text-white' : 'bg-background-secondary text-text-primary hover:bg-primary/20'"
+            :class="[
+              'px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md',
+              activeSkillCategory === category 
+                ? 'bg-accent text-white' 
+                : 'bg-secondary border border-accent/20 text-text-secondary hover:border-accent/50 hover:text-accent'
+            ]"
           >
             {{ t(`skills.categories.${category}`) }}
           </button>
@@ -479,11 +482,11 @@ function navigateTo(path: string) {
 .name-highlight {
   display: inline-block;
   margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background-color: var(--accent);
   color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
   transform: translateY(0);
   transition: all 0.3s ease;
   position: relative;
@@ -500,10 +503,15 @@ function navigateTo(path: string) {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.3),
     transparent
   );
   transition: 0.5s;
+}
+
+.name-highlight:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
 .name-highlight:hover::after {
@@ -577,5 +585,20 @@ function navigateTo(path: string) {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.hero-cta button {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero-cta button:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.hero-cta button:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

@@ -345,7 +345,7 @@
     "successMessage": "操作成功！",
     "errorMessage": "操作失敗，請稍後再試",
     "notFound": "找不到資源",
-    "notFoundMessage": "抱歉，您要找的資源不存在或已被移除。",
+    "notFoundMessage": "抱歉，您要找的資源不存在或已被移除。"
   },
   "blogPost": {
     "readingTime": "閱讀時間",
