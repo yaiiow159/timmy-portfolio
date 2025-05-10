@@ -65,7 +65,10 @@
     "commentSuccess": "Comment posted successfully!",
     "loginToComment": "Please login to leave a comment",
     "noPosts": "No posts found",
-    "tryDifferent": "Try adjusting your search or filter criteria"
+    "tryDifferent": "Try adjusting your search or filter criteria",
+    "noResults": "No posts found",
+    "checkBack": "Check back later for new content",
+    "viewAll": "View All"
   },
   "portfolio": {
     "title": "Portfolio",
@@ -73,7 +76,11 @@
     "viewProject": "View Project",
     "technologies": "Technologies",
     "viewLive": "View Live",
-    "viewCode": "View Code"
+    "viewCode": "View Code",
+    "noResults": "No projects found",
+    "tryDifferentSearch": "Try a different search term",
+    "clearFilters": "Clear filters",
+    "searchPlaceholder": "Search projects..."
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -163,6 +170,9 @@
     "projectDescription": "Project Description",
     "technologies": "Technologies",
     "addTechnology": "Add Technology",
+    "moveTechnologyUp": "Move Up",
+    "moveTechnologyDown": "Move Down",
+    "removeTechnology": "Remove Technology",
     "projectImage": "Project Image",
     "githubUrl": "GitHub URL",
     "liveUrl": "Live URL",
@@ -183,7 +193,6 @@
     "enterLiveUrl": "Enter live URL",
     "chooseImage": "Choose Image",
     "deleteProjectConfirmation": "Are you sure you want to delete this project? This action cannot be undone.",
-    "removeTechnology": "Remove technology",
     "imageUrls": "Project Images",
     "projectImages": "Project Images",
     "chooseImages": "Choose Images",
@@ -221,7 +230,9 @@
       "frontend": "Frontend",
       "backend": "Backend",
       "database": "Database",
-      "devops": "DevOps"
+      "devops": "DevOps",
+      "monitoring": "Monitoring",
+      "systems": "Operating Systems"
     }
   },
   "contact": {

@@ -64,7 +64,9 @@ const skillCategories = [
     skills: [
       { name: 'MongoDB', icon: 'devicon-mongodb-plain colored' },
       { name: 'MySQL', icon: 'devicon-mysql-plain colored' },
-      { name: 'PostgreSQL', icon: 'devicon-postgresql-plain colored' }
+      { name: 'PostgreSQL', icon: 'devicon-postgresql-plain colored' },
+      { name: 'Redis', icon: 'devicon-redis-plain colored' },
+      { name: 'InfluxDB', icon: 'devicon-influxdb-original' }
     ]
   },
   {
@@ -72,7 +74,24 @@ const skillCategories = [
     skills: [
       { name: 'AWS', icon: 'devicon-amazonwebservices-original colored' },
       { name: 'Docker', icon: 'devicon-docker-plain colored' },
-      { name: 'Git', icon: 'devicon-git-plain colored' }
+      { name: 'Git', icon: 'devicon-git-plain colored' },
+      { name: 'SVN', icon: 'devicon-subversion-plain' },
+      { name: 'Jenkins', icon: 'devicon-jenkins-line' },
+      { name: 'GitLab', icon: 'devicon-gitlab-plain colored' }
+    ]
+  },
+  {
+    id: 'monitoring',
+    skills: [
+      { name: 'JConsole', icon: 'devicon-java-plain' }
+    ]
+  },
+  {
+    id: 'systems',
+    skills: [
+      { name: 'Ubuntu', icon: 'devicon-ubuntu-plain colored' },
+      { name: 'CentOS', icon: 'devicon-centos-plain' },
+      { name: 'Windows', icon: 'devicon-windows8-original colored' }
     ]
   }
 ]
@@ -100,18 +119,11 @@ onMounted(async () => {
   try {
     await Promise.all([
       portfolioStore.fetchFeaturedProjects(),
-      blogStore.fetc
+      blogStore.fetchPosts()
     ])
     
     portfolioStore.featuredProjects.forEach(project => {
       projectCarouselIndices.value[project.id] = 0
-    })
-    
-    gsap.from('.hero-title', {
-      opacity: 0, 
-      y: 30, 
-      duration: 0.8,
-      ease: 'power2.out'
     })
     
     gsap.from('.hero-subtitle', { 
@@ -122,28 +134,10 @@ onMounted(async () => {
       ease: 'power2.out'
     })
     
-    gsap.from('.hero-cta', { 
-      opacity: 0, 
-      y: 20, 
-      duration: 0.8,
-      delay: 0.4,
-      ease: 'power2.out'
+    const skillItems = document.querySelectorAll('.skill-item')
+    skillItems.forEach(item => {
+      gsap.set(item, { opacity: 1, y: 0 })
     })
-    
-    setTimeout(() => {
-      const skillItems = document.querySelectorAll('.skill-item')
-      skillItems.forEach(item => {
-        gsap.set(item, { opacity: 0, y: 20 })
-      })
-      
-      gsap.to('.skill-item', {
-        opacity: 1,
-        y: 0,
-        duration: 0.4,
-        stagger: 0.1,
-        ease: 'power2.out'
-      })
-    }, 500)
     
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -201,8 +195,8 @@ function navigateTo(path: string) {
       <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto text-center">
           <h1 class="hero-title text-4xl md:text-6xl font-bold mb-4">
-            <span class="block text-text-secondary">{{ t('home.greeting') }}</span>
-            <span class="text-accent">{{ t('home.name') }}</span>
+            <span class="block text-white">{{ t('home.greeting') }}</span>
+            <span class="text-white bg-accent px-4 py-2 rounded-md shadow-lg" style="text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8), 0px 0px 20px rgba(0, 0, 0, 0.5); display: inline-block; margin-top: 10px;">{{ t('home.name') }}</span>
           </h1>
           <h2 class="hero-subtitle text-2xl md:text-3xl font-semibold mb-6 text-text-primary">
             {{ t('home.title') }}
@@ -237,10 +231,9 @@ function navigateTo(path: string) {
           {{ t('resume.skills') }}
         </h2>
         
-        <!-- Skill Category Tabs -->
         <div class="flex flex-wrap justify-center gap-4 mb-10">
           <button 
-            v-for="category in ['all', 'frontend', 'backend', 'database', 'devops']" 
+            v-for="category in ['all', 'frontend', 'backend', 'database', 'devops', 'monitoring', 'systems']" 
             :key="category"
             @click="activeSkillCategory = category"
             class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
@@ -250,7 +243,6 @@ function navigateTo(path: string) {
           </button>
         </div>
         
-        <!-- Skills Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
           <template v-if="activeSkillCategory === 'all'">
             <div 
@@ -314,7 +306,6 @@ function navigateTo(path: string) {
           
           <div v-else v-for="project in portfolioStore.featuredProjects" :key="project.id" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <div class="h-48 relative overflow-hidden">
-              <!-- Image carousel for multiple images -->
               <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel h-full">
                 <div class="carousel-images h-full" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
                   <img 
@@ -351,15 +342,6 @@ function navigateTo(path: string) {
                 </div>
               </div>
               
-              <!-- Single image fallback -->
-              <img 
-                v-else-if="project.imageUrl" 
-                :src="project.imageUrl" 
-                :alt="project.title"
-                class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-              />
-              
-              <!-- No image placeholder -->
               <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -463,7 +445,7 @@ function navigateTo(path: string) {
               >
                 {{ t('blog.readMore') }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H6" />
                 </svg>
               </router-link>
             </div>
@@ -486,6 +468,8 @@ function navigateTo(path: string) {
 .hero-title {
   font-size: 2.5rem;
   line-height: 1.2;
+  color: #ffffff; 
+  text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.85);
 }
 
 @media (min-width: 768px) {

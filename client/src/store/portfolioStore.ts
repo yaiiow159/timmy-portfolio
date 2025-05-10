@@ -7,8 +7,8 @@ export interface Project {
   title: string
   description: string
   technologies: string[]
-  imageUrls?: string[]  // New format: array of image URLs
-  imageUrl?: string     // Old format: single image URL (for backward compatibility)
+  imageUrl?: string[]
+  imageUrls?: string[]
   liveUrl?: string
   codeUrl?: string
   featured: boolean
@@ -20,13 +20,20 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
+  function normalizeProjectImages(project: any): Project {
+    if (project.imageUrl && !project.imageUrls) {
+      project.imageUrls = project.imageUrl;
+    }
+    return project as Project;
+  }
+
   async function fetchProjects() {
     isLoading.value = true
     error.value = null
     
     try {
       const response = await api.get('/projects')
-      projects.value = response.data
+      projects.value = response.data.map(normalizeProjectImages)
     } catch (err) {
       console.error('Error fetching projects:', err)
       error.value = 'Failed to load projects'
@@ -41,7 +48,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     
     try {
       const response = await api.get('/projects/featured')
-      featuredProjects.value = response.data
+      featuredProjects.value = response.data.map(normalizeProjectImages)
     } catch (err) {
       console.error('Error fetching featured projects:', err)
       error.value = 'Failed to load featured projects'
@@ -55,7 +62,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     
     try {
       const response = await api.get(`/projects/${id}`)
-      return response.data
+      return normalizeProjectImages(response.data)
     } catch (err) {
       console.error(`Error fetching project with ID ${id}:`, err)
       error.value = 'Failed to load project'

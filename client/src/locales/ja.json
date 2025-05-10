@@ -55,25 +55,31 @@
     "backToBlog": "ブログに戻る",
     "loading": "読み込み中...",
     "postNotFound": "記事が見つかりません",
-    "postNotFoundMessage": "申し訳ありません。お探しの記事は存在しないか、削除された可能性があります。",
+    "postNotFoundMessage": "申し訳ありませんが、お探しの記事は存在しないか削除されています。",
     "noComments": "コメントはまだありません",
     "beFirstToComment": "最初のコメントを残しましょう",
-    "commentError": "コメントの投稿に失敗しました。後でもう一度お試しください。",
+    "commentError": "コメントの送信に失敗しました。後でもう一度お試しください",
     "createPost": "記事を作成",
     "editPost": "記事を編集",
     "deletePost": "記事を削除",
-    "commentSuccess": "コメントを投稿しました！",
-    "loginToComment": "コメントを投稿するにはログインしてください",
-    "noPosts": "投稿がありません",
-    "tryDifferent": "検索条件を変更してみてください"
+    "loginToComment": "コメントを残すにはログインしてください",
+    "commentSuccess": "コメントが正常に投稿されました！",
+    "noPosts": "記事が見つかりません",
+    "tryDifferent": "検索条件を調整してみてください",
+    "noResults": "記事が見つかりません",
+    "checkBack": "また後ほどご確認ください",
+    "viewAll": "すべて表示"
   },
   "portfolio": {
     "title": "ポートフォリオ",
     "subtitle": "最新のプロジェクトをご覧ください",
     "viewProject": "プロジェクトを見る",
     "technologies": "使用技術",
-    "viewLive": "実際のサイトを見る",
-    "viewCode": "コードを見る"
+    "viewLive": "ライブサイトを見る",
+    "viewCode": "コードを見る",
+    "noResults": "プロジェクトが見つかりません",
+    "tryDifferentSearch": "別の検索条件をお試しください",
+    "clearFilters": "フィルターをクリア"
   },
   "admin": {
     "dashboard": "ダッシュボード",
@@ -218,7 +224,9 @@
       "frontend": "フロントエンド",
       "backend": "バックエンド",
       "database": "データベース",
-      "devops": "DevOps"
+      "devops": "DevOps",
+      "monitoring": "モニタリング",
+      "systems": "オペレーティングシステム"
     }
   },
   "contact": {

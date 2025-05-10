@@ -75,6 +75,17 @@
           <div class="project-tech">
             <span v-for="(tech, index) in project.technologies" :key="index" class="tech-tag">
               {{ tech }}
+              <div class="tag-actions">
+                <button @click="moveTechnologyUp(index)" class="move-tech" :title="t('admin.moveTechnologyUp')" v-if="index > 0">
+                  <i class="fas fa-arrow-up"></i>
+                </button>
+                <button @click="moveTechnologyDown(index)" class="move-tech" :title="t('admin.moveTechnologyDown')" v-if="index < project.technologies.length - 1">
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+                <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </span>
           </div>
           
@@ -178,9 +189,17 @@
                 class="tech-tag"
               >
                 {{ tech }}
-                <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
-                  <i class="fas fa-times"></i>
-                </button>
+                <div class="tag-actions">
+                  <button @click="moveTechnologyUp(index)" class="move-tech" :title="t('admin.moveTechnologyUp')" v-if="index > 0">
+                    <i class="fas fa-arrow-up"></i>
+                  </button>
+                  <button @click="moveTechnologyDown(index)" class="move-tech" :title="t('admin.moveTechnologyDown')" v-if="index < currentProject.technologies.length - 1">
+                    <i class="fas fa-arrow-down"></i>
+                  </button>
+                  <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
               </span>
             </div>
           </div>
@@ -490,6 +509,20 @@ function removeTechnology(index: number) {
   currentProject.value.technologies.splice(index, 1)
 }
 
+function moveTechnologyUp(index: number) {
+  if (index > 0) {
+    const tech = currentProject.value.technologies.splice(index, 1)[0]
+    currentProject.value.technologies.splice(index - 1, 0, tech)
+  }
+}
+
+function moveTechnologyDown(index: number) {
+  if (index < currentProject.value.technologies.length - 1) {
+    const tech = currentProject.value.technologies.splice(index, 1)[0]
+    currentProject.value.technologies.splice(index + 1, 0, tech)
+  }
+}
+
 async function uploadProjectImage(event: Event) {
   const target = event.target as HTMLInputElement
   const files = target.files
@@ -748,7 +781,7 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .admin-projects {
   padding: 1.5rem;
 }
@@ -949,43 +982,44 @@ defineExpose({
 }
 
 .tech-tag {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  padding: 0.25rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  background-color: #2c3e50;
+  color: white;
   border-radius: 4px;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s ease;
-}
-
-.tech-tag:hover {
-  background-color: var(--accent-light);
-  border-color: var(--accent);
-}
-
-.remove-tech {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  margin-left: 0.5rem;
-  cursor: pointer;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.remove-tech:hover {
-  color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
+  padding: 0.3rem 0.6rem;
+  margin: 0.25rem;
+  font-size: 0.85rem;
+  
+  .tag-actions {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem;
+  }
+  
+  .move-tech, .remove-tech {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.3rem;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: white;
+    }
+  }
+  
+  .remove-tech {
+    &:hover {
+      color: #ff5252;
+    }
+  }
 }
 
 .project-actions {

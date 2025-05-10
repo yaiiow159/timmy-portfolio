@@ -20,14 +20,12 @@ export const availableLocales = [
   { code: 'ja' as LocaleCode, name: '日本語' }
 ]
 
-// 獲取瀏覽器語言設置
 const getBrowserLocale = (): LocaleCode => {
   const navigatorLocale = navigator.language
   const localeCode = navigatorLocale.includes('-') ? navigatorLocale : 'en'
   return (availableLocales.find(locale => locale.code === localeCode)?.code || 'en') as LocaleCode
 }
 
-// 獲取存儲的語言設置或使用瀏覽器語言
 const getStoredLocale = (): LocaleCode => {
   const storedLocale = localStorage.getItem('locale') as LocaleCode
   return storedLocale || getBrowserLocale()
@@ -42,7 +40,6 @@ const i18n = createI18n({
   silentTranslationWarn: true,
 })
 
-// 監聽語言變化並保存到localStorage
 export const setLocale = (locale: LocaleCode) => {
   i18n.global.locale.value = locale
   localStorage.setItem('locale', locale)

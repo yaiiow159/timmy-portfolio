@@ -62,10 +62,13 @@
     "createPost": "创建文章",
     "editPost": "编辑文章",
     "deletePost": "删除文章",
-    "commentSuccess": "评论发表成功！",
     "loginToComment": "请登录后发表评论",
-    "noPosts": "暂无文章",
-    "tryDifferent": "请尝试调整搜索或筛选条件"
+    "commentSuccess": "评论发表成功！",
+    "noPosts": "没有找到文章",
+    "tryDifferent": "请尝试调整搜索条件",
+    "noResults": "没有找到文章",
+    "checkBack": "请稍后再回来查看",
+    "viewAll": "查看全部"
   },
   "portfolio": {
     "title": "作品集",
@@ -74,16 +77,38 @@
     "technologies": "使用技术",
     "viewLive": "查看线上版本",
     "viewCode": "查看源代码",
+    "noResults": "没有找到项目",
+    "tryDifferentSearch": "请尝试不同的搜索条件",
+    "clearFilters": "清除筛选条件",
     "uploadError": "上传图片失败",
     "imageLoadError": "加载图片失败",
     "viewImage": "查看图片",
     "dragAndDrop": "拖拽文件到此处，或点击选择文件",
     "uploadSuccess": "文件上传成功",
-    "uploadError": "文件上传失败",
     "fileSizeLimit": "文件大小不能超过 5MB",
     "deleteSelected": "删除已选择的 {count} 个文件",
     "filesDeleted": "已成功删除 {count} 个文件",
-    "deleteFilesError": "删除文件失败"
+    "deleteFilesError": "删除文件失败",
+    "addTechnology": "添加技术",
+    "technologies": "技术",
+    "removeTechnology": "删除技术",
+    "moveTechnologyUp": "向上移动",
+    "moveTechnologyDown": "向下移动",
+    "imageUrl": "图片链接",
+    "imageUrls": "项目图片集",
+    "projectImages": "项目图片",
+    "chooseImages": "选择多张图片",
+    "addImages": "添加图片",
+    "uploadImages": "上传图片",
+    "dragImagesHere": "拖拽图片到此处或点击选择",
+    "imageRequirements": "图片尺寸应为 600x400 像素",
+    "noImage": "无图片",
+    "previousImage": "上一张图片",
+    "nextImage": "下一张图片",
+    "removeImage": "移除图片",
+    "moveImageUp": "向上移动图片",
+    "moveImageDown": "向下移动图片",
+    "imagePosition": "第 {position} 张，共 {total} 张"
   },
   "admin": {
     "dashboard": "控制面板",
@@ -154,7 +179,6 @@
     "copyUrl": "复制链接",
     "dragAndDrop": "拖拽文件到此处，或点击选择文件",
     "uploadSuccess": "文件上传成功",
-    "uploadError": "文件上传失败",
     "fileSizeLimit": "文件大小不能超过 5MB",
     "deleteSelected": "删除已选择的 {count} 个文件",
     "filesDeleted": "已成功删除 {count} 个文件",
@@ -206,7 +230,9 @@
     "moveImageUp": "向上移动图片",
     "moveImageDown": "向下移动图片",
     "imagePosition": "第 {position} 张，共 {total} 张",
-    "removeTechnology": "删除技术"
+    "removeTechnology": "删除技术",
+    "moveTechnologyUp": "向上移动",
+    "moveTechnologyDown": "向下移动"
   },
   "resume": {
     "title": "简历",
@@ -226,10 +252,12 @@
   "skills": {
     "categories": {
       "all": "所有技能",
-      "frontend": "前端开发",
-      "backend": "后端开发",
+      "frontend": "前端",
+      "backend": "后端",
       "database": "数据库",
-      "devops": "运维开发"
+      "devops": "运维",
+      "monitoring": "监控",
+      "systems": "操作系统"
     }
   },
   "contact": {

@@ -38,7 +38,7 @@ router.get('/featured', async (req, res) => {
         id: true,
         title: true,
         description: true,
-        imageUrls: true,
+        imageUrl: true,
         technologies: true,
         liveUrl: true,
         codeUrl: true
@@ -84,7 +84,7 @@ router.post('/', async (req, res) => {
         title: req.body.title,
         description: req.body.description,
         technologies: req.body.technologies,
-        imageUrls: req.body.imageUrls || [],
+        imageUrl: req.body.imageUrl ? [req.body.imageUrl] : [],
         liveUrl: req.body.liveUrl || null,
         codeUrl: req.body.codeUrl || null,
         featured: req.body.featured || false
@@ -111,7 +111,7 @@ router.put('/:id', async (req, res) => {
         title: req.body.title,
         description: req.body.description,
         technologies: req.body.technologies,
-        imageUrls: req.body.imageUrls,
+        imageUrl: req.body.imageUrl ? [req.body.imageUrl] : [],
         liveUrl: req.body.liveUrl,
         codeUrl: req.body.codeUrl,
         featured: req.body.featured
