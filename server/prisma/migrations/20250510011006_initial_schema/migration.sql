@@ -4,7 +4,7 @@ CREATE TABLE "Project" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "technologies" TEXT[],
-    "imageUrl" TEXT,
+    "imageUrl" TEXT[],
     "liveUrl" TEXT,
     "codeUrl" TEXT,
     "featured" BOOLEAN NOT NULL DEFAULT false,
@@ -42,9 +42,10 @@ CREATE TABLE "Comment" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "username" TEXT NOT NULL DEFAULT 'Timmy',
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'USER',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -59,6 +60,20 @@ CREATE TABLE "Contact" (
     "read" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Contact_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Activity" (
+    "id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "userName" TEXT NOT NULL,
+    "targetId" TEXT,
+    "targetType" TEXT,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Activity_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

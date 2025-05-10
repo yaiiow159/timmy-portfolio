@@ -194,9 +194,9 @@ function navigateTo(path: string) {
     <section class="relative py-20 md:py-32 overflow-hidden">
       <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto text-center">
-          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-4">
-            <span class="block text-white">{{ t('home.greeting') }}</span>
-            <span class="text-white bg-accent px-4 py-2 rounded-md shadow-lg" style="text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8), 0px 0px 20px rgba(0, 0, 0, 0.5); display: inline-block; margin-top: 10px;">{{ t('home.name') }}</span>
+          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6">
+            <span class="block text-text-primary">{{ t('home.greeting') }}</span>
+            <span class="name-highlight">{{ t('home.name') }}</span>
           </h1>
           <h2 class="hero-subtitle text-2xl md:text-3xl font-semibold mb-6 text-text-primary">
             {{ t('home.title') }}
@@ -207,13 +207,13 @@ function navigateTo(path: string) {
           <div class="hero-cta flex flex-col sm:flex-row justify-center gap-4">
             <button 
               @click="navigateTo('/portfolio')" 
-              class="px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+              class="px-6 py-3 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
             >
               {{ t('home.cta') }}
             </button>
             <button 
               @click="navigateTo('/contact')" 
-              class="px-6 py-3 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors"
+              class="px-6 py-3 border-2 border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
             >
               {{ t('contact.title') }}
             </button>
@@ -221,8 +221,10 @@ function navigateTo(path: string) {
         </div>
       </div>
       
-      <div class="absolute -top-24 -right-24 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+      <!-- Enhanced background effects -->
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-6xl max-h-96 bg-gradient-to-r from-accent/5 to-accent-light/5 rounded-full blur-3xl"></div>
     </section>
     
     <section class="py-16 bg-secondary">
@@ -246,9 +248,10 @@ function navigateTo(path: string) {
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
           <template v-if="activeSkillCategory === 'all'">
             <div 
-              v-for="skill in skillCategories.flatMap(category => category.skills)"
+              v-for="(skill, index) in skillCategories.flatMap(category => category.skills)"
               :key="`all-${skill.name}`"
               class="skill-item flex flex-col items-center transform hover:scale-110 transition-transform duration-300"
+              :style="{ '--index': index }"
             >
               <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
                 <i :class="[skill.icon, 'text-3xl']"></i>
@@ -259,9 +262,10 @@ function navigateTo(path: string) {
           
           <template v-else>
             <div 
-              v-for="skill in skillCategories.find(c => c.id === activeSkillCategory)?.skills || []"
+              v-for="(skill, index) in skillCategories.find(c => c.id === activeSkillCategory)?.skills || []"
               :key="`cat-${activeSkillCategory}-${skill.name}`"
               class="skill-item flex flex-col items-center transform hover:scale-110 transition-transform duration-300"
+              :style="{ '--index': index }"
             >
               <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
                 <i :class="[skill.icon, 'text-3xl']"></i>
@@ -304,21 +308,22 @@ function navigateTo(path: string) {
             </div>
           </div>
           
-          <div v-else v-for="project in portfolioStore.featuredProjects" :key="project.id" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+          <div v-else v-for="project in portfolioStore.featuredProjects" :key="project.id" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow project-card">
             <div class="h-48 relative overflow-hidden">
-              <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel h-full">
-                <div class="carousel-images h-full" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
+              <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel h-full w-full">
+                <div class="carousel-images h-full w-full" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
                   <img 
                     v-for="(imageUrl, index) in project.imageUrls" 
                     :key="`${project.id}-img-${index}`"
                     :src="imageUrl" 
                     :alt="`${project.title} - Image ${index + 1}`"
-                    class="w-full h-full object-cover absolute top-0 left-0"
+                    class="w-full h-full object-cover"
+                    style="position: absolute; top: 0; width: 100%;"
                     :style="{ left: `${index * 100}%` }"
                   />
                 </div>
                 
-                <div v-if="project.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between">
+                <div v-if="project.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between z-10">
                   <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev ml-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -331,7 +336,7 @@ function navigateTo(path: string) {
                   </button>
                 </div>
                 
-                <div v-if="project.imageUrls.length > 1" class="carousel-indicators absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                <div v-if="project.imageUrls.length > 1" class="carousel-indicators absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
                   <button 
                     v-for="(_, index) in project.imageUrls" 
                     :key="`${project.id}-indicator-${index}`"
@@ -468,8 +473,41 @@ function navigateTo(path: string) {
 .hero-title {
   font-size: 2.5rem;
   line-height: 1.2;
-  color: #ffffff; 
-  text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.name-highlight {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.name-highlight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.name-highlight:hover::after {
+  left: 100%;
 }
 
 @media (min-width: 768px) {
@@ -481,6 +519,7 @@ function navigateTo(path: string) {
 .project-image-carousel {
   position: relative;
   width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -489,6 +528,16 @@ function navigateTo(path: string) {
   transition: transform 0.3s ease;
   position: relative;
   width: 100%;
+  height: 100%;
+}
+
+.carousel-images img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .carousel-controls {
@@ -506,6 +555,8 @@ function navigateTo(path: string) {
 
 .skill-item {
   opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: calc(var(--index) * 0.1s);
 }
 
 .skill-item i {
@@ -514,5 +565,17 @@ function navigateTo(path: string) {
 
 .skill-item:hover i {
   transform: scale(1.2);
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

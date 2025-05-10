@@ -9,7 +9,6 @@ chmod -R 777 prisma
 
 npx prisma generate
 
-npx prisma migrate dev --name init --create-only
 npx prisma migrate deploy
 
 echo "初始化資料庫和管理員帳戶..."
