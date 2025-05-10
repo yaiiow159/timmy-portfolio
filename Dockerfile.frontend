@@ -11,7 +11,7 @@ COPY client/ ./
 ARG VITE_API_URL=http://localhost:5000/api
 ENV VITE_API_URL=${VITE_API_URL}
 
-RUN npm run build || (echo "Build failed but continuing" && mkdir -p dist)
+RUN npm run build
 
 FROM nginx:alpine
 
