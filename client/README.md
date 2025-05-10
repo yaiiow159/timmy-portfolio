@@ -12,7 +12,7 @@
 </div>
 
 <p align="center">
-<i>Last updated: May 8, 2025</i>
+<i>Last updated: May 10, 2025</i>
 </p>
 
 ## 📋 Overview
@@ -29,7 +29,7 @@ The frontend is built with Vue.js 3 and TypeScript, using Vite as the build tool
 - 📧 **Contact Form** with validation
 - 🔐 **Admin Dashboard** for content management
 - 🌙 **Dark Mode** support
-- 🌐 **i18n Support** for multiple languages
+- 🌐 **i18n Support** for multiple languages (English, Traditional Chinese, Simplified Chinese)
 - 🔍 **SEO Optimization** for better discoverability
 - 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
 - 🚀 **Performance Optimized** - Lazy loading and code splitting
@@ -82,9 +82,19 @@ client/
 │   │   ├── layout/     # Layout components
 │   │   └── portfolio/  # Portfolio components
 │   ├── composables/    # Vue composables
+│   ├── locales/        # i18n translation files
+│   │   ├── en.json     # English translations
+│   │   ├── zh-TW.json  # Traditional Chinese translations
+│   │   └── zh-CN.json  # Simplified Chinese translations
 │   ├── views/          # Page components
+│   │   ├── admin/      # Admin dashboard views
+│   │   ├── blog/       # Blog-related views
+│   │   └── portfolio/  # Portfolio-related views
 │   ├── router/         # Vue Router configuration
 │   ├── stores/         # Pinia stores
+│   │   ├── auth.ts     # Authentication store
+│   │   ├── blog.ts     # Blog store
+│   │   └── portfolio.ts # Portfolio store
 │   ├── styles/         # Global styles
 │   ├── utils/          # Utility functions
 │   ├── App.vue         # Root component
@@ -172,6 +182,16 @@ The application is tested and supported on the following browsers:
 - Firefox (latest 2 versions)
 - Safari (latest 2 versions)
 - Edge (latest 2 versions)
+
+## 🐳 Docker Development
+
+For Docker-based development, the frontend is configured to run in a container with hot reloading enabled. See the main project README for Docker setup instructions.
+
+## 🔍 Known Issues and Workarounds
+
+### Image Handling
+
+The project uses Cloudinary for image storage. The database schema uses `imageUrl` as an array of strings (`String[]`), but some older code may reference `imageUrls`. The `portfolioStore.ts` includes normalization to handle both field names for backward compatibility.
 
 ## 📝 License
 

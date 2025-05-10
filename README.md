@@ -18,7 +18,7 @@ A modern, responsive portfolio website with blog functionality, built using Vue.
 </p>
 
 <p align="center">
-<i>Last updated: May 8, 2025</i>
+<i>Last updated: May 10, 2025</i>
 </p>
 
 ---
@@ -79,9 +79,13 @@ timmy-portfolio/
 │   ├── middleware/         # Express middleware
 │   ├── scripts/            # Script Files
 │   └── package.json        # Backend Dependencies
-├── docker-compose.yml      # Docker Configuration
-├── Dockerfile.frontend     # Frontend Docker Configuration
-├── Dockerfile.backend      # Backend Docker Configuration
+├── docker-compose.yml      # Docker Compose Configuration
+├── docker-compose.dev.yml  # Development Docker Configuration
+├── Dockerfile.frontend     # Frontend Production Docker Configuration
+├── Dockerfile.backend      # Backend Production Docker Configuration
+├── Dockerfile.frontend.dev # Frontend Development Docker Configuration
+├── Dockerfile.backend.dev  # Backend Development Docker Configuration
+├── start-dev.ps1           # Windows Development Script
 ├── deploy.sh               # Linux/macOS Deployment Script
 └── deploy.ps1              # Windows Deployment Script
 ```
@@ -100,6 +104,7 @@ timmy-portfolio/
 - 🌙 **Dark Mode** - Toggle between light and dark themes
 - 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
 - 🔍 **Full-text Search** - Search functionality for blog posts and projects
+- 🌍 **Multilingual Support** - i18n integration with English and Chinese (Traditional and Simplified)
 
 ---
 
@@ -177,7 +182,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 4. Set up database:
 
 ```bash
-npx prisma migrate dev
+npx prisma db push
 ```
 
 5. Initialize database:
@@ -203,23 +208,37 @@ The backend API will run at http://localhost:5000.
 
 Using Docker is the simplest way to develop, avoiding environment configuration issues.
 
-1. Run in the project root directory:
+1. Make sure you have Docker and Docker Compose installed on your system.
+
+2. Run the development script in the project root directory:
 
 ```bash
-# Linux/macOS
-./deploy.sh
-
 # Windows
-.\deploy.ps1
+.\start-dev.ps1
 ```
 
 Or manually run Docker Compose:
 
 ```bash
+# Development environment
+docker-compose -f docker-compose.dev.yml up -d
+
+# Production-like environment
 docker-compose up -d
 ```
 
-This will start the frontend, backend, and database services. The frontend will run at http://localhost:3000, and the backend API at http://localhost:5000.
+3. The services will be available at:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+   - PostgreSQL: localhost:5432
+
+4. If you encounter database schema issues, you can run:
+
+```bash
+docker-compose exec backend npx prisma db push
+```
+
+This will synchronize the Prisma schema with the database without creating migration files.
 
 </details>
 
@@ -399,19 +418,51 @@ pg_dump -U postgres timmy_portfolio > backup.sql
 If using Docker:
 
 ```bash
-cat backup.sql | docker exec -i timmy-portfolio-db psql -U postgres -d timmy_portfolio
+docker exec -i timmy-portfolio-db psql -U postgres timmy_portfolio < backup.sql
 ```
 
 If using local PostgreSQL:
 
 ```bash
-psql -U postgres -d timmy_portfolio < backup.sql
+psql -U postgres timmy_portfolio < backup.sql
 ```
 
 </details>
 
----
+<details>
+<summary><b>How do I handle database schema changes?</b></summary>
 
-<p align="center">
-© 2025 Timmy's Portfolio. All rights reserved.
-</p>
+For development environments, you can use Prisma's db push to synchronize schema changes:
+
+```bash
+npx prisma db push
+```
+
+For production environments, it's recommended to use migrations:
+
+```bash
+npx prisma migrate dev --name describe_your_changes
+npx prisma migrate deploy
+```
+
+If you encounter migration issues, you can reset the database (development only):
+
+```bash
+npx prisma migrate reset
+```
+
+</details>
+
+<details>
+<summary><b>How do I update the Docker containers?</b></summary>
+
+Pull the latest code changes, then rebuild and restart the containers:
+
+```bash
+git pull
+docker-compose down
+docker-compose build
+docker-compose up -d
+```
+
+</details>

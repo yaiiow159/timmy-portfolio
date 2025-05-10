@@ -1,4 +1,4 @@
-# 🚀 Backend - Node.js Application
+# Backend - Node.js Application
 
 <div align="center">
 
@@ -13,29 +13,29 @@
 </div>
 
 <p align="center">
-<i>Last updated: May 8, 2025</i>
+<i>Last updated: May 10, 2025</i>
 </p>
 
-## 📋 Overview
+## Overview
 
 The backend is built with Node.js and Express, using PostgreSQL as the database and Prisma as the ORM. It provides a RESTful API for the portfolio website with robust authentication, data validation, and error handling. Images are stored and served via Cloudinary for optimized delivery and performance.
 
-## 🚀 Features
+## Features
 
-- 🔐 **Authentication & Authorization** - Secure JWT-based authentication
-- 📝 **Blog Management** - Create, read, update, and delete blog posts
-- 🎯 **Project Management** - Manage portfolio projects
-- 📧 **Email Notifications** - Send emails via SMTP
-- 📊 **Analytics** - Track page views and user engagement
-- 🔍 **Search Functionality** - Full-text search for blog posts
-- 📄 **File Uploads** - Store and serve images and documents via Cloudinary
-- 🌐 **CORS Support** - Secure cross-origin requests
-- 🔒 **Rate Limiting** - Prevent abuse and DDoS attacks
-- 📝 **Logging** - Comprehensive logging for debugging and monitoring
-- 🔄 **Caching** - Performance optimization with Redis (optional)
-- 🧠 **AI Integration** - Content suggestion and auto-tagging capabilities
+- **Authentication & Authorization** - Secure JWT-based authentication
+- **Blog Management** - Create, read, update, and delete blog posts
+- **Project Management** - Manage portfolio projects
+- **Email Notifications** - Send emails via SMTP
+- **Analytics** - Track page views and user engagement
+- **Search Functionality** - Full-text search for blog posts
+- **File Uploads** - Store and serve images and documents via Cloudinary
+- **CORS Support** - Secure cross-origin requests
+- **Rate Limiting** - Prevent abuse and DDoS attacks
+- **Logging** - Comprehensive logging for debugging and monitoring
+- **Caching** - Performance optimization with Redis (optional)
+- **AI Integration** - Content suggestion and auto-tagging capabilities
 
-## 💻 Development
+## Development
 
 ### Prerequisites
 
@@ -74,11 +74,11 @@ CLOUDINARY_API_SECRET=your_api_secret
 # Generate Prisma client
 npx prisma generate
 
-# Run migrations
-npx prisma migrate dev
+# Synchronize database schema (recommended for development)
+npx prisma db push
 
-# Seed the database (optional)
-npx prisma db seed
+# Or use migrations for production environments
+# npx prisma migrate dev
 ```
 
 4. Start development server:
@@ -97,7 +97,7 @@ npm run dev
 - `npm run migrate` - Run Prisma migrations
 - `npm run seed` - Seed the database
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 server/
@@ -119,14 +119,16 @@ server/
 │   └── cloudinary.js    # Cloudinary configuration
 ├── scripts/             # Utility scripts
 │   └── init-db.js       # Database initialization
+├── logs/                # Log files directory
 ├── .env                 # Environment variables
 ├── .env.dev             # Development environment variables
 ├── .env.production      # Production environment variables
 ├── package.json         # Project dependencies
+├── entrypoint.sh        # Docker entrypoint script
 └── server.js            # Server entry point
 ```
 
-## 📦 Dependencies
+## Dependencies
 
 - **Express** - Web framework
 - **Prisma** - ORM for database access
@@ -144,7 +146,7 @@ server/
 - **Express-rate-limit** - Rate limiting
 - **Redis** - Caching (optional)
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -167,7 +169,7 @@ server/
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
 | `REDIS_URL` | Redis connection string | For caching |
 
-## 🔒 API Security
+## API Security
 
 The API implements several security measures:
 
@@ -179,7 +181,7 @@ The API implements several security measures:
 - Input validation with Joi
 - SQL injection protection with Prisma
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -191,7 +193,7 @@ npm run test:blog
 npm run test:projects
 ```
 
-## 📝 API Documentation
+## API Documentation
 
 API documentation is available at `/api-docs` when running the server in development mode.
 
@@ -201,40 +203,62 @@ API documentation is available at `/api-docs` when running the server in develop
 |:-------|:---------|:------------|:--------------|
 | POST | `/api/auth/login` | User login | No |
 | POST | `/api/auth/register` | User registration | No |
-| GET | `/api/blog` | Get all blog posts | No |
-| GET | `/api/blog/:id` | Get blog post by ID | No |
-| POST | `/api/blog` | Create blog post | Yes |
-| PUT | `/api/blog/:id` | Update blog post | Yes |
-| DELETE | `/api/blog/:id` | Delete blog post | Yes |
 | GET | `/api/projects` | Get all projects | No |
 | GET | `/api/projects/:id` | Get project by ID | No |
 | POST | `/api/projects` | Create project | Yes |
 | PUT | `/api/projects/:id` | Update project | Yes |
 | DELETE | `/api/projects/:id` | Delete project | Yes |
+| GET | `/api/posts` | Get all blog posts | No |
+| GET | `/api/posts/:id` | Get blog post by ID | No |
+| POST | `/api/posts` | Create blog post | Yes |
+| PUT | `/api/posts/:id` | Update blog post | Yes |
+| DELETE | `/api/posts/:id` | Delete blog post | Yes |
 | POST | `/api/contact` | Send contact message | No |
-| POST | `/api/uploads` | Upload file | Yes |
-| GET | `/api/analytics` | Get analytics data | Yes |
+| POST | `/api/uploads` | Upload file to Cloudinary | Yes |
+| GET | `/api/uploads` | Get all uploads | Yes |
+| DELETE | `/api/uploads/:id` | Delete upload | Yes |
 
-## 🚀 Performance Optimization
+## Docker Development
 
-The backend implements several performance optimizations:
+For Docker-based development, the backend is configured to run in a container with hot reloading enabled. See the main project README for Docker setup instructions.
 
-- Database indexing for faster queries
-- Query optimization with Prisma
-- Response caching with Redis (optional)
-- Pagination for large data sets
-- Cloudinary for optimized image delivery
-- Compression middleware
+## Database Schema Notes
 
-## 📈 Scalability
+### Project Schema
 
-The application is designed to be scalable:
+The `Project` model in Prisma schema includes:
 
-- Stateless authentication with JWT
-- Containerized with Docker for easy horizontal scaling
-- Database connection pooling
-- Efficient query optimization
+```prisma
+model Project {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  technologies String[]
+  imageUrl     String[]  // Array of image URLs
+  liveUrl      String?
+  codeUrl      String?
+  featured     Boolean  @default(false)
+  date         DateTime @default(now())
+}
+```
 
-## 📝 License
+Note that `imageUrl` is defined as a `String[]` (array of strings) in the Prisma schema. When creating or updating projects, make sure to pass image URLs as an array, even if there's only one image.
+
+### Handling Schema Changes
+
+For development environments, use `prisma db push` to synchronize schema changes without creating migration files:
+
+```bash
+npx prisma db push
+```
+
+For production environments, use migrations:
+
+```bash
+npx prisma migrate dev --name describe_your_changes
+npx prisma migrate deploy
+```
+
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
