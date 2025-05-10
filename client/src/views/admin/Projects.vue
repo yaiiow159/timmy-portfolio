@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold mb-4">{{ t('admin.projectsManagement') }}</h1>
       <button 
         @click="openProjectModal()" 
-        class="btn btn-primary"
+        class="btn btn-primary add-project-btn"
       >
         <i class="fas fa-plus mr-2"></i> {{ t('admin.addProject') }}
       </button>
@@ -77,13 +77,13 @@
               {{ tech }}
               <div class="tag-actions">
                 <button @click="moveTechnologyUp(index)" class="move-tech" :title="t('admin.moveTechnologyUp')" v-if="index > 0">
-                  <i class="fas fa-arrow-up"></i>
+                  <span class="move-icon">↑</span>
                 </button>
                 <button @click="moveTechnologyDown(index)" class="move-tech" :title="t('admin.moveTechnologyDown')" v-if="index < project.technologies.length - 1">
-                  <i class="fas fa-arrow-down"></i>
+                  <span class="move-icon">↓</span>
                 </button>
                 <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
-                  <i class="fas fa-times"></i>
+                  <span class="x-icon">×</span>
                 </button>
               </div>
             </span>
@@ -191,13 +191,13 @@
                 {{ tech }}
                 <div class="tag-actions">
                   <button @click="moveTechnologyUp(index)" class="move-tech" :title="t('admin.moveTechnologyUp')" v-if="index > 0">
-                    <i class="fas fa-arrow-up"></i>
+                    <span class="move-icon">↑</span>
                   </button>
                   <button @click="moveTechnologyDown(index)" class="move-tech" :title="t('admin.moveTechnologyDown')" v-if="index < currentProject.technologies.length - 1">
-                    <i class="fas fa-arrow-down"></i>
+                    <span class="move-icon">↓</span>
                   </button>
                   <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
-                    <i class="fas fa-times"></i>
+                    <span class="x-icon">×</span>
                   </button>
                 </div>
               </span>
@@ -359,7 +359,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineExpose } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/store/authStore.ts'
 import { useNotificationStore } from '@/store/notificationStore.ts'
@@ -766,19 +766,6 @@ function previewImage(imageUrl: string) {
 onMounted(() => {
   fetchProjects()
 })
-
-defineExpose({
-  openProjectModal,
-  addTechnology,
-  removeTechnology,
-  uploadProjectImage,
-  saveProject,
-  confirmDelete,
-  deleteProject,
-  handleImageError,
-  removeProjectImage,
-  previewImage
-})
 </script>
 
 <style scoped lang="scss">
@@ -791,6 +778,8 @@ defineExpose({
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .loading-container {
@@ -982,43 +971,61 @@ defineExpose({
 }
 
 .tech-tag {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.tech-tag {
   display: inline-flex;
   align-items: center;
-  background-color: #2c3e50;
-  color: white;
-  border-radius: 4px;
-  padding: 0.3rem 0.6rem;
-  margin: 0.25rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.x-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 0.8;
+  margin-left: 0.3rem;
+}
+
+.tag-actions {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.move-tech, .remove-tech {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.3rem;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
   
-  .tag-actions {
-    display: inline-flex;
-    align-items: center;
-    margin-left: 0.5rem;
+  &:hover {
+    color: white;
   }
-  
-  .move-tech, .remove-tech {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    padding: 0;
-    margin-left: 0.3rem;
-    font-size: 0.8rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-    
-    &:hover {
-      color: white;
-    }
-  }
-  
-  .remove-tech {
-    &:hover {
-      color: #ff5252;
-    }
+}
+
+.remove-tech {
+  &:hover {
+    color: #ff5252;
   }
 }
 
@@ -1528,5 +1535,15 @@ defineExpose({
 
 .dark-mode {
   --border-color: rgba(125, 125, 125, 0.3);
+}
+
+.add-project-btn {
+  white-space: nowrap;
+}
+
+.move-icon {
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 0.8;
 }
 </style>

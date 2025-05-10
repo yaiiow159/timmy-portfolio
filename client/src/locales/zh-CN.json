@@ -232,7 +232,8 @@
     "imagePosition": "第 {position} 张，共 {total} 张",
     "removeTechnology": "删除技术",
     "moveTechnologyUp": "向上移动",
-    "moveTechnologyDown": "向下移动"
+    "moveTechnologyDown": "向下移动",
+    "imageUploaded": "图片上传成功"
   },
   "resume": {
     "title": "简历",
@@ -434,6 +435,7 @@
     "delete": "删除",
     "edit": "编辑",
     "save": "保存",
-    "submit": "提交"
+    "submit": "提交",
+    "uploading": "上传中..."
   }
 }

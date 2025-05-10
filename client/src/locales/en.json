@@ -207,7 +207,8 @@
     "moveImageUp": "Move Image Up",
     "moveImageDown": "Move Image Down",
     "imagePosition": "Image {position} of {total}",
-    "imageUrl": "Image URL"
+    "imageUrl": "Image URL",
+    "imageUploaded": "Image uploaded successfully"
   },
   "resume": {
     "title": "Resume",
@@ -407,6 +408,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "uploading": "Uploading..."
   }
 }

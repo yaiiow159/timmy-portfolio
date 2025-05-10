@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY client/package*.json ./
 RUN npm install
-RUN npm install --save-dev @types/node
+RUN npm install --save-dev @types/node sass sass-embedded
 
 ENV VITE_API_URL=http://localhost:5000/api
 ENV NODE_ENV=development

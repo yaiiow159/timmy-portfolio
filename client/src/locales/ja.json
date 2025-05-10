@@ -201,7 +201,8 @@
     "moveImageUp": "画像を上に移動",
     "moveImageDown": "画像を下に移動",
     "imagePosition": "{total}枚中{position}枚目",
-    "removeTechnology": "技術を削除"
+    "removeTechnology": "技術を削除",
+    "imageUploaded": "画像をアップロードしました"
   },
   "resume": {
     "title": "履歴書",
@@ -401,6 +402,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "uploading": "Uploading..."
   }
 }
