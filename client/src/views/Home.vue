@@ -194,12 +194,12 @@ function navigateTo(path: string) {
     <section class="relative py-20 md:py-32 overflow-hidden">
       <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto text-center">
-          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6">
-            <span class="block text-text-primary">{{ t('home.greeting') }}</span>
+          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-4">
+            <span class="block text-white">{{ t('home.greeting') }}</span>
             <span class="name-highlight">{{ t('home.name') }}</span>
           </h1>
-          <h2 class="hero-subtitle text-2xl md:text-3xl font-semibold mb-6 text-text-primary">
-            {{ t('home.title') }}
+          <h2 class="hero-subtitle text-2xl md:text-3xl font-semibold mb-6 text-white">
+            <span class="profession-highlight">{{ t('home.title') }}</span>
           </h2>
           <p class="hero-description text-lg md:text-xl text-text-secondary mb-8">
             {{ t('home.intro') }}
@@ -476,7 +476,7 @@ function navigateTo(path: string) {
 .hero-title {
   font-size: 2.5rem;
   line-height: 1.2;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .name-highlight {
@@ -486,11 +486,12 @@ function navigateTo(path: string) {
   background-color: var(--accent);
   color: white;
   border-radius: 0.75rem;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
   transform: translateY(0);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .name-highlight::after {
@@ -511,17 +512,22 @@ function navigateTo(path: string) {
 
 .name-highlight:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .name-highlight:hover::after {
   left: 100%;
 }
 
-@media (min-width: 768px) {
-  .hero-title {
-    font-size: 3.5rem;
-  }
+.profession-highlight {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 0.5rem;
+  backdrop-filter: blur(4px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
 .project-image-carousel {

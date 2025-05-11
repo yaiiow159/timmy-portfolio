@@ -117,6 +117,48 @@
               </div>
             </form>
           </div>
+          
+          <div class="mt-8">
+            <h4 class="text-lg font-medium mb-4">{{ t('portfolio.comments') }}</h4>
+            
+            <div v-if="post.comments && post.comments.length > 0" class="relative">
+              <div class="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-accent scrollbar-track-secondary">
+                <div class="flex space-x-4 py-2">
+                  <div 
+                    v-for="comment in post.comments" 
+                    :key="comment.id" 
+                    class="flex-shrink-0 w-80 bg-white dark:bg-secondary p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+                  >
+                    <div class="flex items-center mb-3">
+                      <div class="bg-accent/20 rounded-full w-10 h-10 flex items-center justify-center text-accent font-medium">
+                        {{ comment.name.charAt(0).toUpperCase() }}
+                      </div>
+                      <div class="ml-3">
+                        <p class="font-medium">{{ comment.name }}</p>
+                        <p class="text-xs text-text-secondary dark:text-text-secondary-light">
+                          {{ new Date(comment.date).toLocaleDateString() }}
+                        </p>
+                      </div>
+                    </div>
+                    <p class="text-sm">{{ comment.content }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex justify-center mt-2 space-x-1">
+                <div 
+                  v-for="(_, index) in post.comments" 
+                  :key="index"
+                  class="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+                  :class="{ 'bg-accent': index === 0 }"
+                ></div>
+              </div>
+            </div>
+            
+            <div v-else class="bg-white dark:bg-secondary p-4 rounded-lg text-center text-text-secondary dark:text-text-secondary-light">
+              {{ t('blog.noComments') }}
+            </div>
+          </div>
         </div>
       </div>
       

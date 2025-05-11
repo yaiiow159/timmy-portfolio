@@ -49,6 +49,7 @@
     "submit": "提交",
     "submitting": "提交中...",
     "submitComment": "提交评论",
+    "noComments": "暂无评论",
     "recentPosts": "最新文章",
     "categories": "分类",
     "relatedPosts": "相关文章",
@@ -77,6 +78,7 @@
     "technologies": "使用技术",
     "viewLive": "查看线上版本",
     "viewCode": "查看源代码",
+    "viewDetails": "查看详情",
     "noResults": "没有找到项目",
     "tryDifferentSearch": "请尝试不同的搜索条件",
     "clearFilters": "清除筛选条件",
@@ -233,7 +235,8 @@
     "removeTechnology": "删除技术",
     "moveTechnologyUp": "向上移动",
     "moveTechnologyDown": "向下移动",
-    "imageUploaded": "图片上传成功"
+    "imageUploaded": "图片上传成功",
+    "comments": "评论"
   },
   "resume": {
     "title": "简历",

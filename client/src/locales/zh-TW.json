@@ -49,6 +49,7 @@
     "submit": "提交",
     "submitting": "提交中...",
     "submitComment": "提交評論",
+    "noComments": "暫無評論",
     "recentPosts": "最新文章",
     "categories": "分類",
     "relatedPosts": "相關文章",
@@ -56,7 +57,6 @@
     "loading": "載入中...",
     "postNotFound": "找不到文章",
     "postNotFoundMessage": "抱歉，您要找的文章不存在或已被移除。",
-    "noComments": "目前沒有評論",
     "beFirstToComment": "成為第一個留言的人",
     "commentError": "評論提交失敗，請稍後再試",
     "createPost": "建立文章",
@@ -77,6 +77,7 @@
     "technologies": "使用技術",
     "viewLive": "查看線上版本",
     "viewCode": "查看原始碼",
+    "viewDetails": "查看詳情",
     "noResults": "沒有找到專案",
     "tryDifferentSearch": "請嘗試不同的搜尋條件",
     "clearFilters": "清除篩選條件"
@@ -269,7 +270,8 @@
     "removeImage": "移除圖片",
     "moveImageUp": "向上移動圖片",
     "moveImageDown": "向下移動圖片",
-    "imagePosition": "第 {position} 張，共 {total} 張"
+    "imagePosition": "第 {position} 張，共 {total} 張",
+    "comments": "評論"
   },
   "contact": {
     "title": "聯絡我",

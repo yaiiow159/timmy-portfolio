@@ -164,8 +164,12 @@ onMounted(() => {
         <button 
           v-if="!project.liveUrl && !project.codeUrl"
           class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+          @click="$emit('view-details', project.id)"
         >
-          {{ t('portfolio.viewProject') }}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {{ t('portfolio.viewDetails') }}
         </button>
       </div>
     </div>
