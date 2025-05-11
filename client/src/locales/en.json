@@ -199,7 +199,14 @@
     "imagePosition": "Image {position} of {total}",
     "imageUrl": "Image URL",
     "imageUploaded": "Image uploaded successfully",
-    "comments": "Comments"
+    "comments": "Comments",
+    "searchPosts": "Search posts",
+    "sortByDate": "Sort by date",
+    "sortByTitle": "Sort by title",
+    "sortByComments": "Sort by comments",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "noPosts": "No posts"
   },
   "resume": {
     "title": "Resume",

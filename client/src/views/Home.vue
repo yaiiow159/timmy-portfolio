@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import gsap from 'gsap'
 import { usePortfolioStore } from '@/store/portfolioStore'
 import { useBlogStore } from '@/store/blogStore'
 
@@ -40,12 +39,29 @@ function prevProjectImage(projectId: string): void {
   setProjectCarouselIndex(projectId, prevIndex)
 }
 
+onMounted(async () => {
+  try {
+    await Promise.all([
+      portfolioStore.fetchFeaturedProjects(),
+      blogStore.fetchPosts()
+    ])
+    
+    portfolioStore.featuredProjects.forEach(project => {
+      projectCarouselIndices.value[project.id] = 0
+    })
+    
+    isLoaded.value = true
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    isLoaded.value = true
+  }
+})
+
 const skillCategories = [
   {
     id: 'frontend',
     skills: [
       { name: 'Vue.js', icon: 'devicon-vuejs-plain colored' },
-      { name: 'React', icon: 'devicon-react-original colored' },
       { name: 'TypeScript', icon: 'devicon-typescript-plain colored' },
       { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain colored' }
     ]
@@ -65,8 +81,7 @@ const skillCategories = [
       { name: 'MongoDB', icon: 'devicon-mongodb-plain colored' },
       { name: 'MySQL', icon: 'devicon-mysql-plain colored' },
       { name: 'PostgreSQL', icon: 'devicon-postgresql-plain colored' },
-      { name: 'Redis', icon: 'devicon-redis-plain colored' },
-      { name: 'InfluxDB', icon: 'devicon-influxdb-original' }
+      { name: 'Redis', icon: 'devicon-redis-plain colored' }
     ]
   },
   {
@@ -83,7 +98,8 @@ const skillCategories = [
   {
     id: 'monitoring',
     skills: [
-      { name: 'JConsole', icon: 'devicon-java-plain' }
+      { name: 'JConsole', icon: 'devicon-java-plain' },
+      { name: 'Grafana', icon: 'devicon-grafana-original colored' }
     ]
   },
   {
@@ -96,124 +112,56 @@ const skillCategories = [
   }
 ]
 
-watch(activeSkillCategory, () => {
+watch(() => activeSkillCategory.value, () => {
   setTimeout(() => {
     const skillItems = document.querySelectorAll('.skill-item')
     skillItems.forEach(item => {
-      gsap.set(item, { opacity: 0, y: 20 })
+      const htmlItem = item as HTMLElement;
+      htmlItem.style.setProperty('opacity', '0');
+      htmlItem.style.setProperty('transform', 'translateY(20px)');
     })
     
-    gsap.to('.skill-item', {
-      opacity: 1,
-      y: 0,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: 'power2.out'
-    })
+    setTimeout(() => {
+      skillItems.forEach(item => {
+        const htmlItem = item as HTMLElement;
+        htmlItem.style.setProperty('opacity', '1');
+        htmlItem.style.setProperty('transform', 'translateY(0)');
+      })
+    }, 50)
   }, 50)
 })
 
-onMounted(async () => {
-  isLoaded.value = true
-  
-  try {
-    await Promise.all([
-      portfolioStore.fetchFeaturedProjects(),
-      blogStore.fetchPosts()
-    ])
-    
-    portfolioStore.featuredProjects.forEach(project => {
-      projectCarouselIndices.value[project.id] = 0
-    })
-    
-    gsap.from('.hero-subtitle', { 
-      opacity: 0, 
-      y: 20, 
-      duration: 0.8,
-      delay: 0.2,
-      ease: 'power2.out'
-    })
-    
-    const skillItems = document.querySelectorAll('.skill-item')
-    skillItems.forEach(item => {
-      gsap.set(item, { opacity: 1, y: 0 })
-    })
-    
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  }
-  
-  const tl = gsap.timeline()
-  
-  tl.from('.hero-title', {
-    y: 50,
-    opacity: 0,
-    duration: 0.8,
-    ease: 'power3.out'
-  })
-  .from('.hero-subtitle', {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out'
-  }, '-=0.4')
-  .from('.hero-description', {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out'
-  }, '-=0.3')
-  .from('.hero-cta', {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out'
-  }, '-=0.3')
-  .from('.skill-category-tabs', {
-    y: 20,
-    opacity: 0,
-    duration: 0.5,
-    ease: 'power2.out'
-  }, '-=0.2')
-  .from('.skill-item', {
-    y: 20,
-    opacity: 0,
-    duration: 0.4,
-    stagger: 0.1,
-    ease: 'power2.out'
-  }, '-=0.2')
-})
-
-function navigateTo(path: string) {
-  router.push(path)
-}
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <section class="relative py-20 md:py-32 overflow-hidden">
-      <div class="container mx-auto px-4">
+  <div class="min-h-screen" v-if="isLoaded">
+    <section class="relative py-20 md:py-32 overflow-hidden hero-section">
+      <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-3xl mx-auto text-center">
-          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-4">
-            <span class="block text-white">{{ t('home.greeting') }}</span>
-            <span class="name-highlight">{{ t('home.name') }}</span>
+          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6">
+            <span class="block greeting-text">{{ t('home.greeting') }}</span>
+            <div class="name-container inline-block">
+              <span class="name-highlight">{{ t('home.name') }}</span>
+            </div>
           </h1>
-          <h2 class="hero-subtitle text-2xl md:text-3xl font-semibold mb-6 text-white">
-            <span class="profession-highlight">{{ t('home.title') }}</span>
-          </h2>
-          <p class="hero-description text-lg md:text-xl text-text-secondary mb-8">
+          <div class="profession-container mb-6">
+            <h2 class="profession-highlight text-2xl md:text-3xl font-semibold">
+              {{ t('home.title') }}
+            </h2>
+          </div>
+          <p class="hero-description text-lg md:text-xl mb-10 max-w-2xl mx-auto">
             {{ t('home.intro') }}
           </p>
-          <div class="hero-cta flex flex-col sm:flex-row justify-center gap-4">
+          <div class="hero-cta flex flex-col sm:flex-row justify-center gap-6">
             <button 
-              @click="navigateTo('/portfolio')" 
-              class="px-8 py-4 bg-accent hover:bg-accent-light text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl text-lg"
+              @click="router.push('/portfolio')" 
+              class="cta-button primary-button"
             >
               {{ t('home.cta') }}
             </button>
             <button 
-              @click="navigateTo('/contact')" 
-              class="px-8 py-4 border-2 border-accent text-accent hover:bg-accent/10 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl text-lg"
+              @click="router.push('/contact')" 
+              class="cta-button secondary-button"
             >
               {{ t('contact.title') }}
             </button>
@@ -221,18 +169,21 @@ function navigateTo(path: string) {
         </div>
       </div>
       
-      <div class="absolute -top-24 -right-24 w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-pulse-slow"></div>
-      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-pulse-slow"></div>
-      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-6xl max-h-96 bg-gradient-to-r from-accent/10 to-accent-light/10 rounded-full blur-3xl"></div>
+      <div class="hero-bg-element top-right"></div>
+      <div class="hero-bg-element bottom-left"></div>
+      <div class="hero-bg-element center"></div>
     </section>
     
-    <section class="py-16 bg-secondary">
+    <section class="py-16 bg-secondary skills-section">
       <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-8 text-text-primary">
-          {{ t('resume.skills') }}
-        </h2>
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-text-primary mb-4">
+            {{ t('resume.skills') }}
+          </h2>
+          <div class="w-24 h-1 bg-accent mx-auto rounded-full"></div>
+        </div>
         
-        <div class="flex flex-wrap justify-center gap-4 mb-10">
+        <div class="skills-filter flex flex-wrap justify-center gap-4 mb-10">
           <button 
             v-for="category in ['all', 'frontend', 'backend', 'database', 'devops', 'monitoring', 'systems']" 
             :key="category"
@@ -240,7 +191,7 @@ function navigateTo(path: string) {
             :class="[
               'px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md',
               activeSkillCategory === category 
-                ? 'bg-accent text-white' 
+                ? 'bg-accent text-white shadow-md' 
                 : 'bg-secondary border border-accent/20 text-text-secondary hover:border-accent/50 hover:text-accent'
             ]"
           >
@@ -248,7 +199,7 @@ function navigateTo(path: string) {
           </button>
         </div>
         
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
+        <div class="skills-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-items-center">
           <template v-if="activeSkillCategory === 'all'">
             <div 
               v-for="(skill, index) in skillCategories.flatMap(category => category.skills)"
@@ -256,10 +207,10 @@ function navigateTo(path: string) {
               class="skill-item flex flex-col items-center transform hover:scale-110 transition-transform duration-300"
               :style="{ '--index': index }"
             >
-              <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
-                <i :class="[skill.icon, 'text-3xl']"></i>
+              <div class="skill-icon w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
+                <i :class="[skill.icon, 'text-3xl text-accent']"></i>
               </div>
-              <span class="text-sm text-text-secondary font-medium">{{ skill.name }}</span>
+              <span class="skill-name text-sm text-text-secondary font-medium">{{ skill.name }}</span>
             </div>
           </template>
           
@@ -270,10 +221,10 @@ function navigateTo(path: string) {
               class="skill-item flex flex-col items-center transform hover:scale-110 transition-transform duration-300"
               :style="{ '--index': index }"
             >
-              <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
-                <i :class="[skill.icon, 'text-3xl']"></i>
+              <div class="skill-icon w-16 h-16 flex items-center justify-center bg-primary rounded-lg mb-3 shadow-lg hover:shadow-xl transition-shadow">
+                <i :class="[skill.icon, 'text-3xl text-accent']"></i>
               </div>
-              <span class="text-sm text-text-secondary font-medium">{{ skill.name }}</span>
+              <span class="skill-name text-sm text-text-secondary font-medium">{{ skill.name }}</span>
             </div>
           </template>
         </div>
@@ -286,15 +237,15 @@ function navigateTo(path: string) {
           <h2 class="text-3xl font-bold text-text-primary">
             {{ t('portfolio.title') }}
           </h2>
-          <router-link 
-            to="/portfolio" 
-            class="text-accent hover:text-accent-light transition-colors flex items-center gap-1"
+          <button 
+            @click="router.push('/portfolio')" 
+            class="text-accent hover:text-accent-light transition-colors flex items-center gap-1 cursor-pointer"
           >
             {{ t('portfolio.viewProject') }}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
-          </router-link>
+          </button>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -369,29 +320,27 @@ function navigateTo(path: string) {
                 </span>
               </div>
               <div class="flex gap-4">
-                <a 
+                <button 
                   v-if="project.liveUrl" 
-                  :href="project.liveUrl" 
-                  target="_blank" 
-                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+                  @click="router.push(project.liveUrl)" 
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors cursor-pointer"
                 >
                   {{ t('portfolio.viewLive') }}
-                </a>
-                <a 
+                </button>
+                <button 
                   v-if="project.codeUrl" 
-                  :href="project.codeUrl" 
-                  target="_blank" 
-                  class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors"
+                  @click="router.push(project.codeUrl)" 
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors cursor-pointer"
                 >
                   {{ t('portfolio.viewCode') }}
-                </a>
-                <router-link 
+                </button>
+                <button 
                   v-if="!project.liveUrl && !project.codeUrl" 
-                  :to="`/portfolio`" 
-                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+                  @click="router.push('/portfolio')" 
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors cursor-pointer"
                 >
                   {{ t('portfolio.viewProject') }}
-                </router-link>
+                </button>
               </div>
             </div>
           </div>
@@ -405,15 +354,15 @@ function navigateTo(path: string) {
           <h2 class="text-3xl font-bold text-text-primary">
             {{ t('blog.title') }}
           </h2>
-          <router-link 
-            to="/blog" 
-            class="text-accent hover:text-accent-light transition-colors flex items-center gap-1"
+          <button 
+            @click="router.push('/blog')" 
+            class="text-accent hover:text-accent-light transition-colors flex items-center gap-1 cursor-pointer"
           >
             {{ t('blog.viewAll') }}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
-          </router-link>
+          </button>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -447,15 +396,15 @@ function navigateTo(path: string) {
             <div class="p-6">
               <h3 class="text-xl font-semibold mb-2 text-text-primary">{{ post.title }}</h3>
               <p class="text-text-secondary mb-4">{{ post.excerpt }}</p>
-              <router-link 
-                :to="`/blog/${post.id}`" 
-                class="inline-flex items-center text-accent hover:text-accent-light transition-colors"
+              <button 
+                @click="router.push(`/blog/${post.id}`)" 
+                class="inline-flex items-center text-accent hover:text-accent-light transition-colors cursor-pointer"
               >
                 {{ t('blog.readMore') }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H6" />
                 </svg>
-              </router-link>
+              </button>
             </div>
           </div>
           
@@ -473,15 +422,38 @@ function navigateTo(path: string) {
 </template>
 
 <style scoped>
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  padding: 8rem 0;
+}
+
 .hero-title {
-  font-size: 2.5rem;
   line-height: 1.2;
-  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1.5rem;
+}
+
+.greeting-text {
+  color: var(--text-primary);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.75rem;
+}
+
+.dark .greeting-text {
+  color: #ffffff;
+}
+
+.light .greeting-text {
+  color: #333333;
+}
+
+.name-container {
+  margin-top: 0.5rem;
+  display: inline-block;
 }
 
 .name-highlight {
   display: inline-block;
-  margin-top: 0.5rem;
   padding: 0.75rem 1.5rem;
   background-color: var(--accent);
   color: white;
@@ -519,15 +491,138 @@ function navigateTo(path: string) {
   left: 100%;
 }
 
+.profession-container {
+  margin: 1.5rem 0;
+}
+
 .profession-highlight {
   display: inline-block;
-  padding: 0.5rem 1.25rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  border-radius: 0.5rem;
-  backdrop-filter: blur(4px);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem 1.5rem;
+  position: relative;
+  font-weight: 700;
+  transform: translateY(0);
   transition: all 0.3s ease;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.dark .profession-highlight {
+  color: transparent;
+  background-image: linear-gradient(135deg, var(--accent), var(--accent-light));
+  background-clip: text;
+  -webkit-background-clip: text;
+  text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3);
+}
+
+.light .profession-highlight {
+  color: var(--accent-dark);
+  text-shadow: 0 0 3px rgba(var(--accent-rgb), 0.2);
+}
+
+.profession-highlight:hover {
+  transform: translateY(-2px);
+}
+
+.dark .profession-highlight:hover {
+  text-shadow: 0 0 25px rgba(var(--accent-rgb), 0.4);
+}
+
+.light .profession-highlight:hover {
+  text-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+}
+
+.hero-description {
+  color: var(--text-secondary);
+  max-width: 36rem;
+  margin: 0 auto 2rem auto;
+  line-height: 1.6;
+}
+
+.hero-cta {
+  margin-top: 2rem;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-align: center;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.primary-button {
+  background-color: var(--accent);
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: var(--accent-light);
+}
+
+.secondary-button {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.secondary-button:hover {
+  background-color: rgba(var(--accent-rgb), 0.1);
+}
+
+.hero-bg-element {
+  position: absolute;
+  border-radius: 100%;
+  filter: blur(60px);
+}
+
+.hero-bg-element.top-right {
+  top: -6rem;
+  right: -6rem;
+  width: 24rem;
+  height: 24rem;
+  background-color: rgba(var(--accent-rgb), 0.3);
+  animation: pulse-slow 8s infinite alternate;
+}
+
+.hero-bg-element.bottom-left {
+  bottom: -6rem;
+  left: -6rem;
+  width: 24rem;
+  height: 24rem;
+  background-color: rgba(var(--accent-rgb), 0.3);
+  animation: pulse-slow 8s infinite alternate-reverse;
+}
+
+.hero-bg-element.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  max-width: 60rem;
+  max-height: 24rem;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-light-rgb), 0.05));
+}
+
+@keyframes pulse-slow {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
 }
 
 .project-image-carousel {
@@ -568,43 +663,63 @@ function navigateTo(path: string) {
 }
 
 .skill-item {
-  opacity: 0;
-  animation: fadeIn 0.5s ease forwards;
-  animation-delay: calc(var(--index) * 0.1s);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.skill-item i {
-  transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.skill-item:hover i {
-  transform: scale(1.2);
-  filter: drop-shadow(0 0 8px var(--accent));
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.hero-cta button {
+.skill-icon {
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  transition: box-shadow 0.3s ease;
 }
 
-.hero-cta button:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.skill-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.1), transparent);
+  z-index: -1;
 }
 
-.hero-cta button:active {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.skill-name {
+  transition: color 0.3s ease;
+}
+
+.skill-item:hover .skill-name {
+  color: var(--accent);
+}
+
+.skills-section {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.skills-filter button {
+  position: relative;
+  overflow: hidden;
+}
+
+.skills-filter button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.skills-filter button:hover::after {
+  left: 100%;
+}
+
+.skills-grid {
+  padding: 1rem;
 }
 </style>
