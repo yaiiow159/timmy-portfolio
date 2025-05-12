@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Project } from '../store/portfolioStore'
 import gsap from 'gsap'
@@ -15,6 +15,7 @@ const projects = ref<Project[]>([])
 const showDetailsModal = ref(false)
 const selectedProject = ref<Project | null>(null)
 const detailsCarouselIndex = ref(0)
+const detailsCarouselInterval = ref<number | null>(null)
 
 function viewProjectDetails(projectId: string) {
   const project = projects.value.find(p => p.id === projectId)
@@ -22,12 +23,15 @@ function viewProjectDetails(projectId: string) {
     selectedProject.value = project
     detailsCarouselIndex.value = 0
     showDetailsModal.value = true
+    
+    startDetailsCarousel()
   }
 }
 
 function closeDetailsModal() {
   showDetailsModal.value = false
   selectedProject.value = null
+  stopDetailsCarousel()
 }
 
 function nextDetailsImage() {
@@ -38,6 +42,25 @@ function nextDetailsImage() {
 function prevDetailsImage() {
   if (!selectedProject.value || !selectedProject.value.imageUrls || selectedProject.value.imageUrls.length <= 1) return
   detailsCarouselIndex.value = (detailsCarouselIndex.value - 1 + selectedProject.value.imageUrls.length) % selectedProject.value.imageUrls.length
+}
+
+function startDetailsCarousel() {
+  // Clear any existing interval
+  stopDetailsCarousel()
+  
+  // Only start if we have multiple images
+  if (selectedProject.value?.imageUrls && selectedProject.value.imageUrls.length > 1) {
+    detailsCarouselInterval.value = window.setInterval(() => {
+      nextDetailsImage()
+    }, 5000) // Change image every 5 seconds
+  }
+}
+
+function stopDetailsCarousel() {
+  if (detailsCarouselInterval.value) {
+    clearInterval(detailsCarouselInterval.value)
+    detailsCarouselInterval.value = null
+  }
 }
 
 onMounted(async () => {
@@ -71,6 +94,11 @@ onMounted(async () => {
       ease: 'power2.out'
     }, '-=0.2')
   }
+})
+
+// Clean up intervals when component is unmounted
+onUnmounted(() => {
+  stopDetailsCarousel()
 })
 
 const categories = computed(() => {
@@ -189,7 +217,6 @@ function selectCategory(category: string) {
     </div>
   </div>
   
-  <!-- Project Details Modal -->
   <div v-if="showDetailsModal && selectedProject" class="fixed inset-0 z-50 overflow-y-auto" @click.self="closeDetailsModal">
     <div class="flex items-center justify-center min-h-screen p-4">
       <div class="fixed inset-0 bg-black opacity-70 transition-opacity" @click="closeDetailsModal"></div>
@@ -204,19 +231,20 @@ function selectCategory(category: string) {
           </svg>
         </button>
         
-        <!-- Image Carousel -->
-        <div class="h-64 sm:h-80 md:h-96 bg-gray-800 relative overflow-hidden">
+        <div class="h-64 sm:h-80 md:h-96 bg-gray-800 relative overflow-hidden"
+             @mouseenter="stopDetailsCarousel" 
+             @mouseleave="startDetailsCarousel">
           <div v-if="selectedProject.imageUrls && selectedProject.imageUrls.length > 0" class="h-full w-full">
-            <div class="carousel-images h-full w-full relative" :style="{ transform: `translateX(-${detailsCarouselIndex * 100}%)` }">
+            <transition-group name="fade" tag="div" class="carousel-images h-full w-full relative">
               <img 
                 v-for="(imageUrl, index) in selectedProject.imageUrls" 
                 :key="`details-img-${index}`"
+                v-show="detailsCarouselIndex === index"
                 :src="imageUrl" 
                 :alt="`${selectedProject.title} - Image ${index + 1}`"
-                class="w-full h-full object-cover absolute top-0 left-0"
-                :style="{ left: `${index * 100}%` }"
+                class="w-full h-full object-cover absolute top-0 left-0 transition-transform duration-500"
               />
-            </div>
+            </transition-group>
             
             <div v-if="selectedProject.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between">
               <button @click.prevent="prevDetailsImage" class="carousel-control ml-4 bg-black/40 hover:bg-black/60 text-white rounded-full p-2">
@@ -249,7 +277,6 @@ function selectCategory(category: string) {
           </div>
         </div>
         
-        <!-- Project Details -->
         <div class="p-6">
           <h2 class="text-2xl font-bold mb-2 text-text-primary">{{ selectedProject.title }}</h2>
           
@@ -303,27 +330,49 @@ function selectCategory(category: string) {
 <style scoped>
 .project-image-carousel {
   position: relative;
-  width: 100%;
   overflow: hidden;
 }
 
-.carousel-images {
-  display: flex;
-  transition: transform 0.3s ease;
-  position: relative;
-  width: 100%;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .carousel-controls {
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
 }
 
-.project-card:hover .carousel-controls {
+.carousel-controls:hover {
   opacity: 1;
 }
 
-.carousel-indicator {
-  transition: background-color 0.2s ease;
+.filter-button {
+  @apply px-3 py-1 rounded-full text-sm font-medium transition-colors;
+}
+
+.filter-button.active {
+  @apply bg-accent text-white;
+}
+
+.filter-button:not(.active) {
+  @apply bg-primary text-text-secondary hover:bg-accent hover:text-white;
+}
+
+.search-input {
+  @apply bg-primary border-0 rounded-full px-4 py-2 text-text-primary focus:ring-2 focus:ring-accent focus:outline-none w-full;
+}
+
+.project-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
 }
 </style>

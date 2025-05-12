@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted, watch} from 'vue'
+import {ref, onMounted, watch, onUnmounted} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { usePortfolioStore } from '@/store/portfolioStore'
@@ -12,6 +12,7 @@ const blogStore = useBlogStore()
 const isLoaded = ref(false)
 const projectCarouselIndices = ref<Record<string, number>>({})
 const activeSkillCategory = ref('all')
+const carouselIntervals = ref<Record<string, number>>({})
 
 function getProjectCarouselIndex(projectId: string): number {
   return projectCarouselIndices.value[projectId] || 0
@@ -39,6 +40,24 @@ function prevProjectImage(projectId: string): void {
   setProjectCarouselIndex(projectId, prevIndex)
 }
 
+function startCarousel(projectId: string): void {
+  const project = portfolioStore.featuredProjects.find(p => p.id === projectId)
+  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return
+  
+  stopCarousel(projectId)
+  
+  carouselIntervals.value[projectId] = window.setInterval(() => {
+    nextProjectImage(projectId)
+  }, 5000)
+}
+
+function stopCarousel(projectId: string): void {
+  if (carouselIntervals.value[projectId]) {
+    clearInterval(carouselIntervals.value[projectId])
+    delete carouselIntervals.value[projectId]
+  }
+}
+
 onMounted(async () => {
   try {
     await Promise.all([
@@ -48,6 +67,11 @@ onMounted(async () => {
     
     portfolioStore.featuredProjects.forEach(project => {
       projectCarouselIndices.value[project.id] = 0
+      
+      // Start carousel for each project with multiple images
+      if (project.imageUrls && project.imageUrls.length > 1) {
+        startCarousel(project.id)
+      }
     })
     
     isLoaded.value = true
@@ -55,6 +79,13 @@ onMounted(async () => {
     console.error('Error fetching data:', error)
     isLoaded.value = true
   }
+})
+
+// Clean up intervals when component is unmounted
+onUnmounted(() => {
+  Object.keys(carouselIntervals.value).forEach(projectId => {
+    clearInterval(carouselIntervals.value[projectId])
+  })
 })
 
 const skillCategories = [
@@ -263,19 +294,20 @@ watch(() => activeSkillCategory.value, () => {
           </div>
           
           <div v-else v-for="project in portfolioStore.featuredProjects" :key="project.id" class="bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow project-card">
-            <div class="h-48 relative overflow-hidden">
+            <div class="h-48 relative overflow-hidden" 
+                 @mouseenter="stopCarousel(project.id)" 
+                 @mouseleave="startCarousel(project.id)">
               <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel h-full w-full">
-                <div class="carousel-images h-full w-full" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
+                <transition-group name="fade" tag="div" class="carousel-images h-full w-full">
                   <img 
                     v-for="(imageUrl, index) in project.imageUrls" 
                     :key="`${project.id}-img-${index}`"
+                    v-show="getProjectCarouselIndex(project.id) === index"
                     :src="imageUrl" 
                     :alt="`${project.title} - Image ${index + 1}`"
-                    class="w-full h-full object-cover"
-                    style="position: absolute; top: 0; width: 100%;"
-                    :style="{ left: `${index * 100}%` }"
+                    class="w-full h-full object-cover absolute top-0 left-0 transition-transform duration-500 hover:scale-110"
                   />
-                </div>
+                </transition-group>
                 
                 <div v-if="project.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between z-10">
                   <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev ml-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
@@ -721,5 +753,15 @@ watch(() => activeSkillCategory.value, () => {
 
 .skills-grid {
   padding: 1rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

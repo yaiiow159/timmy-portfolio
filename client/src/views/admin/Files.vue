@@ -440,7 +440,6 @@ async function batchDeleteFiles() {
 async function saveProjectChanges() {
   try {
     isSubmitting.value = true
-    // Implement project changes saving logic here
     notificationStore.addNotification({
       type: 'success',
       message: t('admin.projectChangesSaved'),

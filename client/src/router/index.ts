@@ -49,14 +49,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/admin',
     name: 'Admin',
     component: () => import('../views/Admin.vue'),
-    meta: { requiresAuth: true, transition: 'fade-in' },
+    meta: { 
+      transition: 'fade-in',
+      requiresAuth: true
+    },
     children: [
       {
         path: '',
-        redirect: { name: 'AdminDashboard' }
-      },
-      {
-        path: 'dashboard',
         name: 'AdminDashboard',
         component: () => import('../views/admin/Dashboard.vue')
       },
@@ -96,7 +95,7 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
@@ -107,15 +106,21 @@ const router = createRouter({
   }
 })
 
+router.afterEach(() => {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      document.body.style.display = 'none'
+      document.body.offsetHeight
+      document.body.style.display = ''
+    })
+  })
+})
+
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
   
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!authStore.isAuthenticated) {
-      next({ name: 'Auth' })
-    } else {
-      next()
-    }
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/auth')
   } else {
     next()
   }

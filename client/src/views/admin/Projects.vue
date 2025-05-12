@@ -1,36 +1,43 @@
 <template>
   <div class="admin-projects">
     <div class="header-container">
-      <h1 class="text-2xl font-bold mb-4">{{ t('admin.projectsManagement') }}</h1>
+      <h1>{{ t('admin.projectsManagement') }}</h1>
       <button 
-        @click="openProjectModal()" 
-        class="btn btn-primary add-project-btn"
+        @click="openCreateModal()" 
+        class="btn btn-primary"
       >
         <i class="fas fa-plus mr-2"></i> {{ t('admin.addProject') }}
       </button>
     </div>
 
-    <div v-if="isLoading" class="loading-container">
+    <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
       <p>{{ t('common.loading') }}</p>
     </div>
-
+    
     <div v-else-if="projects.length > 0" class="projects-grid">
       <div v-for="project in projects" :key="project.id" class="project-card">
         <div class="project-image">
-          <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel">
-            <div class="carousel-images" :style="{ transform: `translateX(-${getProjectCarouselIndex(project.id) * 100}%)` }">
-              <img 
-                v-for="(imageUrl, index) in project.imageUrls" 
-                :key="`${project.id}-img-${index}`"
-                :src="imageUrl" 
-                :alt="`${project.title} - Image ${index + 1}`"
-                @error="handleImageError"
-                class="w-full h-48 object-cover"
-              />
+          <div 
+            v-if="project.images && project.images.length > 0" 
+            class="project-image-carousel"
+            @mouseenter="handleMouseEnter(project.id)"
+            @mouseleave="handleMouseLeave(project.id)"
+          >
+            <div class="carousel-images">
+              <transition-group name="fade">
+                <img 
+                  v-for="(image, index) in project.images" 
+                  :key="`${project.id}-img-${index}`"
+                  :src="image" 
+                  :alt="`${project.title} - Image ${index + 1}`"
+                  class="carousel-image"
+                  v-show="project.currentImageIndex === index"
+                />
+              </transition-group>
             </div>
             
-            <div v-if="project.imageUrls.length > 1" class="carousel-controls">
+            <div class="carousel-controls">
               <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev">
                 <i class="fas fa-chevron-left"></i>
               </button>
@@ -40,316 +47,226 @@
               
               <div class="carousel-indicators">
                 <button 
-                  v-for="(_, index) in project.imageUrls" 
+                  v-for="(_, index) in project.images" 
                   :key="`${project.id}-indicator-${index}`"
-                  @click="setProjectCarouselIndex(project.id, index)"
+                  @click="goToImage(project.id, index)"
                   class="carousel-indicator"
-                  :class="{ active: getProjectCarouselIndex(project.id) === index }"
+                  :class="{ active: project.currentImageIndex === index }"
                 ></button>
               </div>
             </div>
+            
+            <div class="carousel-counter" v-if="project.images.length > 1">
+              {{ project.currentImageIndex + 1 }} / {{ project.images.length }}
+            </div>
           </div>
           
-          <img
-            v-else-if="project.imageUrl" 
-            :src="project.imageUrl" 
-            :alt="project.title"
-            @error="handleImageError"
-            class="w-full h-48 object-cover rounded-t-lg"
-          />
-          
-          <div v-else class="no-image-placeholder">
+          <div 
+            v-else
+            class="no-image-placeholder"
+          >
             <i class="fas fa-image"></i>
             <span>{{ t('admin.noImage') }}</span>
-          </div>
-          
-          <div class="featured-badge" v-if="project.featured">
-            <i class="fas fa-star mr-1"></i> {{ t('admin.featured') }}
           </div>
         </div>
         
         <div class="project-content">
           <h3 class="project-title">{{ project.title }}</h3>
-          <p class="project-description">{{ project.description.substring(0, 100) }}{{ project.description.length > 100 ? '...' : '' }}</p>
+          <p class="project-description">{{ project.description }}</p>
           
           <div class="project-tech">
-            <span v-for="(tech, index) in project.technologies" :key="index" class="tech-tag">
-              {{ tech }}
-              <div class="tag-actions">
-                <button @click="moveTechnologyUp(index)" class="move-tech" :title="t('admin.moveTechnologyUp')" v-if="index > 0">
-                  <span class="move-icon">↑</span>
-                </button>
-                <button @click="moveTechnologyDown(index)" class="move-tech" :title="t('admin.moveTechnologyDown')" v-if="index < project.technologies.length - 1">
-                  <span class="move-icon">↓</span>
-                </button>
-                <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
-                  <span class="x-icon">×</span>
-                </button>
-              </div>
+            <span 
+              v-for="(tech, index) in project.technologies" 
+              :key="`${project.id}-tech-${index}`"
+              class="tech-tag"
+            >
+              <i class="fas fa-tag"></i> {{ tech }}
             </span>
           </div>
           
+          <div class="project-links" v-if="project.codeUrl || project.liveUrl">
+            <a v-if="project.codeUrl" :href="project.codeUrl" target="_blank" class="project-link">
+              <i class="fab fa-github"></i> GitHub
+            </a>
+            <a v-if="project.liveUrl" :href="project.liveUrl" target="_blank" class="project-link">
+              <i class="fas fa-external-link-alt"></i> Live Demo
+            </a>
+          </div>
+          
           <div class="project-actions">
-            <button @click="openProjectModal(project)" class="btn btn-edit">
+            <button @click="openEditModal(project)" class="btn btn-edit">
               <i class="fas fa-edit"></i> {{ t('common.edit') }}
             </button>
-            <button @click="confirmDelete(project)" class="btn btn-delete">
+            <button @click="openDeleteModal(project.id)" class="btn btn-delete">
               <i class="fas fa-trash"></i> {{ t('common.delete') }}
             </button>
-            <button 
-              v-if="project.imageUrls && project.imageUrls.length > 0" 
-              @click="previewImage(project.imageUrls[getProjectCarouselIndex(project.id)])" 
-              class="btn btn-view"
-            >
-              <i class="fas fa-eye"></i> {{ t('admin.viewImage') }}
-            </button>
-            <button 
-              v-else-if="project.imageUrl" 
-              @click="previewImage(project.imageUrl)" 
-              class="btn btn-view"
-            >
-              <i class="fas fa-eye"></i> {{ t('admin.viewImage') }}
-            </button>
           </div>
+        </div>
+        
+        <div class="project-badge" v-if="project.featured">
+          <i class="fas fa-star"></i> {{ t('admin.featured') }}
         </div>
       </div>
     </div>
-
+    
     <div v-else class="no-projects">
-      <i class="fas fa-folder-open text-4xl mb-2 text-gray-400"></i>
+      <i class="fas fa-folder-open text-4xl mb-2"></i>
       <p>{{ t('admin.noProjects') }}</p>
-      <button @click="openProjectModal()" class="btn btn-primary mt-4">
+      <button @click="openCreateModal()" class="btn btn-primary mt-4">
         <i class="fas fa-plus mr-2"></i> {{ t('admin.addFirstProject') }}
       </button>
     </div>
-
-    <div v-if="showProjectModal" class="modal-overlay" @click.self="showProjectModal = false">
-      <div class="modal-container">
+    
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div :class="['modal-container', { 'modal-sm': currentProject.id === null }]">
         <div class="modal-header">
-          <h2>
-            <i class="fas fa-{{ isEditing ? 'edit' : 'plus-circle' }} mr-2"></i>
-            {{ isEditing ? t('admin.editProject') : t('admin.addProject') }}
-          </h2>
-          <button @click="showProjectModal = false" class="close-btn">
-            <i class="fas fa-times"></i>
-          </button>
+          <h2>{{ currentProject.id ? t('admin.editProject') : t('admin.addProject') }}</h2>
+          <button class="close-button" @click="closeModal">&times;</button>
         </div>
-        
         <div class="modal-body">
           <div class="form-group">
-            <label for="title" class="form-label">
-              <i class="fas fa-heading mr-2"></i>
-              {{ t('admin.projectTitle') }}
-            </label>
-            <input 
-              type="text" 
-              id="title" 
-              v-model="currentProject.title" 
-              :placeholder="t('admin.enterProjectTitle')"
-              class="form-input"
-            />
+            <label for="title" class="form-label">{{ t('admin.projectTitle') }}</label>
+            <input type="text" id="title" v-model="currentProject.title" class="form-control" :placeholder="t('admin.enterTitle')" />
           </div>
-          
           <div class="form-group">
-            <label for="description" class="form-label">
-              <i class="fas fa-align-left mr-2"></i>
-              {{ t('admin.projectDescription') }}
-            </label>
-            <textarea 
-              id="description" 
-              v-model="currentProject.description" 
-              :placeholder="t('admin.enterProjectDescription')"
-              class="form-textarea"
-              rows="4"
-            ></textarea>
+            <label for="description" class="form-label">{{ t('admin.projectDescription') }}</label>
+            <textarea id="description" v-model="currentProject.description" class="form-control" :placeholder="t('admin.enterDescription')"></textarea>
           </div>
-          
           <div class="form-group">
-            <label class="form-label">
-              <i class="fas fa-tags mr-2"></i>
-              {{ t('admin.technologies') }}
-            </label>
-            <div class="tech-input-container">
-              <input 
-                type="text" 
-                v-model="newTechnology" 
-                :placeholder="t('admin.addTechnology')"
-                class="form-input"
-                @keyup.enter="addTechnology"
+            <label for="github" class="form-label">GitHub URL</label>
+            <input type="text" id="github" v-model="currentProject.codeUrl" class="form-control" placeholder="Enter GitHub URL" />
+          </div>
+          <div class="form-group">
+            <label for="live" class="form-label">Live URL</label>
+            <input type="text" id="live" v-model="currentProject.liveUrl" class="form-control" placeholder="Enter live URL" />
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="featured" v-model="currentProject.featured" />
+              <label for="featured">{{ t('admin.featured') }}</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('admin.technologies') }}</label>
+            <div class="technologies-container">
+              <div class="technology-input-group">
+                <input 
+                  type="text" 
+                  v-model="newTechnology" 
+                  class="form-control" 
+                  :placeholder="t('admin.enterTechnology')" 
+                  @keyup.enter="addTechnology"
+                />
+                <button class="btn btn-primary" @click="addTechnology">{{ t('admin.add') }}</button>
+              </div>
+              <div class="technologies-list">
+                <div v-for="(tech, index) in currentProject.technologies" :key="index" class="technology-tag">
+                  <span>{{ tech }}</span>
+                  <button class="remove-tag" @click="removeTechnology(index)" title="Remove">×</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('admin.projectImages') }}</label>
+            <div class="file-input-container">
+              <input
+                  type="file"
+                  id="image"
+                  @change="handleFileChange"
+                  accept="image/*"
+                  class="file-input"
+                  ref="fileInputRef"
+                  multiple
               />
-              <button @click="addTechnology" class="btn btn-sm btn-primary tech-add-btn">
-                <i class="fas fa-plus"></i>
+              <label for="image" class="file-input-label">
+                <i class="fas fa-file-image mr-1"></i>
+                {{ t('admin.selectImage') }}
+              </label>
+              <button
+                  @click="uploadImages"
+                  class="upload-btn"
+                  :disabled="!selectedFiles.length || uploadingImage"
+              >
+                <i class="fas fa-upload mr-1"></i>
+                {{ uploadingImage ? t('common.uploading') : t('admin.uploadImage') }}
               </button>
             </div>
             
-            <div class="tech-tags" v-if="currentProject.technologies.length > 0">
-              <span 
-                v-for="(tech, index) in currentProject.technologies" 
-                :key="index" 
-                class="tech-tag"
-              >
-                {{ tech }}
-                <div class="tag-actions">
-                  <button @click="moveTechnologyUp(index)" class="move-tech" :title="t('admin.moveTechnologyUp')" v-if="index > 0">
-                    <span class="move-icon">↑</span>
-                  </button>
-                  <button @click="moveTechnologyDown(index)" class="move-tech" :title="t('admin.moveTechnologyDown')" v-if="index < currentProject.technologies.length - 1">
-                    <span class="move-icon">↓</span>
-                  </button>
-                  <button @click="removeTechnology(index)" class="remove-tech" :title="t('admin.removeTechnology')">
-                    <span class="x-icon">×</span>
-                  </button>
-                </div>
-              </span>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="image" class="form-label">
-              <i class="fas fa-images mr-2"></i>
-              {{ t('admin.projectImages') }}
-            </label>
-            <div class="image-upload-container">
-              <input 
-                type="file" 
-                id="image" 
-                @change="uploadProjectImage" 
-                accept="image/*"
-                class="file-input"
-                multiple
-              />
-              <label for="image" class="file-label">
-                <i class="fas fa-cloud-upload-alt mr-2"></i>
-                {{ t('admin.chooseImages') }}
-              </label>
-              <span v-if="isSubmitting" class="ml-2 uploading-indicator">
-                <span class="spinner-sm"></span>
-                {{ t('common.uploading') }}...
-              </span>
+            <div v-if="selectedFiles.length > 0" class="selected-files-preview">
+              <div v-for="(file, index) in selectedFiles" :key="index" class="selected-file-item">
+                <img :src="getPreviewUrl(file)" alt="Selected image preview" class="preview-thumbnail" />
+                <span class="file-name">{{ file.name }}</span>
+                <button @click="removeSelectedFile(index)" class="remove-selected-file">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </div>
             
-            <div v-if="currentProject.imageUrls && currentProject.imageUrls.length > 0" class="images-preview">
-              <div v-for="(imageUrl, index) in currentProject.imageUrls" :key="index" class="image-preview-item">
+            <div v-if="currentProject.images && currentProject.images.length > 0" class="images-preview">
+              <div 
+                v-for="(image, index) in currentProject.images" 
+                :key="`manage-${index}`" 
+                class="image-item"
+              >
                 <img 
-                  :src="imageUrl" 
+                  :src="image" 
                   alt="Project preview" 
-                  class="preview-img" 
-                  @error="handleImageError"
-                  @load="imageLoaded = true"
                 />
                 <div class="image-actions">
-                  <button @click="removeProjectImage(index)" class="remove-image" title="Remove image">
-                    <i class="fas fa-times"></i>
+                  <button @click="removeImage(index)" class="btn-remove" title="Remove image">
+                    <i class="fas fa-trash-alt"></i>
                   </button>
-                  <button v-if="index > 0" @click="moveImageUp(index)" class="move-image" title="Move up">
+                  <button v-if="index > 0" @click="moveImageUp(index)" class="btn-move-up" title="Move up">
                     <i class="fas fa-arrow-up"></i>
                   </button>
-                  <button v-if="index < currentProject.imageUrls.length - 1" @click="moveImageDown(index)" class="move-image" title="Move down">
+                  <button v-if="index < currentProject.images.length - 1" @click="moveImageDown(index)" class="btn-move-down" title="Move down">
                     <i class="fas fa-arrow-down"></i>
                   </button>
                 </div>
               </div>
             </div>
-            
-            <!-- For backward compatibility - show single image if using old format -->
-            <div v-else-if="currentProject.imageUrl" class="image-preview">
-              <img 
-                :src="currentProject.imageUrl" 
-                alt="Project preview" 
-                class="preview-img" 
-                @error="handleImageError"
-                @load="imageLoaded = true"
-              />
-              <button @click="removeProjectImage(-1)" class="remove-image">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="githubUrl" class="form-label">
-              <i class="fab fa-github mr-2"></i>
-              {{ t('admin.githubUrl') }}
-            </label>
-            <input 
-              type="text" 
-              id="githubUrl" 
-              v-model="currentProject.githubUrl" 
-              :placeholder="t('admin.enterGithubUrl')"
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="liveUrl" class="form-label">
-              <i class="fas fa-globe mr-2"></i>
-              {{ t('admin.liveUrl') }}
-            </label>
-            <input 
-              type="text" 
-              id="liveUrl" 
-              v-model="currentProject.liveUrl" 
-              :placeholder="t('admin.enterLiveUrl')"
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="featured" class="form-label">
-              <i class="fas fa-star mr-2"></i>
-              {{ t('admin.featured') }}
-            </label>
-            <input 
-              type="checkbox" 
-              id="featured" 
-              v-model="currentProject.featured" 
-              class="form-checkbox"
-            />
           </div>
         </div>
         
         <div class="modal-footer">
-          <button @click="showProjectModal = false" class="btn btn-secondary">
+          <button @click="closeModal" class="btn btn-secondary">
             <i class="fas fa-times mr-1"></i>
             {{ t('common.cancel') }}
           </button>
           <button 
             @click="saveProject" 
-            class="btn btn-primary save-btn" 
-            :disabled="isSubmitting"
+            class="btn btn-primary" 
+            :disabled="uploadingImage"
           >
-            <span v-if="isSubmitting" class="spinner-sm mr-1"></span>
-            <i v-else class="fas fa-{{ isEditing ? 'save' : 'plus' }} mr-1"></i>
+            <i class="fas fa-save mr-1"></i>
             {{ isEditing ? t('common.update') : t('common.save') }}
           </button>
         </div>
       </div>
     </div>
 
-    <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
+    <div v-if="showDeleteModal" class="modal-overlay" @click.self="closeDeleteModal">
       <div class="modal-container modal-sm">
         <div class="modal-header">
           <h2>{{ t('admin.confirmDelete') }}</h2>
-          <button @click="showDeleteModal = false" class="close-btn">
+          <button @click="closeDeleteModal" class="close-button">
             <i class="fas fa-times"></i>
           </button>
         </div>
         
         <div class="modal-body">
           <p>{{ t('admin.deleteProjectConfirmation') }}</p>
-          <p class="font-bold mt-2">{{ projectToDelete?.title }}</p>
         </div>
         
         <div class="modal-footer">
-          <button @click="showDeleteModal = false" class="btn btn-secondary">
+          <button @click="closeDeleteModal" class="btn btn-secondary">
             {{ t('common.cancel') }}
           </button>
           <button 
             @click="deleteProject" 
             class="btn btn-danger" 
-            :disabled="isSubmitting"
           >
-            <span v-if="isSubmitting" class="spinner-sm"></span>
             {{ t('common.delete') }}
           </button>
         </div>
@@ -359,1191 +276,1163 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useAuthStore } from '@/store/authStore.ts'
-import { useNotificationStore } from '@/store/notificationStore.ts'
-import api from '../../services/api'
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useNotificationStore } from '@/store/notificationStore';
+import api from '@/services/api';
+import type { Project } from '@/types/project';
+import { useAuthStore } from '@/store/authStore';
 
-const { t } = useI18n()
-const authStore = useAuthStore()
-const notificationStore = useNotificationStore()
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  technologies: string[]
-  imageUrls?: string[]
-  imageUrl?: string
-  imagePublicId?: string
-  imagePublicIds?: string[]
-  githubUrl?: string
-  liveUrl?: string
-  featured: boolean
-  date: string
+interface AdminProject extends Project {
+  currentImageIndex: number;
+  intervalId?: number;
+  images: string[];
 }
 
-const projects = ref<Project[]>([])
-const isLoading = ref(true)
-const isSubmitting = ref(false)
-const showProjectModal = ref(false)
-const showDeleteModal = ref(false)
-const isEditing = ref(false)
-const projectToDelete = ref<Project | null>(null)
-const newTechnology = ref('')
+const { t } = useI18n();
+const notificationStore = useNotificationStore();
+const authStore = useAuthStore();
 
-const currentProject = ref({
+const projects = ref<AdminProject[]>([]);
+const loading = ref(true);
+const showModal = ref(false);
+const showDeleteModal = ref(false);
+const isEditing = ref(false);
+const projectIdToDelete = ref<string | null>(null);
+const selectedFiles = ref<File[]>([]);
+const uploadingImage = ref(false);
+const newTechnology = ref('');
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const previewUrls = ref<string[]>([]);
+
+const emptyProject: AdminProject = {
   id: '',
   title: '',
   description: '',
-  technologies: [] as string[],
-  imageUrls: [] as string[],
-  imageUrl: '',
-  imagePublicIds: [] as string[],
-  imagePublicId: '',
-  githubUrl: '',
+  technologies: [],
+  images: [],
   liveUrl: '',
-  featured: false
-})
+  codeUrl: '',
+  featured: false,
+  date: '',
+  currentImageIndex: 0
+};
 
-const imageLoaded = ref(false)
+const currentProject = reactive<AdminProject>({ ...emptyProject });
 
-const projectCarouselIndices = ref<Record<string, number>>({})
+onMounted(async () => {
+  await fetchProjects();
+  startAllCarousels();
+});
 
-function getProjectCarouselIndex(projectId: string): number {
-  return projectCarouselIndices.value[projectId] || 0;
-}
-
-function setProjectCarouselIndex(projectId: string, index: number): void {
-  projectCarouselIndices.value[projectId] = index;
-}
-
-function nextProjectImage(projectId: string): void {
-  const project = projects.value.find(p => p.id === projectId);
-  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return;
-  
-  const currentIndex = getProjectCarouselIndex(projectId);
-  const nextIndex = (currentIndex + 1) % project.imageUrls.length;
-  setProjectCarouselIndex(projectId, nextIndex);
-}
-
-function prevProjectImage(projectId: string): void {
-  const project = projects.value.find(p => p.id === projectId);
-  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return;
-  
-  const currentIndex = getProjectCarouselIndex(projectId);
-  const prevIndex = (currentIndex - 1 + project.imageUrls.length) % project.imageUrls.length;
-  setProjectCarouselIndex(projectId, prevIndex);
-}
+onUnmounted(() => {
+  stopAllCarousels();
+});
 
 async function fetchProjects() {
-  isLoading.value = true
+  try {
+    loading.value = true;
+    const response = await api.get('/projects');
+    projects.value = response.data.map((project: Project) => ({
+      ...project,
+      images: project.imageUrl ? (Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl]) : [], // Convert imageUrl to images array
+      currentImageIndex: 0
+    }));
+    startAllCarousels();
+  } catch (error) {
+    notificationStore.addNotification({
+      message: t('admin.errorFetchingProjects'),
+      type: 'error',
+      duration: 5000
+    });
+    console.error('Error fetching projects:', error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function startAllCarousels() {
+  projects.value.forEach(project => {
+    if (project.images && project.images.length > 1) {
+      startCarousel(project.id);
+    }
+  });
+}
+
+function stopAllCarousels() {
+  projects.value.forEach(project => {
+    if (project.intervalId) {
+      clearInterval(project.intervalId);
+      project.intervalId = undefined;
+    }
+  });
+}
+
+function startCarousel(projectId: string) {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || project.intervalId || !project.images || project.images.length <= 1) return;
+  
+  project.intervalId = window.setInterval(() => {
+    nextProjectImage(projectId);
+  }, 5000);
+}
+
+function stopCarousel(projectId: string) {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || !project.intervalId) return;
+  
+  clearInterval(project.intervalId);
+  project.intervalId = undefined;
+}
+
+function handleMouseEnter(projectId: string) {
+  stopCarousel(projectId);
+}
+
+function handleMouseLeave(projectId: string) {
+  const project = projects.value.find(p => p.id === projectId);
+  if (project && project.images && project.images.length > 1) {
+    startCarousel(projectId);
+  }
+}
+
+function prevProjectImage(projectId: string) {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || !project.images || !project.images.length) return;
+  
+  project.currentImageIndex = (project.currentImageIndex - 1 + project.images.length) % project.images.length;
+}
+
+function nextProjectImage(projectId: string) {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || !project.images || !project.images.length) return;
+  
+  project.currentImageIndex = (project.currentImageIndex + 1) % project.images.length;
+}
+
+function goToImage(projectId: string, index: number) {
+  const project = projects.value.find(p => p.id === projectId);
+  if (!project || !project.images || !project.images.length) return;
+  
+  project.currentImageIndex = index;
+}
+
+function openCreateModal() {
+  isEditing.value = false;
+  Object.assign(currentProject, emptyProject);
+  showModal.value = true;
+}
+
+function openEditModal(project: AdminProject) {
+  isEditing.value = true;
+  Object.assign(currentProject, {
+    ...project,
+    technologies: [...project.technologies],
+    images: project.images ? [...project.images] : [],
+    currentImageIndex: 0
+  });
+  showModal.value = true;
+}
+
+function closeModal() {
+  showModal.value = false;
+  selectedFiles.value = [];
+  if (fileInputRef.value) {
+    fileInputRef.value.value = '';
+  }
+}
+
+function openDeleteModal(projectId: string) {
+  projectIdToDelete.value = projectId;
+  showDeleteModal.value = true;
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false;
+  projectIdToDelete.value = null;
+}
+
+function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    selectedFiles.value = Array.from(input.files);
+    // Create preview URLs for selected files
+    selectedFiles.value.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && e.target.result) {
+          // Preview URLs will be handled by getPreviewUrl function
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  } else {
+    selectedFiles.value = [];
+  }
+}
+
+function getPreviewUrl(file: File): string {
+  return URL.createObjectURL(file);
+}
+
+function removeSelectedFile(index: number) {
+  selectedFiles.value.splice(index, 1);
+  if (fileInputRef.value) {
+    // Can't directly modify files collection, so we reset the input if all files are removed
+    if (selectedFiles.value.length === 0) {
+      fileInputRef.value.value = '';
+    }
+  }
+}
+
+async function uploadImages() {
+  if (!selectedFiles.value.length) return;
   
   try {
-    const response = await api.get('/projects')
-    projects.value = response.data
-  } catch (error) {
-    console.error('Error fetching projects:', error)
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('admin.fetchProjectsError'),
-      duration: 5000
-    })
-  } finally {
-    isLoading.value = false
-  }
-}
-
-function openProjectModal(project?: Project) {
-    if (project) {
-      isEditing.value = true
-      currentProject.value = {
-        id: project.id,
-        title: project.title,
-        description: project.description,
-        technologies: [...project.technologies],
-        imageUrls: project.imageUrls || [],
-        imageUrl: project.imageUrl || '',
-        imagePublicIds: project.imagePublicIds || [],
-        imagePublicId: project.imagePublicId || '',
-        githubUrl: project.githubUrl || '',
-        liveUrl: project.liveUrl || '',
-        featured: project.featured
-      }
-      
-      if (!project.imageUrls && project.imageUrl) {
-        currentProject.value.imageUrls = [project.imageUrl];
-        if (project.imagePublicId) {
-          currentProject.value.imagePublicIds = [project.imagePublicId];
-        }
-      }
-    } else {
-      isEditing.value = false
-      currentProject.value = {
-        id: '',
-        title: '',
-        description: '',
-        technologies: [],
-        imageUrls: [],
-        imageUrl: '',
-        imagePublicIds: [],
-        imagePublicId: '',
-        githubUrl: '',
-        liveUrl: '',
-        featured: false
-      }
-    }
-  
-  showProjectModal.value = true
-}
-
-function addTechnology() {
-  if (newTechnology.value.trim() && !currentProject.value.technologies.includes(newTechnology.value.trim())) {
-    currentProject.value.technologies.push(newTechnology.value.trim())
-    newTechnology.value = ''
-  }
-}
-
-function removeTechnology(index: number) {
-  currentProject.value.technologies.splice(index, 1)
-}
-
-function moveTechnologyUp(index: number) {
-  if (index > 0) {
-    const tech = currentProject.value.technologies.splice(index, 1)[0]
-    currentProject.value.technologies.splice(index - 1, 0, tech)
-  }
-}
-
-function moveTechnologyDown(index: number) {
-  if (index < currentProject.value.technologies.length - 1) {
-    const tech = currentProject.value.technologies.splice(index, 1)[0]
-    currentProject.value.technologies.splice(index + 1, 0, tech)
-  }
-}
-
-async function uploadProjectImage(event: Event) {
-  const target = event.target as HTMLInputElement
-  const files = target.files
-  
-  if (!files || files.length === 0) return
-  
-  isSubmitting.value = true
-  
-  if (!currentProject.value.imageUrls) {
-    currentProject.value.imageUrls = [];
-  }
-  
-  if (!currentProject.value.imagePublicIds) {
-    currentProject.value.imagePublicIds = [];
-  }
-  
-  let uploadedCount = 0;
-  const totalFiles = files.length;
-  
-  const uploadPromises = [];
-  
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const formData = new FormData()
-    formData.append('file', file)
+    uploadingImage.value = true;
     
-    const uploadPromise = api.post('/uploads', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'x-auth-token': authStore.token as string
-      }
-    }).then(response => {
-      currentProject.value.imageUrls.push(response.data.filePath);
-      currentProject.value.imagePublicIds.push(response.data.publicId);
+    for (const file of selectedFiles.value) {
+      const formData = new FormData();
+      formData.append('file', file);
       
-      if (currentProject.value.imageUrls.length === 1) {
-        currentProject.value.imageUrl = response.data.filePath;
-        currentProject.value.imagePublicId = response.data.publicId;
-      }
-      
-      uploadedCount++;
-      
-      if (uploadedCount === totalFiles) {
+      try {
+        const response = await api.post('/uploads', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-auth-token': authStore.token as string
+          }
+        });
+        
+        if (response.data && response.data.filePath) {
+          currentProject.images.push(response.data.filePath);
+        }
+      } catch (uploadError) {
+        console.error('Error uploading individual image:', uploadError);
         notificationStore.addNotification({
-          type: 'success',
-          message: files.length > 1 ? t('admin.imagesUploaded') : t('admin.imageUploaded'),
-          duration: 3000
+          message: t('admin.errorUploadingImage') + `: ${file.name}`,
+          type: 'error',
+          duration: 5000
         });
       }
-    }).catch(error => {
-      console.error('Error uploading image:', error);
-      notificationStore.addNotification({
-        type: 'error',
-        message: t('admin.imageUploadError'),
-        duration: 5000
-      });
-    });
+    }
     
-    uploadPromises.push(uploadPromise);
-  }
-  
-  try {
-    await Promise.all(uploadPromises);
+    if (currentProject.images.length > 0) {
+      notificationStore.addNotification({
+        message: selectedFiles.value.length > 1 
+          ? t('admin.multipleImagesUploaded') 
+          : t('admin.imageUploaded'),
+        type: 'success',
+        duration: 3000
+      });
+    }
+    
+    selectedFiles.value = [];
+    if (fileInputRef.value) {
+      fileInputRef.value.value = '';
+    }
+  } catch (error) {
+    notificationStore.addNotification({
+      message: t('admin.errorUploadingImage'),
+      type: 'error',
+      duration: 5000
+    });
+    console.error('Error uploading image:', error);
   } finally {
-    isSubmitting.value = false;
-    (event.target as HTMLInputElement).value = '';
+    uploadingImage.value = false;
   }
 }
 
-function removeProjectImage(index: number) {
-  if (index === -1) {
-    currentProject.value.imageUrl = '';
-    currentProject.value.imagePublicId = '';
-    currentProject.value.imageUrls = [];
-    currentProject.value.imagePublicIds = [];
-  } else {
-    currentProject.value.imageUrls.splice(index, 1);
-    if (currentProject.value.imagePublicIds && currentProject.value.imagePublicIds.length > index) {
-      currentProject.value.imagePublicIds.splice(index, 1);
-    }
-    
-    if (index === 0 && currentProject.value.imageUrls.length > 0) {
-      currentProject.value.imageUrl = currentProject.value.imageUrls[0];
-      currentProject.value.imagePublicId = currentProject.value.imagePublicIds?.[0] || '';
-    } else if (currentProject.value.imageUrls.length === 0) {
-      currentProject.value.imageUrl = '';
-      currentProject.value.imagePublicId = '';
-    }
-  }
+function removeImage(index: number) {
+  currentProject.images.splice(index, 1);
 }
 
 function moveImageUp(index: number) {
-  if (index <= 0 || index >= currentProject.value.imageUrls.length) return;
-  
-  [currentProject.value.imageUrls[index], currentProject.value.imageUrls[index - 1]] =
-  [currentProject.value.imageUrls[index - 1], currentProject.value.imageUrls[index]];
-  
-  if (currentProject.value.imagePublicIds && currentProject.value.imagePublicIds.length > index) {
-    [currentProject.value.imagePublicIds[index], currentProject.value.imagePublicIds[index - 1]] = 
-    [currentProject.value.imagePublicIds[index - 1], currentProject.value.imagePublicIds[index]];
-  }
-  
-  if (index === 1) {
-    currentProject.value.imageUrl = currentProject.value.imageUrls[0];
-    currentProject.value.imagePublicId = currentProject.value.imagePublicIds?.[0] || '';
+  if (index > 0) {
+    const temp = currentProject.images[index];
+    currentProject.images[index] = currentProject.images[index - 1];
+    currentProject.images[index - 1] = temp;
   }
 }
 
 function moveImageDown(index: number) {
-  if (index < 0 || index >= currentProject.value.imageUrls.length - 1) return;
-  
-  [currentProject.value.imageUrls[index], currentProject.value.imageUrls[index + 1]] =
-  [currentProject.value.imageUrls[index + 1], currentProject.value.imageUrls[index]];
-  
-  if (currentProject.value.imagePublicIds && currentProject.value.imagePublicIds.length > index + 1) {
-    [currentProject.value.imagePublicIds[index], currentProject.value.imagePublicIds[index + 1]] = 
-    [currentProject.value.imagePublicIds[index + 1], currentProject.value.imagePublicIds[index]];
+  if (index < currentProject.images.length - 1) {
+    const temp = currentProject.images[index];
+    currentProject.images[index] = currentProject.images[index + 1];
+    currentProject.images[index + 1] = temp;
   }
-  
-  if (index === 0) {
-    currentProject.value.imageUrl = currentProject.value.imageUrls[0];
-    currentProject.value.imagePublicId = currentProject.value.imagePublicIds?.[0] || '';
+}
+
+function addTechnology() {
+  if (newTechnology.value.trim() && !currentProject.technologies.includes(newTechnology.value.trim())) {
+    currentProject.technologies.push(newTechnology.value.trim());
+    newTechnology.value = '';
   }
+}
+
+function removeTechnology(index: number) {
+  currentProject.technologies.splice(index, 1);
 }
 
 async function saveProject() {
-  if (!currentProject.value.title || !currentProject.value.description || currentProject.value.technologies.length === 0) {
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('admin.fillRequiredFields'),
-      duration: 5000
-    })
-    return
-  }
-  
   try {
-    isSubmitting.value = true
-    
+    const projectData = {
+      title: currentProject.title,
+      description: currentProject.description,
+      technologies: currentProject.technologies,
+      imageUrl: currentProject.images.length > 0 ? currentProject.images : undefined, // Convert images back to imageUrl
+      liveUrl: currentProject.liveUrl,
+      codeUrl: currentProject.codeUrl,
+      featured: currentProject.featured
+    };
+
     if (isEditing.value) {
-      await api.put(`/projects/${currentProject.value.id}`, currentProject.value, {
-        headers: {
-          'x-auth-token': authStore.token as string
-        }
-      })
-      
+      await api.put(`/projects/${currentProject.id}`, projectData);
       notificationStore.addNotification({
-        type: 'success',
         message: t('admin.projectUpdated'),
-        duration: 5000
-      })
-    } else {
-      const response = await api.post('/projects', currentProject.value, {
-        headers: {
-          'x-auth-token': authStore.token as string
-        }
-      })
-      
-      await api.post('/activities', {
-        type: 'PROJECT_ADDED',
-        title: '添加了新專案',
-        description: `《${currentProject.value.title}》`,
-        userName: authStore.user?.name ?? 'Anonymous',
-        targetId: response.data.id,
-        targetType: 'project'
-      })
-      
-      notificationStore.addNotification({
         type: 'success',
+        duration: 3000
+      });
+    } else {
+      await api.post('/projects', projectData);
+      notificationStore.addNotification({
         message: t('admin.projectCreated'),
-        duration: 5000
-      })
+        type: 'success',
+        duration: 3000
+      });
     }
     
-    await fetchProjects()
-    showProjectModal.value = false
+    await fetchProjects();
+    closeModal();
   } catch (error) {
-    console.error('Error saving project:', error)
     notificationStore.addNotification({
+      message: t('admin.errorSavingProject'),
       type: 'error',
-      message: isEditing.value ? t('admin.updateError') : t('admin.createError'),
       duration: 5000
-    })
-  } finally {
-    isSubmitting.value = false
+    });
+    console.error('Error saving project:', error);
   }
-}
-
-function confirmDelete(project: Project) {
-  projectToDelete.value = project
-  showDeleteModal.value = true
 }
 
 async function deleteProject() {
-  if (!projectToDelete.value) return
+  if (!projectIdToDelete.value) return;
   
   try {
-    isSubmitting.value = true
-    
-    await api.delete(`/projects/${projectToDelete.value.id}`, {
-      headers: {
-        'x-auth-token': authStore.token as string
-      }
-    })
-    
+    await api.delete(`/projects/${projectIdToDelete.value}`);
     notificationStore.addNotification({
-      type: 'success',
       message: t('admin.projectDeleted'),
-      duration: 5000
-    })
-    
-    await fetchProjects()
-    showDeleteModal.value = false
-    projectToDelete.value = null
+      type: 'success',
+      duration: 3000
+    });
+    await fetchProjects();
+    closeDeleteModal();
   } catch (error) {
-    console.error('Error deleting project:', error)
     notificationStore.addNotification({
+      message: t('admin.errorDeletingProject'),
       type: 'error',
-      message: t('admin.deleteError'),
       duration: 5000
-    })
-  } finally {
-    isSubmitting.value = false
+    });
+    console.error('Error deleting project:', error);
   }
 }
 
-function handleImageError(event: Event) {
-  const img = event.target as HTMLImageElement
-  img.src = '/placeholder-image.png' 
-  console.error('Failed to load image:', currentProject.value.imageUrl)
-  notificationStore.addNotification({
-    type: 'error',
-    message: t('admin.imageLoadError'),
-    duration: 5000
-  })
-}
-
-function previewImage(imageUrl: string) {
-  window.open(imageUrl, '_blank')
-}
-
-onMounted(() => {
-  fetchProjects()
-})
+watch(projects, () => {
+  stopAllCarousels();
+  startAllCarousels();
+}, { deep: true });
 </script>
 
 <style scoped lang="scss">
 .admin-projects {
-  padding: 1.5rem;
-}
-
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-}
-
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top: 4px solid #3498db;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-
-.spinner-sm {
-  border: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top: 2px solid #ffffff;
-  width: 16px;
-  height: 16px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  margin-right: 0.5rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.project-card {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  background-color: var(--bg-secondary);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
-
-.project-image {
-  position: relative;
-  height: 12rem;
-  overflow: hidden;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-}
-
-.project-image-carousel {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.carousel-images {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.5s ease;
-}
-
-.carousel-images img {
-  flex-shrink: 0;
-  width: 100%;
-}
-
-.carousel-controls {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.carousel-control {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  pointer-events: auto;
-  opacity: 0;
-  transition: opacity 0.3s ease, background-color 0.3s ease;
-}
-
-.project-image-carousel:hover .carousel-control {
-  opacity: 1;
-}
-
-.carousel-prev {
-  left: 10px;
-}
-
-.carousel-next {
-  right: 10px;
-}
-
-.carousel-control:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.carousel-indicators {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  pointer-events: auto;
-}
-
-.carousel-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.5);
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.carousel-indicator.active {
-  background-color: white;
-}
-
-.no-image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
-}
-
-.no-image-placeholder i {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.project-content {
-  padding: 1rem;
-}
-
-.project-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.project-description {
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-  line-height: 1.5;
-}
-
-.project-tech {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tech-tag {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  padding: 0.4rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-}
-
-.tech-tag {
-  display: inline-flex;
-  align-items: center;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  padding: 0.4rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-}
-
-.x-icon {
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: 0.8;
-  margin-left: 0.3rem;
-}
-
-.tag-actions {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.5rem;
-}
-
-.move-tech, .remove-tech {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  padding: 0;
-  margin-left: 0.3rem;
-  font-size: 0.8rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
+  padding: 2rem;
   
-  &:hover {
-    color: white;
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #3498db;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  }
+  
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    
+    .project-card {
+      background: linear-gradient(145deg, var(--surface-card), var(--surface-section));
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      }
+      
+      .project-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: var(--accent-color);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 5;
+      }
+      
+      .project-image {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, var(--accent-color), var(--accent-dark));
+        }
+        
+        .project-image-carousel {
+          position: relative;
+          height: 100%;
+          width: 100%;
+          
+          .carousel-images {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              transition: transform 0.5s ease;
+            }
+          }
+          
+          .carousel-counter {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            z-index: 5;
+          }
+          
+          .carousel-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: linear-gradient(
+              to right,
+              rgba(0, 0, 0, 0.3) 0%,
+              rgba(0, 0, 0, 0) 15%,
+              rgba(0, 0, 0, 0) 85%,
+              rgba(0, 0, 0, 0.3) 100%
+            );
+            
+            .carousel-control {
+              background: rgba(0, 0, 0, 0.5);
+              color: white;
+              border: none;
+              border-radius: 50%;
+              width: 40px;
+              height: 40px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              margin: 0 1rem;
+              transition: all 0.3s ease;
+              z-index: 10;
+              
+              &:hover {
+                background: rgba(0, 0, 0, 0.8);
+                transform: scale(1.1);
+              }
+            }
+            
+            .carousel-indicators {
+              position: absolute;
+              bottom: 1rem;
+              left: 0;
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              gap: 0.5rem;
+              z-index: 10;
+              
+              .carousel-indicator {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.5);
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                
+                &.active {
+                  background: white;
+                  transform: scale(1.2);
+                }
+                
+                &:hover {
+                  background: rgba(255, 255, 255, 0.8);
+                }
+              }
+            }
+          }
+          
+          &:hover {
+            .carousel-controls {
+              opacity: 1;
+            }
+            
+            img {
+              transform: scale(1.05);
+            }
+          }
+        }
+        
+        .no-image-placeholder {
+          height: 100%;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+          color: #999;
+          
+          i {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.7;
+          }
+        }
+      }
+      
+      .project-content {
+        padding: 1.75rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--surface-card);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        
+        .project-title {
+          font-size: 1.35rem;
+          font-weight: bold;
+          margin-bottom: 0.75rem;
+          color: var(--text-color);
+          position: relative;
+          padding-bottom: 0.75rem;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+          }
+        }
+        
+        .project-description {
+          color: var(--text-color-secondary);
+          margin-bottom: 1.25rem;
+          line-height: 1.6;
+          flex: 1;
+        }
+        
+        .project-tech {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1.25rem;
+          
+          .tech-tag {
+            background: linear-gradient(145deg, var(--surface-section), var(--surface-hover));
+            padding: 0.35rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+            
+            i {
+              color: var(--accent-color);
+              font-size: 0.75rem;
+            }
+            
+            &:hover {
+              background: var(--surface-hover);
+              transform: translateY(-2px);
+              box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+            }
+          }
+        }
+        
+        .project-links {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.25rem;
+          
+          .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            
+            &:hover {
+              color: var(--accent-dark);
+              transform: translateY(-2px);
+            }
+            
+            i {
+              font-size: 1rem;
+            }
+          }
+        }
+        
+        .project-actions {
+          display: flex;
+          gap: 0.75rem;
+          margin-top: auto;
+          
+          .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            
+            &.btn-edit {
+              background-color: var(--accent-color);
+              color: white;
+              
+              &:hover {
+                background-color: var(--accent-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              }
+            }
+            
+            &.btn-delete {
+              background-color: rgba(220, 53, 69, 0.1);
+              color: #dc3545;
+              
+              &:hover {
+                background-color: #dc3545;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .no-projects {
+    background-color: var(--surface-card);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    
+    i {
+      font-size: 3rem;
+      color: var(--text-color-secondary);
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      font-size: 1.25rem;
+      color: var(--text-color-secondary);
+      margin-bottom: 1.5rem;
+    }
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    
+    .modal-container {
+      background: linear-gradient(145deg, #2d2d2d, #3a3a3a) !important;
+      color: #ffffff;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      
+      &.modal-sm {
+        max-width: 500px;
+      }
+      
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(to right, #333333, #444444);
+        border-radius: 16px 16px 0 0;
+        
+        h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--accent-color);
+        }
+        
+        .close-button {
+          background: none;
+          border: none;
+          color: #ffffff;
+          font-size: 1.5rem;
+          cursor: pointer;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background-color 0.2s, transform 0.2s;
+          
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+          }
+        }
+      }
+      
+      .modal-body {
+        padding: 2rem;
+        background: linear-gradient(145deg, #2d2d2d, #3a3a3a) !important;
+        position: relative;
+        z-index: 1;
+        
+        .form-group {
+          margin-bottom: 1.75rem;
+          
+          .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--accent-color);
+          }
+          
+          .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            
+            &:focus {
+              outline: none;
+              border-color: var(--accent-color);
+              box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.25);
+            }
+            
+            &::placeholder {
+              color: rgba(255, 255, 255, 0.5);
+            }
+          }
+          
+          textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+          }
+          
+          .checkbox-group {
+            display: flex;
+            align-items: center;
+            
+            input[type="checkbox"] {
+              margin-right: 0.5rem;
+              width: 18px;
+              height: 18px;
+              accent-color: var(--accent-color);
+            }
+            
+            label {
+              cursor: pointer;
+            }
+          }
+          
+          .technologies-container {
+            .technology-input-group {
+              display: flex;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+              
+              .form-control {
+                flex: 1;
+              }
+              
+              .btn {
+                padding: 0.75rem 1rem;
+              }
+            }
+            
+            .technologies-list {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.5rem;
+              
+              .technology-tag {
+                display: flex;
+                align-items: center;
+                background-color: rgba(var(--accent-color-rgb), 0.2);
+                color: var(--accent-color);
+                padding: 0.5rem 0.75rem;
+                border-radius: 50px;
+                font-size: 0.875rem;
+                
+                .remove-tag {
+                  background: none;
+                  border: none;
+                  color: currentColor;
+                  margin-left: 0.5rem;
+                  cursor: pointer;
+                  font-size: 1.25rem;
+                  line-height: 1;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 0;
+                  
+                  &:hover {
+                    color: #ffffff;
+                  }
+                }
+              }
+            }
+          }
+          
+          .file-input-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            
+            .file-input {
+              display: none;
+            }
+            
+            .file-input-label {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0.75rem 1.25rem;
+              background-color: rgba(255, 255, 255, 0.1);
+              color: #ffffff;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: background-color 0.3s;
+              border: 1px dashed rgba(255, 255, 255, 0.3);
+              
+              &:hover {
+                background-color: rgba(255, 255, 255, 0.15);
+              }
+            }
+            
+            .upload-btn {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0.75rem 1.25rem;
+              background-color: var(--accent-color);
+              color: #ffffff;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: background-color 0.3s, transform 0.2s;
+              
+              &:hover:not(:disabled) {
+                background-color: var(--accent-dark);
+                transform: translateY(-2px);
+              }
+              
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+            }
+          }
+          
+          .selected-files-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            
+            .selected-file-item {
+              position: relative;
+              width: 100px;
+              border-radius: 8px;
+              overflow: hidden;
+              background-color: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              
+              .preview-thumbnail {
+                width: 100%;
+                height: 100px;
+                object-fit: cover;
+              }
+              
+              .file-name {
+                display: block;
+                font-size: 0.75rem;
+                padding: 0.25rem;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+              
+              .remove-selected-file {
+                position: absolute;
+                top: 0.25rem;
+                right: 0.25rem;
+                background-color: rgba(0, 0, 0, 0.5);
+                color: white;
+                border: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                
+                &:hover {
+                  background-color: rgba(255, 0, 0, 0.7);
+                }
+              }
+            }
+          }
+          
+          .images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            
+            .image-item {
+              position: relative;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+              aspect-ratio: 1;
+              
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s;
+              }
+              
+              &:hover {
+                img {
+                  transform: scale(1.05);
+                }
+                
+                .image-actions {
+                  opacity: 1;
+                }
+              }
+              
+              .image-actions {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: space-around;
+                padding: 0.5rem;
+                opacity: 0;
+                transition: opacity 0.3s;
+                
+                button {
+                  background: none;
+                  border: none;
+                  color: white;
+                  cursor: pointer;
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transition: background-color 0.2s, transform 0.2s;
+                  
+                  &:hover {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    transform: scale(1.1);
+                  }
+                  
+                  &.btn-remove:hover {
+                    background-color: rgba(255, 0, 0, 0.7);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(to right, #333333, #444444);
+        border-radius: 0 0 16px 16px;
+        
+        .btn {
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.2s, box-shadow 0.2s;
+          
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          }
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          &.btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            
+            &:hover:not(:disabled) {
+              background-color: var(--accent-dark);
+            }
+          }
+          
+          &.btn-secondary {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.2);
+            }
+          }
+          
+          &.btn-danger {
+            background-color: #dc3545;
+            color: white;
+            
+            &:hover {
+              background-color: #bd2130;
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-.remove-tech {
-  &:hover {
-    color: #ff5252;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
 }
 
-.project-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  border: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.btn:hover::before {
-  opacity: 1;
-}
-
-.btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  border-radius: 6px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-.btn-secondary {
-  background: linear-gradient(135deg, #9ca3af, #6b7280);
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: linear-gradient(135deg, #6b7280, #4b5563);
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #f87171, #ef4444);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.btn-edit {
-  background: linear-gradient(135deg, #67e8f9, #06b6d4);
-  color: white;
-}
-
-.btn-edit:hover {
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
-}
-
-.btn-delete {
-  background: linear-gradient(135deg, #f87171, #ef4444);
-  color: white;
-}
-
-.btn-delete:hover {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.btn-view {
-  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-  color: white;
-}
-
-.btn-view:hover {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-}
-
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  background: linear-gradient(135deg, #d1d5db, #9ca3af);
-  color: #f3f4f6;
-  box-shadow: none;
-}
-
-.btn:disabled::before {
-  display: none;
-}
-
-.tech-add-btn {
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  color: white;
-  border-radius: 6px;
-}
-
-.tech-add-btn:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-}
-
-.file-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.file-label::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.file-label:hover::before {
-  opacity: 1;
-}
-
-.file-label:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-.remove-image {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.remove-image:hover {
-  background: rgba(239, 68, 68, 0.8);
-}
-
-.no-projects {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  text-align: center;
-  color: #6c757d;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-container {
-  background-color: var(--bg-primary);
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: modal-appear 0.3s ease-out;
-}
-
-@keyframes modal-appear {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-sm {
-  max-width: 400px;
-}
-
-.modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--bg-secondary);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--bg-secondary);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-}
-
-.modal-body {
-  padding: 1.5rem;
-  color: var(--text-primary);
-}
-
-.modal-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--bg-secondary);
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  background-color: var(--bg-primary);
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 0.95rem;
-}
-
-.form-input, .form-textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-input:focus, .form-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.tech-input-container {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.tech-tag {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  padding: 0.4rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s ease;
-}
-
-.tech-tag:hover {
-  background-color: var(--accent-light);
-  border-color: var(--accent);
-}
-
-.remove-tech {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  margin-left: 0.5rem;
-  cursor: pointer;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.remove-tech:hover {
-  color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: background-color 0.2s;
-}
-
-.checkbox-container:hover {
-  background-color: var(--bg-secondary);
-}
-
-.checkbox-container input {
-  margin-right: 0.5rem;
-  width: 18px;
-  height: 18px;
-}
-
-.featured-checkbox {
-  margin-top: 1rem;
-}
-
-.featured-icon {
-  color: #ffc107;
-}
-
-.image-upload-container {
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.file-input {
-  display: none;
-}
-
-.file-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.file-label::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.file-label:hover::before {
-  opacity: 1;
-}
-
-.file-label:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-.images-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.image-preview-item {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.image-preview-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.image-actions {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.move-image {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.move-image:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.save-btn {
-  min-width: 100px;
-}
-
-:root {
-  --border-color: rgba(125, 125, 125, 0.2);
-  --accent-light: rgba(var(--accent-rgb), 0.1);
-  --accent-rgb: 59, 130, 246;
-}
-
-.dark-mode {
-  --border-color: rgba(125, 125, 125, 0.3);
-}
-
-.add-project-btn {
-  white-space: nowrap;
-}
-
-.move-icon {
-  font-size: 1rem;
-  font-weight: bold;
-  line-height: 0.8;
 }
 </style>

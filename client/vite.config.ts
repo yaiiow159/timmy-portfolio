@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// Use environment variable if available, otherwise use the backend container name
 const API_URL = process.env.VITE_API_URL || 'http://backend-dev:5000'
 
 export default defineConfig({
