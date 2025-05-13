@@ -455,12 +455,10 @@ function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
     selectedFiles.value = Array.from(input.files);
-    // Create preview URLs for selected files
     selectedFiles.value.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target && e.target.result) {
-          // Preview URLs will be handled by getPreviewUrl function
         }
       };
       reader.readAsDataURL(file);
@@ -477,7 +475,6 @@ function getPreviewUrl(file: File): string {
 function removeSelectedFile(index: number) {
   selectedFiles.value.splice(index, 1);
   if (fileInputRef.value) {
-    // Can't directly modify files collection, so we reset the input if all files are removed
     if (selectedFiles.value.length === 0) {
       fileInputRef.value.value = '';
     }
