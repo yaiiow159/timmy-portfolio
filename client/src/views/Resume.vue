@@ -161,7 +161,7 @@ function downloadResume(language: 'zh' | 'en') {
                 <span class="text-accent mr-2">•</span>
                 <div>
                   <span class="font-medium">Markup & Styling:</span>
-                  <span class="text-text-secondary"> HTML, CSS, Bootstrap</span>
+                  <span class="text-text-secondary"> HTML, CSS, Bootstrap, Tailwind</span>
                 </div>
               </li>
               <li class="flex items-start">
@@ -215,7 +215,7 @@ function downloadResume(language: 'zh' | 'en') {
                 <span class="text-accent mr-2">•</span>
                 <div>
                   <span class="font-medium">Cloud Platforms:</span>
-                  <span class="text-text-secondary"> AWS, OCP</span>
+                  <span class="text-text-secondary"> AWS, GCP</span>
                 </div>
               </li>
               <li class="flex items-start">
