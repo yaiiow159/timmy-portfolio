@@ -260,7 +260,10 @@
     "imageUploaded": "图片上传成功",
     "comments": "评论",
     "selectImage": "选择图片",
-    "add": "添加"
+    "add": "添加",
+    "edit": "编辑",
+    "delete": "删除",
+    "addPost": "添加文章"
   },
   "resume": {
     "title": "简历",

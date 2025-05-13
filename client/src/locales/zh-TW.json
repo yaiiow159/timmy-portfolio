@@ -247,7 +247,14 @@
     "moveImageUp": "向上移動圖片",
     "moveImageDown": "向下移動圖片",
     "selectImage": "選擇圖片",
-    "add": "新增"
+    "add": "新增",
+    "edit": "編輯",
+    "delete": "刪除",
+    "deleteComment": "刪除評論",
+    "deleteImage": "刪除圖片",
+    "deleteTechnology": "刪除技術",
+    "deletePostError": "刪除文章失敗",
+    "comments": "評論"
   },
   "contact": {
     "title": "聯絡我",

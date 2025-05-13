@@ -118,6 +118,8 @@
     "add": "Add"
   },
   "admin": {
+    "edit": "Edit",
+    "delete": "Delete",
     "dashboard": "Dashboard",
     "dashboardTitle": "Dashboard Overview",
     "totalPosts": "Total Posts",
@@ -251,7 +253,8 @@
     "searchPosts": "Search Posts",
     "descending": "Descending",
     "ascending": "Ascending",
-    "add": "Add"
+    "add": "Add",
+    "comments": "Comments"
   },
   "resume": {
     "title": "Resume",
