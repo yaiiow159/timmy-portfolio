@@ -102,8 +102,6 @@
     "moveImageDown": "Move Image Down",
     "imagePosition": "Image {position} of {total}",
     "imageUrl": "Image URL",
-    "imageUploaded": "Image uploaded successfully",
-    "imagesUploaded": "Images uploaded successfully",
     "imageUploadError": "Failed to upload image",
     "filterByCategory": "Filter by Category",
     "filterByTag": "Filter by Tag",
@@ -115,7 +113,8 @@
     "searchPosts": "Search Posts",
     "descending": "Descending",
     "ascending": "Ascending",
-    "add": "Add"
+    "add": "Add",
+    "comments": "Comments"
   },
   "admin": {
     "edit": "Edit",

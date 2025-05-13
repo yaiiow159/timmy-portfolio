@@ -83,7 +83,9 @@
     "technologies": "使用技術",
     "noResults": "プロジェクトが見つかりません",
     "tryDifferentSearch": "別の検索条件をお試しください",
-    "clearFilters": "フィルターをクリア"
+    "clearFilters": "フィルターをクリア",
+    "viewAll": "すべて表示",
+    "comments": "コメント"
   },
   "admin": {
     "add": "追加",

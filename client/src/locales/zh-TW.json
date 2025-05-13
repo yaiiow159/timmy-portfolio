@@ -80,7 +80,8 @@
     "viewDetails": "查看詳情",
     "noResults": "沒有找到專案",
     "tryDifferentSearch": "請嘗試不同的搜尋條件",
-    "clearFilters": "清除篩選條件"
+    "clearFilters": "清除篩選條件",
+    "comments": "評論"
   },
   "resume": {
     "title": "履歷",
