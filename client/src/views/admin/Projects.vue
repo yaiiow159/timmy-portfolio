@@ -303,7 +303,6 @@ const selectedFiles = ref<File[]>([]);
 const uploadingImage = ref(false);
 const newTechnology = ref('');
 const fileInputRef = ref<HTMLInputElement | null>(null);
-const previewUrls = ref<string[]>([]);
 
 const emptyProject: AdminProject = {
   id: '',
