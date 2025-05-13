@@ -366,7 +366,7 @@
   "notFound": {
     "title": "404",
     "heading": "找不到页面",
-    "description": "您要找的页面可能已被移除、更名或暂时无法使用。",
+    "description": "您要找的页面可能已被移除、更\n  },名或暂时无法使用。",
     "backToHome": "返回首页"
   },
   "editor": {
@@ -456,7 +456,7 @@
     "backToTop": "回到顶部",
     "language": "语言",
     "madeWith": "Made with",
-    "developerDescription": "这个网站是用 Vue.js、Nuxt.js 和 Tailwind CSS 开发的。"
+    "developerDescription": "Timmy的个人形象网站"
   },
   "common": {
     "cancel": "取消",

@@ -448,25 +448,25 @@
     "deletePost": "記事を削除"
   },
   "footer": {
-    "about": "About",
-    "posts": "Posts",
-    "contact": "Contact",
-    "subscribe": "Subscribe",
-    "privacy": "Privacy Policy",
-    "terms": "Terms",
+    "about": "私について",
+    "posts": "記事",
+    "contact": "お問い合わせ",
+    "subscribe": "購読",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
     "copyright": " 2023 Timmy Portfolio",
-    "backToTop": "Back to Top",
-    "language": "Language",
-    "madeWith": "Made with",
-    "developerDescription": "This website is made with Vue.js, Nuxt.js, and Tailwind CSS."
+    "backToTop": "トップに戻る",
+    "language": "言語",
+    "madeWith": "制作",
+    "developerDescription": "Timmyのポートフォリオサイト"
   },
   "common": {
-    "save": "Save",
-    "edit": "Edit",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "confirm": "Confirm",
-    "close": "Close",
-    "uploading": "Uploading..."
+    "save": "保存",
+    "edit": "編集",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "confirm": "確認",
+    "close": "閉じる",
+    "uploading": "アップロード中..."
   }
 }

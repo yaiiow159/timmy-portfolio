@@ -450,7 +450,7 @@
     "backToTop": "Back to Top",
     "language": "Language",
     "madeWith": "Made with",
-    "developerDescription": "This website is made with Vue.js, Nuxt.js, and Tailwind CSS."
+    "developerDescription": "A portfolio website for Timmy"
   },
   "common": {
     "save": "Save",

@@ -236,9 +236,6 @@
     "filterByCategory": "依分類篩選",
     "filterByTag": "依標籤篩選",
     "filterByAuthor": "依作者篩選",
-    "sortByDate": "依日期排序",
-    "sortByTitle": "依標題排序",
-    "sortByComments": "依評論數排序",
     "imageRequirements": "圖片應為600x400像素",
     "noImage": "無圖片",
     "previousImage": "上一張圖片",
@@ -354,5 +351,18 @@
     "copyLink": "複製連結",
     "linkCopied": "連結已複製",
     "readMore": "閱讀更多"
+  },
+  "footer": {
+    "about": "關於我",
+    "posts": "文章",
+    "contact": "聯繫我",
+    "subscribe": "訂閱",
+    "privacy": "隐私政策",
+    "terms": "條款",
+    "copyright": " 2023 Timmy Portfolio",
+    "backToTop": "回到頂部",
+    "language": "語言",
+    "madeWith": "製作使用",
+    "developerDescription": "Timmy的個人形象網站"
   }
 }
