@@ -17,6 +17,19 @@ const selectedProject = ref<Project | null>(null)
 const detailsCarouselIndex = ref(0)
 const detailsCarouselInterval = ref<number | null>(null)
 
+function getProjectImages(project: Project): string[] {
+  if (project.imageUrls && project.imageUrls.length > 0) {
+    return project.imageUrls;
+  }
+  else if (project.imageUrl) {
+    if (Array.isArray(project.imageUrl)) {
+      return project.imageUrl;
+    }
+    return [project.imageUrl];
+  }
+  return [];
+}
+
 function viewProjectDetails(projectId: string) {
   const project = projects.value.find(p => p.id === projectId)
   if (project) {
@@ -35,24 +48,29 @@ function closeDetailsModal() {
 }
 
 function nextDetailsImage() {
-  if (!selectedProject.value || !selectedProject.value.imageUrls || selectedProject.value.imageUrls.length <= 1) return
-  detailsCarouselIndex.value = (detailsCarouselIndex.value + 1) % selectedProject.value.imageUrls.length
+  if (!selectedProject.value) return
+  const images = getProjectImages(selectedProject.value)
+  if (images.length <= 1) return
+  detailsCarouselIndex.value = (detailsCarouselIndex.value + 1) % images.length
 }
 
 function prevDetailsImage() {
-  if (!selectedProject.value || !selectedProject.value.imageUrls || selectedProject.value.imageUrls.length <= 1) return
-  detailsCarouselIndex.value = (detailsCarouselIndex.value - 1 + selectedProject.value.imageUrls.length) % selectedProject.value.imageUrls.length
+  if (!selectedProject.value) return
+  const images = getProjectImages(selectedProject.value)
+  if (images.length <= 1) return
+  detailsCarouselIndex.value = (detailsCarouselIndex.value - 1 + images.length) % images.length
 }
 
 function startDetailsCarousel() {
-  // Clear any existing interval
   stopDetailsCarousel()
   
-  // Only start if we have multiple images
-  if (selectedProject.value?.imageUrls && selectedProject.value.imageUrls.length > 1) {
-    detailsCarouselInterval.value = window.setInterval(() => {
-      nextDetailsImage()
-    }, 5000) // Change image every 5 seconds
+  if (selectedProject.value) {
+    const images = getProjectImages(selectedProject.value)
+    if (images.length > 1) {
+      detailsCarouselInterval.value = window.setInterval(() => {
+        nextDetailsImage()
+      }, 5000)
+    }
   }
 }
 
@@ -234,10 +252,10 @@ function selectCategory(category: string) {
         <div class="h-64 sm:h-80 md:h-96 bg-gray-800 relative overflow-hidden"
              @mouseenter="stopDetailsCarousel" 
              @mouseleave="startDetailsCarousel">
-          <div v-if="selectedProject.imageUrls && selectedProject.imageUrls.length > 0" class="h-full w-full">
+          <div v-if="selectedProject.imageUrls || selectedProject.imageUrl" class="h-full w-full">
             <transition-group name="fade" tag="div" class="carousel-images h-full w-full relative">
               <img 
-                v-for="(imageUrl, index) in selectedProject.imageUrls" 
+                v-for="(imageUrl, index) in getProjectImages(selectedProject)"
                 :key="`details-img-${index}`"
                 v-show="detailsCarouselIndex === index"
                 :src="imageUrl" 
@@ -246,7 +264,7 @@ function selectCategory(category: string) {
               />
             </transition-group>
             
-            <div v-if="selectedProject.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between">
+            <div v-if="getProjectImages(selectedProject).length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between">
               <button @click.prevent="prevDetailsImage" class="carousel-control ml-4 bg-black/40 hover:bg-black/60 text-white rounded-full p-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -259,9 +277,9 @@ function selectCategory(category: string) {
               </button>
             </div>
             
-            <div v-if="selectedProject.imageUrls.length > 1" class="carousel-indicators absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            <div v-if="getProjectImages(selectedProject).length > 1" class="carousel-indicators absolute bottom-4 left-0 right-0 flex justify-center gap-2">
               <button 
-                v-for="(_, index) in selectedProject.imageUrls" 
+                v-for="(_, index) in getProjectImages(selectedProject)"
                 :key="`indicator-${index}`"
                 @click="detailsCarouselIndex = index"
                 class="w-3 h-3 rounded-full focus:outline-none transition-colors"

@@ -276,7 +276,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, watch } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useNotificationStore } from '@/store/notificationStore';
 import api from '@/services/api';
@@ -633,11 +633,6 @@ async function deleteProject() {
     console.error('Error deleting project:', error);
   }
 }
-
-watch(projects, () => {
-  stopAllCarousels();
-  startAllCarousels();
-}, { deep: true });
 </script>
 
 <style scoped lang="scss">
