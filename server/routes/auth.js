@@ -118,13 +118,51 @@ router.get('/user', auth, async (req, res) => {
       select: {
         id: true,
         name: true,
-        email: true
+        email: true,
+        role: true
       }
     });
     
     res.json(user);
   } catch (err) {
     console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   POST api/auth/refresh
+// @desc    Refresh authentication token
+// @access  Private
+router.post('/refresh', auth, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
+  } catch (err) {
+    console.error('Error refreshing token:', err.message);
     res.status(500).send('Server Error');
   }
 });

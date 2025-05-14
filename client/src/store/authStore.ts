@@ -3,13 +3,13 @@ import {ref, computed} from 'vue'
 import api from '../services/api'
 import {useNotificationStore} from './notificationStore'
 import {useI18n} from 'vue-i18n'
+import router from '../router'
 
 export interface User {
     id: string
     name: string
     email: string
     role: 'admin' | 'editor' | 'user'
-    date: string
 }
 
 export interface LoginCredentials {
@@ -45,6 +45,13 @@ export const useAuthStore = defineStore('auth', () => {
                 }
             })
             user.value = response.data
+            
+            // Start token refresh if not already started
+            if (user.value && !refreshInterval) {
+                startTokenRefresh()
+            }
+            
+            return user.value
         } catch (err: any) {
             console.error('Error loading user:', err)
             if (err.response?.status === 401) {
@@ -56,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
                     duration: 5000
                 })
             }
+            return null
         } finally {
             isLoading.value = false
         }
@@ -86,8 +94,22 @@ export const useAuthStore = defineStore('auth', () => {
             const response = await api.post('/auth/login', credentials)
             token.value = response.data.token
             localStorage.setItem('auth-token', response.data.token)
-            await loadUser()
-            return true
+            
+            const userData = await loadUser()
+            
+            if (userData) {
+                notificationStore.addNotification({
+                    type: 'success',
+                    message: t('auth.loginSuccess'),
+                    duration: 3000
+                })
+                
+                router.push('/admin')
+                
+                return true
+            }
+            
+            return false
         } catch (err: any) {
             console.error('Login error:', err)
             error.value = err.response?.data?.msg ?? t('errors.auth.loginFailed')

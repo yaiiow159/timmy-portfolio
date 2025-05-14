@@ -24,6 +24,7 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "successMessage": "Login successful!",
+    "loginSuccess": "Login successful!",
     "registerSuccess": "Registration successful!",
     "passwordMismatch": "Passwords do not match",
     "logoutSuccess": "Logged out successfully"

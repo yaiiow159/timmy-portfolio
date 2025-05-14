@@ -24,6 +24,7 @@
     "noAccount": "還沒有帳戶？",
     "haveAccount": "已經有帳戶了？",
     "successMessage": "登入成功！",
+    "loginSuccess": "登入成功！",
     "registerSuccess": "註冊成功！",
     "passwordMismatch": "密碼不一致",
     "logoutSuccess": "登出成功！"

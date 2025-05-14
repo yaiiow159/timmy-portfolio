@@ -47,9 +47,20 @@ const editorOptions = {
     },
     keyboard: {
       bindings: {}
+    },
+    history: {
+      delay: 1000,
+      maxStack: 500,
+      userOnly: true
     }
   },
-  placeholder: t('editor.contentPlaceholder')
+  placeholder: t('editor.contentPlaceholder'),
+  bounds: '.editor-container',
+  formats: [
+    'header', 'size', 'bold', 'italic', 'underline', 'strike',
+    'color', 'background', 'align', 'indent', 'list', 'bullet',
+    'blockquote', 'code-block', 'link', 'image', 'video'
+  ]
 }
 
 function addTag() {
@@ -145,7 +156,10 @@ async function savePost() {
 }
 
 function onEditorChange({ html }: { html: string }) {
-  editorContent.value = html
+  // Only update if content actually changed to prevent unnecessary re-renders
+  if (editorContent.value !== html) {
+    editorContent.value = html
+  }
 }
 
 let observer: MutationObserver | null = null
@@ -155,6 +169,7 @@ function onEditorReady(editor: any) {
     observer.disconnect()
   }
   
+  // Use a more efficient debounce with a shorter delay
   let updateTimeout: ReturnType<typeof setTimeout> | null = null
   const debouncedUpdate = (content: string) => {
     if (updateTimeout) clearTimeout(updateTimeout)
@@ -162,20 +177,32 @@ function onEditorReady(editor: any) {
       if (editorContent.value !== content) {
         editorContent.value = content
       }
-    }, 100)
+    }, 50) // Reduced from 100ms to 50ms for better responsiveness
   }
 
+  // Optimize the mutation observer to be less aggressive
   observer = new MutationObserver((mutations) => {
+    // Only process if there are actual changes
     if (mutations.length > 0) {
-      const content = editor.root.innerHTML
-      debouncedUpdate(content)
+      // Check if any mutations are related to text or formatting
+      const hasRelevantMutations = mutations.some(mutation => 
+        mutation.type === 'characterData' || 
+        (mutation.type === 'childList' && 
+         (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0))
+      )
+      
+      if (hasRelevantMutations) {
+        const content = editor.root.innerHTML
+        debouncedUpdate(content)
+      }
     }
   })
 
   observer.observe(editor.root, {
     childList: true,
     characterData: true,
-    subtree: true
+    subtree: true,
+    characterDataOldValue: false // Don't need old values, saves memory
   })
   
   const cleanup = () => {

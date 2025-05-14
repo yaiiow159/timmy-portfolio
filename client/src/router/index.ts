@@ -116,10 +116,21 @@ router.afterEach(() => {
   })
 })
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    if (authStore.token && !authStore.user) {
+      try {
+        await authStore.loadUser()
+        if (authStore.isAuthenticated) {
+          next()
+          return
+        }
+      } catch (error) {
+        console.error('Error loading user in navigation guard:', error)
+      }
+    }
     next('/auth')
   } else {
     next()

@@ -114,7 +114,6 @@ onMounted(async () => {
   }
 })
 
-// Clean up intervals when component is unmounted
 onUnmounted(() => {
   stopDetailsCarousel()
 })

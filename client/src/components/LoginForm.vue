@@ -99,7 +99,6 @@ async function handleSubmit() {
   
   if (success) {
     emit('login-success')
-    router.push('/admin')
   }
 }
 </script>
