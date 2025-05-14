@@ -81,11 +81,9 @@
 import { reactive } from 'vue'
 import { useAuthStore } from '../store/authStore'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
-const router = useRouter()
 
 const emit = defineEmits(['login-success', 'switch-mode'])
 
