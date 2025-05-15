@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { usePortfolioStore } from '@/store/portfolioStore'
 import { useBlogStore } from '@/store/blogStore'
+import { formatDescription } from '@/utils/textFormatters'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -341,7 +342,7 @@ watch(() => activeSkillCategory.value, () => {
             </div>
             <div class="p-6">
               <h3 class="text-xl font-semibold mb-2 text-text-primary">{{ project.title }}</h3>
-              <p class="text-text-secondary mb-4">{{ project.description }}</p>
+              <p class="text-text-secondary mb-4 line-clamp-3" v-html="formatDescription(project.description, 150)"></p>
               <div class="flex flex-wrap gap-2 mb-4">
                 <span 
                   v-for="tech in project.technologies.slice(0, 3)" 
@@ -427,7 +428,7 @@ watch(() => activeSkillCategory.value, () => {
             </div>
             <div class="p-6">
               <h3 class="text-xl font-semibold mb-2 text-text-primary">{{ post.title }}</h3>
-              <p class="text-text-secondary mb-4">{{ post.excerpt }}</p>
+              <p class="text-text-secondary mb-4 line-clamp-3" v-html="formatDescription(post.excerpt, 150)"></p>
               <button 
                 @click="router.push(`/blog/${post.id}`)" 
                 class="inline-flex items-center text-accent hover:text-accent-light transition-colors cursor-pointer"

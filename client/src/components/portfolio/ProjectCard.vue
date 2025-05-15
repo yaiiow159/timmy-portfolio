@@ -118,9 +118,7 @@ onUnmounted(() => {
       <h3 class="text-xl font-bold mb-2 text-text-primary group-hover:text-accent transition-colors">
         {{ project.title }}
       </h3>
-      <p class="text-text-secondary mb-4 line-clamp-3 flex-grow">
-        {{ formatDescription(project.description, 150) }}
-      </p>
+      <p class="text-text-secondary mb-4 line-clamp-3 flex-grow" v-html="formatDescription(project.description, 150)"></p>
       
       <div class="flex flex-wrap gap-2 mb-4">
         <span 
