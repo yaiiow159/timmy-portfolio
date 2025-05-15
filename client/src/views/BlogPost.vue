@@ -253,7 +253,12 @@ marked.setOptions({
     }
     return hljs.highlightAuto(code).value
   } as any,
-  breaks: true
+  breaks: true,
+  gfm: true,
+  pedantic: false,
+  sanitize: false,  
+  smartLists: true,
+  smartypants: false
 } as MarkedOptions)
 
 onMounted(async () => {
