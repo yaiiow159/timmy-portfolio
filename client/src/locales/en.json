@@ -118,6 +118,7 @@
     "comments": "Comments"
   },
   "admin": {
+    "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
     "dashboard": "Dashboard",
