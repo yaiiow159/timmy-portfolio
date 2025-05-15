@@ -72,7 +72,7 @@
         
         <div class="project-content">
           <h3 class="project-title">{{ project.title }}</h3>
-          <div class="project-description" v-html="'<p>' + formatDescription(project.description) + '</p>'"></div>
+          <div class="project-description line-clamp-3" v-html="'<p>' + formatDescription(project.description) + '</p>'"></div>
           
           <div class="project-tech">
             <span 
@@ -288,6 +288,7 @@ import { useNotificationStore } from '@/store/notificationStore';
 import api from '@/services/api';
 import type { Project } from '@/types/project';
 import { useAuthStore } from '@/store/authStore';
+import { formatDescription } from '@/utils/textFormatters';
 
 interface AdminProject extends Project {
   currentImageIndex: number;
@@ -647,11 +648,6 @@ async function deleteProject() {
     });
     console.error('Error deleting project:', error);
   }
-}
-
-function formatDescription(text: string): string {
-  if (!text) return '';
-  return text.replace(/\n/g, '<br>');
 }
 </script>
 
@@ -1460,5 +1456,12 @@ function formatDescription(text: string): string {
 .project-description {
   white-space: pre-line;
   line-height: 1.6;
+}
+
+.project-description.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 </style>

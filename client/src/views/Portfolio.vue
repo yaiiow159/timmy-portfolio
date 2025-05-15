@@ -5,6 +5,7 @@ import type { Project } from '../store/portfolioStore'
 import gsap from 'gsap'
 import { portfolioService } from '../services/portfolioService'
 import ProjectCard from '../components/portfolio/ProjectCard.vue'
+import { formatDescription } from '@/utils/textFormatters'
 
 const { t } = useI18n()
 
@@ -79,16 +80,6 @@ function stopDetailsCarousel() {
     clearInterval(detailsCarouselInterval.value)
     detailsCarouselInterval.value = null
   }
-}
-
-function formatDescription(text: string): string {
-  if (!text) return '';
-
-  const withParagraphs = text.replace(/\n\s*\n/g, '||PARAGRAPH||');
-
-  const withLineBreaks = withParagraphs.replace(/\n/g, '<br>');
-
-  return withLineBreaks.replace(/\|\|PARAGRAPH\|\|/g, '</p><p class="mt-4">');
 }
 
 onMounted(async () => {

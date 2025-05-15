@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import type { Project } from '@/store/portfolioStore.ts'
 import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { formatDescription } from '@/utils/textFormatters'
 
 const { t } = useI18n()
 
@@ -79,7 +80,6 @@ onUnmounted(() => {
           />
         </transition-group>
         
-        <!-- Carousel controls (only show if there are multiple images) -->
         <div v-if="projectImages.length > 1" class="absolute inset-0 flex items-center justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity carousel-controls">
           <button @click.prevent="prevImage" class="bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +119,7 @@ onUnmounted(() => {
         {{ project.title }}
       </h3>
       <p class="text-text-secondary mb-4 line-clamp-3 flex-grow">
-        {{ project.description }}
+        {{ formatDescription(project.description, 150) }}
       </p>
       
       <div class="flex flex-wrap gap-2 mb-4">
