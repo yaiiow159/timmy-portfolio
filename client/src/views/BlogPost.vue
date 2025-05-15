@@ -229,6 +229,7 @@ import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
 import gsap from 'gsap'
 import { useNotificationStore } from '../store/notificationStore'
+import { formatDescription } from '../utils/textFormatters'
 
 const route = useRoute()
 const router = useRouter()
@@ -287,7 +288,8 @@ onMounted(async () => {
 const renderedContent = computed(() => {
   if (!post.value) return ''
   try {
-    return marked(post.value.content)
+    const formattedContent = formatDescription(post.value.content)
+    return marked(formattedContent)
   } catch (error) {
     console.error('Error rendering markdown:', error)
     return '<p class="text-red-500">Error rendering content</p>'

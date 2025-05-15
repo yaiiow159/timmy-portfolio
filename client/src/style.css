@@ -12,6 +12,7 @@
   --text-secondary: #9ca3af;
   --accent: #60a5fa;
   --accent-light: #93c5fd;
+  --accent-text-color: #ffffff;
 }
 
 html.dark {
@@ -22,6 +23,7 @@ html.dark {
   --text-secondary: #9ca3af;
   --accent: #60a5fa;
   --accent-light: #93c5fd;
+  --accent-text-color: #ffffff;
 }
 
 html.light {
@@ -32,9 +34,9 @@ html.light {
   --text-secondary: #6b7280;
   --accent: #8b5cf6;
   --accent-light: #a78bfa;
+  --accent-text-color: #ffffff;
 }
 
-/* 暗色主題 (默認) */
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -46,7 +48,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 亮色主題 - 更加生動的背景 */
 html.light body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -308,7 +309,7 @@ code {
 
 .btn-primary {
   background-color: #60a5fa;
-  color: #ffffff;
+  color: var(--accent-text-color);
 }
 
 .btn-primary:hover {
@@ -317,7 +318,7 @@ code {
 
 .light .btn-primary {
   background-color: #8b5cf6;
-  color: #ffffff;
+  color: var(--accent-text-color);
   box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
 }
 
@@ -354,7 +355,7 @@ code {
 
 .btn-outline:hover {
   background-color: #60a5fa;
-  color: #ffffff;
+  color: var(--accent-text-color);
 }
 
 .light .btn-outline {
@@ -364,7 +365,7 @@ code {
 
 .light .btn-outline:hover {
   background-color: #8b5cf6;
-  color: #ffffff;
+  color: var(--accent-text-color);
   box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
 }
 

@@ -5,6 +5,7 @@ import type { BlogPost } from '../store/blogStore'
 import gsap from 'gsap'
 import { blogService } from '../services/blogService'
 import { getStaticUrl } from '../services/api'
+import { formatDescription } from '../utils/textFormatters'
 
 const { t } = useI18n()
 
@@ -222,7 +223,7 @@ function getImageUrl(imagePath: string | undefined): string {
                   <p class="text-sm text-text-secondary mb-4">
                     {{ t('blog.postedOn') }} {{ formatDate(post.date) }} {{ t('blog.by') }} {{ post.author || 'Anonymous' }}
                   </p>
-                  <p class="text-text-secondary mb-4">{{ post.excerpt }}</p>
+                  <p class="text-text-secondary mb-4" v-html="formatDescription(post.excerpt, 150)"></p>
                   <router-link 
                     :to="`/blog/${post.id}`" 
                     class="inline-block px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
