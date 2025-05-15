@@ -83,7 +83,12 @@ function stopDetailsCarousel() {
 
 function formatDescription(text: string): string {
   if (!text) return '';
-  return text.replace(/\n/g, '<br>');
+
+  const withParagraphs = text.replace(/\n\s*\n/g, '||PARAGRAPH||');
+
+  const withLineBreaks = withParagraphs.replace(/\n/g, '<br>');
+
+  return withLineBreaks.replace(/\|\|PARAGRAPH\|\|/g, '</p><p class="mt-4">');
 }
 
 onMounted(async () => {

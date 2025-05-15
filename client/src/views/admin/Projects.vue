@@ -72,7 +72,7 @@
         
         <div class="project-content">
           <h3 class="project-title">{{ project.title }}</h3>
-          <p class="project-description" v-html="formatDescription(project.description)"></p>
+          <div class="project-description" v-html="'<p>' + formatDescription(project.description) + '</p>'"></div>
           
           <div class="project-tech">
             <span 
