@@ -72,7 +72,7 @@
         
         <div class="project-content">
           <h3 class="project-title">{{ project.title }}</h3>
-          <p class="project-description">{{ project.description }}</p>
+          <p class="project-description" v-html="formatDescription(project.description)"></p>
           
           <div class="project-tech">
             <span 
@@ -130,7 +130,13 @@
           </div>
           <div class="form-group">
             <label for="description" class="form-label">{{ t('admin.projectDescription') }}</label>
-            <textarea id="description" v-model="currentProject.description" class="form-control" :placeholder="t('admin.enterDescription')"></textarea>
+            <textarea 
+              id="description" 
+              v-model="currentProject.description" 
+              class="form-control description-textarea" 
+              :placeholder="t('admin.enterDescription')"
+              rows="5"
+            ></textarea>
           </div>
           <div class="form-group">
             <label for="github" class="form-label">GitHub URL</label>
@@ -642,6 +648,11 @@ async function deleteProject() {
     console.error('Error deleting project:', error);
   }
 }
+
+function formatDescription(text: string): string {
+  if (!text) return '';
+  return text.replace(/\n/g, '<br>');
+}
 </script>
 
 <style scoped lang="scss">
@@ -901,6 +912,7 @@ async function deleteProject() {
           margin-bottom: 1.25rem;
           line-height: 1.6;
           flex: 1;
+          white-space: pre-line;
         }
         
         .project-tech {
@@ -1437,5 +1449,16 @@ async function deleteProject() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.description-textarea {
+  min-height: 120px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.project-description {
+  white-space: pre-line;
+  line-height: 1.6;
 }
 </style>

@@ -81,6 +81,11 @@ function stopDetailsCarousel() {
   }
 }
 
+function formatDescription(text: string): string {
+  if (!text) return '';
+  return text.replace(/\n/g, '<br>');
+}
+
 onMounted(async () => {
   try {
     isLoading.value = true
@@ -298,7 +303,7 @@ function selectCategory(category: string) {
           <h2 class="text-2xl font-bold mb-2 text-text-primary">{{ selectedProject.title }}</h2>
           
           <div class="mb-6">
-            <p class="text-text-secondary">{{ selectedProject.description }}</p>
+            <p class="text-text-secondary" v-html="formatDescription(selectedProject.description)"></p>
           </div>
           
           <div class="mb-6">

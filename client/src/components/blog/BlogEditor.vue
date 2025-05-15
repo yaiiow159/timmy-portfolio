@@ -156,7 +156,6 @@ async function savePost() {
 }
 
 function onEditorChange({ html }: { html: string }) {
-  // Only update if content actually changed to prevent unnecessary re-renders
   if (editorContent.value !== html) {
     editorContent.value = html
   }
@@ -169,7 +168,6 @@ function onEditorReady(editor: any) {
     observer.disconnect()
   }
   
-  // Use a more efficient debounce with a shorter delay
   let updateTimeout: ReturnType<typeof setTimeout> | null = null
   const debouncedUpdate = (content: string) => {
     if (updateTimeout) clearTimeout(updateTimeout)
@@ -177,15 +175,12 @@ function onEditorReady(editor: any) {
       if (editorContent.value !== content) {
         editorContent.value = content
       }
-    }, 50) // Reduced from 100ms to 50ms for better responsiveness
+    }, 50)
   }
 
-  // Optimize the mutation observer to be less aggressive
   observer = new MutationObserver((mutations) => {
-    // Only process if there are actual changes
     if (mutations.length > 0) {
-      // Check if any mutations are related to text or formatting
-      const hasRelevantMutations = mutations.some(mutation => 
+      const hasRelevantMutations = mutations.some(mutation =>
         mutation.type === 'characterData' || 
         (mutation.type === 'childList' && 
          (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0))
@@ -202,7 +197,7 @@ function onEditorReady(editor: any) {
     childList: true,
     characterData: true,
     subtree: true,
-    characterDataOldValue: false // Don't need old values, saves memory
+    characterDataOldValue: false
   })
   
   const cleanup = () => {
@@ -357,7 +352,6 @@ function onEditorReady(editor: any) {
 </template>
 
 <style>
-/* 工具欄基礎樣式 */
 .ql-toolbar {
   position: relative;
   z-index: 40;
@@ -369,14 +363,12 @@ function onEditorReady(editor: any) {
   border-width: 0 0 2px 0 !important;
 }
 
-/* 工具欄按鈕組 */
 .ql-toolbar.ql-snow .ql-formats {
   display: inline-block;
   vertical-align: middle;
   margin: 0 8px 0 0 !important;
 }
 
-/* 按鈕基礎樣式 */
 .ql-snow.ql-toolbar button {
   height: 28px;
   width: 28px;
@@ -391,7 +383,6 @@ function onEditorReady(editor: any) {
   color: var(--color-text-primary);
 }
 
-/* 下拉選單容器 */
 .ql-snow .ql-picker {
   height: 28px;
   position: relative;
@@ -399,7 +390,6 @@ function onEditorReady(editor: any) {
   vertical-align: middle;
 }
 
-/* 下拉選單標籤 */
 .ql-snow .ql-picker-label {
   padding: 0 4px;
   border: 1px solid var(--color-border);
@@ -413,7 +403,6 @@ function onEditorReady(editor: any) {
   color: var(--color-text-primary);
 }
 
-/* 字體大小選擇器 */
 .ql-snow .ql-picker.ql-size {
   width: 98px;
 }
