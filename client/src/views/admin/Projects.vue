@@ -985,7 +985,7 @@ async function deleteProject() {
             
             &.btn-edit {
               background-color: var(--accent-color);
-              color: var(--accent-text-color, white);
+              color: white;
               
               &:hover {
                 background-color: var(--accent-dark);

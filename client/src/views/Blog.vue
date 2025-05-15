@@ -103,6 +103,8 @@ const pageNumbers = computed(() => {
 })
 
 async function changePage(page: number) {
+  if (page < 1 || page > totalPages.value) return
+  
   currentPage.value = page
   window.scrollTo({ top: 0, behavior: 'smooth' })
   
@@ -120,6 +122,18 @@ async function changePage(page: number) {
     console.error('Error fetching blog posts:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    changePage(currentPage.value + 1)
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    changePage(currentPage.value - 1)
   }
 }
 
@@ -141,7 +155,11 @@ function selectCategory(category: string) {
   currentPage.value = 1
 }
 
-// Function to get image URL
+function updateSearch(value: string) {
+  searchQuery.value = value
+  currentPage.value = 1
+}
+
 function getImageUrl(imagePath: string | undefined): string {
   if (!imagePath) return '';
   return imagePath.startsWith('http') ? imagePath : getStaticUrl(imagePath);
@@ -163,7 +181,8 @@ function getImageUrl(imagePath: string | undefined): string {
           <div class="mb-8">
             <div class="relative">
               <input 
-                v-model="searchQuery"
+                :value="searchQuery"
+                @input="updateSearch(($event.target as HTMLInputElement).value)"
                 type="text" 
                 class="w-full bg-secondary border border-gray-700 rounded-lg py-3 px-4 pl-10 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
                 :placeholder="'Search articles...'"
@@ -196,83 +215,95 @@ function getImageUrl(imagePath: string | undefined): string {
             >
               <div class="md:flex">
                 <div class="md:w-1/3 h-64 md:h-auto bg-gray-700">
-                  <!-- Display actual image if available, otherwise show placeholder -->
-                  <img 
+                  <img
                     v-if="post.coverImage" 
                     :src="getImageUrl(post.coverImage)" 
-                    :alt="post.title"
-                    class="h-full w-full object-cover"
+                    :alt="post.title" 
+                    class="w-full h-full object-cover"
                   />
-                  <div v-else class="h-full w-full bg-gray-700 flex items-center justify-center text-gray-500">
+                  <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M5 12h14" />
                     </svg>
                   </div>
                 </div>
+                
                 <div class="md:w-2/3 p-6">
                   <div class="flex flex-wrap gap-2 mb-2">
                     <span 
                       v-for="tag in post.tags" 
                       :key="tag"
-                      class="text-xs font-medium bg-accent/10 text-accent px-2 py-1 rounded-full"
+                      class="text-xs px-2 py-1 bg-primary rounded-full text-text-secondary"
                     >
-                      {{ tag }}
+                      #{{ tag }}
                     </span>
                   </div>
-                  <h2 class="text-xl font-semibold mb-2 text-text-primary">{{ post.title }}</h2>
-                  <p class="text-sm text-text-secondary mb-4">
+                  
+                  <h2 class="text-2xl font-bold mb-2 text-text-primary">{{ post.title }}</h2>
+                  
+                  <div class="text-sm text-text-secondary mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                     {{ t('blog.postedOn') }} {{ formatDate(post.date) }} {{ t('blog.by') }} {{ post.author || 'Anonymous' }}
-                  </p>
-                  <p class="text-text-secondary mb-4" v-html="formatDescription(post.excerpt, 150)"></p>
+                  </div>
+                  
+                  <p class="text-text-secondary mb-4">{{ post.excerpt || formatDescription(post.content, 150) }}</p>
+                  
                   <router-link 
                     :to="`/blog/${post.id}`" 
-                    class="inline-block px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
+                    class="inline-block px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                   >
-                    {{ t('blog.readMore') }} →
+                    {{ t('blog.readMore') }}
                   </router-link>
                 </div>
               </div>
             </div>
           </div>
           
-          <div v-else class="text-center py-16">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-text-secondary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div v-else class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3 class="text-xl font-semibold text-text-primary mb-2">{{ t('blog.noPosts') }}</h3>
             <p class="text-text-secondary">{{ t('blog.tryDifferent') }}</p>
           </div>
           
+          <!-- Pagination Controls -->
           <div v-if="totalPages > 1 && !isLoading" class="flex justify-center mt-12">
-            <div class="flex space-x-2">
+            <div class="flex items-center space-x-2">
               <button 
-                @click="changePage(currentPage - 1)" 
+                @click="prevPage" 
                 :disabled="currentPage === 1"
-                class="px-3 py-1 rounded-md bg-secondary text-text-primary disabled:opacity-50"
+                class="px-3 py-2 rounded-lg bg-secondary text-text-primary transition-colors"
+                :class="{'opacity-50 cursor-not-allowed': currentPage === 1, 'hover:bg-accent/20': currentPage !== 1}"
               >
-                ←
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
               
-              <button 
-                v-for="page in pageNumbers" 
-                :key="page"
-                @click="changePage(page)"
-                :class="[
-                  'px-3 py-1 rounded-md',
-                  currentPage === page 
-                    ? 'bg-accent text-white' 
-                    : 'bg-secondary text-text-primary hover:bg-accent/20'
-                ]"
-              >
-                {{ page }}
-              </button>
+              <div class="flex space-x-1">
+                <button 
+                  v-for="page in pageNumbers" 
+                  :key="page"
+                  @click="changePage(page)"
+                  class="w-10 h-10 flex items-center justify-center rounded-lg transition-colors"
+                  :class="currentPage === page ? 'bg-accent text-white' : 'bg-secondary text-text-primary hover:bg-accent/20'"
+                >
+                  {{ page }}
+                </button>
+              </div>
               
               <button 
-                @click="changePage(currentPage + 1)" 
+                @click="nextPage" 
                 :disabled="currentPage === totalPages"
-                class="px-3 py-1 rounded-md bg-secondary text-text-primary disabled:opacity-50"
+                class="px-3 py-2 rounded-lg bg-secondary text-text-primary transition-colors"
+                :class="{'opacity-50 cursor-not-allowed': currentPage === totalPages, 'hover:bg-accent/20': currentPage !== totalPages}"
               >
-                →
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
           </div>
@@ -281,17 +312,13 @@ function getImageUrl(imagePath: string | undefined): string {
         <div class="lg:w-1/3 blog-sidebar">
           <div class="bg-secondary rounded-lg p-6 shadow-lg mb-8">
             <h3 class="text-xl font-semibold mb-4 text-accent">{{ t('blog.categories') }}</h3>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="category in categories"
+            <div class="space-y-2">
+              <button 
+                v-for="category in categories" 
                 :key="category"
                 @click="selectCategory(category)"
-                :class="[
-                  'px-3 py-1 rounded-full text-sm font-medium transition-colors',
-                  selectedCategory === category
-                    ? 'bg-accent text-white'
-                    : 'bg-primary text-text-secondary hover:bg-accent/20'
-                ]"
+                class="block w-full text-left px-3 py-2 rounded-lg transition-colors"
+                :class="selectedCategory === category ? 'bg-accent text-white' : 'bg-primary text-text-secondary hover:bg-accent/20 hover:text-accent'"
               >
                 {{ category }}
               </button>
@@ -301,17 +328,22 @@ function getImageUrl(imagePath: string | undefined): string {
           <div class="bg-secondary rounded-lg p-6 shadow-lg">
             <h3 class="text-xl font-semibold mb-4 text-accent">{{ t('blog.recentPosts') }}</h3>
             <div class="space-y-4">
-              <div v-for="(post, index) in posts.slice(0, 3)" :key="index" class="flex gap-3">
+              <div v-for="post in posts.slice(0, 3)" :key="post.id" class="flex gap-3">
                 <div class="w-16 h-16 bg-gray-700 rounded-lg flex-shrink-0 overflow-hidden">
                   <img 
                     v-if="post.coverImage" 
                     :src="getImageUrl(post.coverImage)" 
-                    :alt="post.title"
-                    class="h-full w-full object-cover"
+                    :alt="post.title" 
+                    class="w-full h-full object-cover"
                   />
+                  <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M5 12h14" />
+                    </svg>
+                  </div>
                 </div>
                 <div>
-                  <router-link :to="`/blog/${post.id}`" class="text-text-primary hover:text-accent font-medium transition-colors">
+                  <router-link :to="`/blog/${post.id}`" class="font-medium text-text-primary hover:text-accent transition-colors">
                     {{ post.title }}
                   </router-link>
                   <p class="text-xs text-text-secondary">{{ formatDate(post.date) }}</p>
@@ -327,4 +359,11 @@ function getImageUrl(imagePath: string | undefined): string {
 
 <style scoped>
 /* Add any component-specific styles here */
+.blog-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+}
 </style>

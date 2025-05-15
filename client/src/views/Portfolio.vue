@@ -18,6 +18,10 @@ const selectedProject = ref<Project | null>(null)
 const detailsCarouselIndex = ref(0)
 const detailsCarouselInterval = ref<number | null>(null)
 
+// Pagination
+const currentPage = ref(1)
+const projectsPerPage = 6
+
 function getProjectImages(project: Project): string[] {
   if (project.imageUrls && project.imageUrls.length > 0) {
     return project.imageUrls;
@@ -145,12 +149,51 @@ const filteredProjects = computed(() => {
   return result
 })
 
+// Pagination computed properties
+const totalPages = computed(() => {
+  return Math.ceil(filteredProjects.value.length / projectsPerPage)
+})
+
+const paginatedProjects = computed(() => {
+  const startIndex = (currentPage.value - 1) * projectsPerPage
+  const endIndex = startIndex + projectsPerPage
+  return filteredProjects.value.slice(startIndex, endIndex)
+})
+
+// Pagination methods
+function goToPage(page: number) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    goToPage(currentPage.value + 1)
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    goToPage(currentPage.value - 1)
+  }
+}
+
 function selectCategory(category: string) {
   if (selectedCategory.value === category) {
     selectedCategory.value = ''
   } else {
     selectedCategory.value = category
   }
+  // Reset to first page when changing filters
+  currentPage.value = 1
+}
+
+// Reset page when search changes
+function updateSearch(value: string) {
+  searchQuery.value = value
+  currentPage.value = 1
 }
 </script>
 
@@ -169,7 +212,8 @@ function selectCategory(category: string) {
           <div class="md:w-1/3">
             <div class="relative">
               <input 
-                v-model="searchQuery"
+                :value="searchQuery"
+                @input="updateSearch(($event.target as HTMLInputElement).value)"
                 type="text" 
                 class="w-full bg-secondary border border-gray-700 rounded-lg py-3 px-4 pl-10 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
                 :placeholder="t('portfolio.searchPlaceholder')"
@@ -212,7 +256,7 @@ function selectCategory(category: string) {
       
       <div v-else-if="filteredProjects.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <ProjectCard 
-          v-for="project in filteredProjects" 
+          v-for="project in paginatedProjects" 
           :key="project.id"
           :project="project"
           @view-details="viewProjectDetails"
@@ -226,11 +270,50 @@ function selectCategory(category: string) {
         <h3 class="text-xl font-semibold text-text-primary mb-2">{{ t('portfolio.noResults') }}</h3>
         <p class="text-text-secondary">{{ t('portfolio.tryDifferentSearch') }}</p>
         <button 
-          @click="selectedCategory = ''; searchQuery = ''" 
+          @click="selectedCategory = ''; searchQuery = ''; currentPage = 1" 
           class="mt-4 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light transition-colors"
         >
           {{ t('portfolio.clearFilters') }}
         </button>
+      </div>
+      
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1" class="flex justify-center mt-12">
+        <div class="flex items-center space-x-2">
+          <button 
+            @click="prevPage" 
+            :disabled="currentPage === 1"
+            class="px-3 py-2 rounded-lg bg-secondary text-text-primary transition-colors"
+            :class="{'opacity-50 cursor-not-allowed': currentPage === 1, 'hover:bg-accent/20': currentPage !== 1}"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <div class="flex space-x-1">
+            <button 
+              v-for="page in totalPages" 
+              :key="page"
+              @click="goToPage(page)"
+              class="w-10 h-10 flex items-center justify-center rounded-lg transition-colors"
+              :class="currentPage === page ? 'bg-accent text-white' : 'bg-secondary text-text-primary hover:bg-accent/20'"
+            >
+              {{ page }}
+            </button>
+          </div>
+          
+          <button 
+            @click="nextPage" 
+            :disabled="currentPage === totalPages"
+            class="px-3 py-2 rounded-lg bg-secondary text-text-primary transition-colors"
+            :class="{'opacity-50 cursor-not-allowed': currentPage === totalPages, 'hover:bg-accent/20': currentPage !== totalPages}"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
