@@ -418,7 +418,19 @@ function goToImage(projectId: string, index: number) {
 
 function openCreateModal() {
   isEditing.value = false;
-  Object.assign(currentProject, emptyProject);
+  currentProject.id = '';
+  currentProject.title = '';
+  currentProject.description = '';
+  currentProject.technologies = [];
+  currentProject.images = [];
+  currentProject.liveUrl = '';
+  currentProject.codeUrl = '';
+  currentProject.featured = false;
+  currentProject.date = '';
+  currentProject.currentImageIndex = 0;
+  
+  selectedFiles.value = [];
+  
   showModal.value = true;
 }
 
