@@ -454,6 +454,7 @@
   },
   "common": {
     "save": "Save",
+    "update": "Update",
     "edit": "Edit",
     "cancel": "Cancel",
     "delete": "Delete",
