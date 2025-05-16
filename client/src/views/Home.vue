@@ -355,14 +355,14 @@ watch(() => activeSkillCategory.value, () => {
               <div class="flex gap-4">
                 <button 
                   v-if="project.liveUrl" 
-                  @click="router.push(project.liveUrl)" 
+                  @click="window.open(project.liveUrl, '_blank')" 
                   class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors cursor-pointer"
                 >
                   {{ t('portfolio.viewLive') }}
                 </button>
                 <button 
                   v-if="project.codeUrl" 
-                  @click="router.push(project.codeUrl)" 
+                  @click="window.open(project.codeUrl, '_blank')" 
                   class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors cursor-pointer"
                 >
                   {{ t('portfolio.viewCode') }}
