@@ -59,10 +59,6 @@ function stopCarousel(projectId: string): void {
   }
 }
 
-function openExternalUrl(url: string): void {
-  window.open(url, '_blank')
-}
-
 onMounted(async () => {
   try {
     await Promise.all([
@@ -357,20 +353,28 @@ watch(() => activeSkillCategory.value, () => {
                 </span>
               </div>
               <div class="flex gap-4">
-                <button 
+                <a 
                   v-if="project.liveUrl" 
-                  @click="openExternalUrl(project.liveUrl)" 
-                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors cursor-pointer"
+                  :href="project.liveUrl" 
+                  target="_blank"
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-accent hover:bg-accent-light text-white font-medium rounded-lg transition-colors"
                 >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
                   {{ t('portfolio.viewLive') }}
-                </button>
-                <button 
+                </a>
+                <a 
                   v-if="project.codeUrl" 
-                  @click="openExternalUrl(project.codeUrl)" 
-                  class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors cursor-pointer"
+                  :href="project.codeUrl" 
+                  target="_blank"
+                  class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white font-medium rounded-lg transition-colors"
                 >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
                   {{ t('portfolio.viewCode') }}
-                </button>
+                </a>
                 <button 
                   v-if="!project.liveUrl && !project.codeUrl" 
                   @click="router.push('/portfolio')" 
