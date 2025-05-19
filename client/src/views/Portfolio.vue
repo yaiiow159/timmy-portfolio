@@ -18,9 +18,27 @@ const selectedProject = ref<Project | null>(null)
 const detailsCarouselIndex = ref(0)
 const detailsCarouselInterval = ref<number | null>(null)
 
-// Pagination
+const tagsPerPage = 10
+const showAllTags = ref(false)
+const displayedTagsCount = ref(tagsPerPage)
+
 const currentPage = ref(1)
 const projectsPerPage = 6
+
+const categories = computed(() => {
+  const allTechnologies = projects.value.flatMap(project => project.technologies)
+  return [...new Set(allTechnologies)].sort()
+})
+
+const filteredTags = computed(() => {
+  const allTags = categories.value
+  const initialTags = showAllTags.value ? allTags : allTags.slice(0, tagsPerPage)
+  return initialTags
+})
+
+function toggleShowAllTags() {
+  showAllTags.value = !showAllTags.value
+}
 
 function getProjectImages(project: Project): string[] {
   if (project.imageUrls && project.imageUrls.length > 0) {
@@ -123,11 +141,6 @@ onUnmounted(() => {
   stopDetailsCarousel()
 })
 
-const categories = computed(() => {
-  const allTechnologies = projects.value.flatMap(project => project.technologies)
-  return [...new Set(allTechnologies)].sort()
-})
-
 const filteredProjects = computed(() => {
   let result = projects.value
   
@@ -226,13 +239,28 @@ function updateSearch(value: string) {
           
           <div class="flex flex-wrap gap-2">
             <button 
-              v-for="category in categories" 
+              v-for="category in filteredTags" 
               :key="category"
               @click="selectCategory(category)"
               class="px-3 py-1.5 rounded-lg text-sm transition-colors"
               :class="selectedCategory === category ? 'bg-accent text-white' : 'bg-secondary text-text-secondary hover:bg-accent/20 hover:text-accent'"
             >
               {{ category }}
+            </button>
+            
+            <button 
+              v-if="categories.length > tagsPerPage"
+              @click="toggleShowAllTags"
+              class="px-3 py-1.5 rounded-lg text-sm bg-secondary text-accent hover:bg-accent/10 transition-colors flex items-center"
+            >
+              <span v-if="!showAllTags">{{ t('portfolio.showMore') }} ({{ categories.length - tagsPerPage }})</span>
+              <span v-else>{{ t('portfolio.showLess') }}</span>
+              <svg v-if="!showAllTags" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
             </button>
           </div>
         </div>
@@ -387,14 +415,30 @@ function updateSearch(value: string) {
           
           <div class="mb-6">
             <h3 class="text-lg font-semibold mb-2 text-text-primary">{{ t('portfolio.technologies') }}</h3>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2 tag-container">
               <span 
-                v-for="tech in selectedProject.technologies" 
+                v-for="(tech, index) in selectedProject.technologies" 
                 :key="tech"
-                class="px-3 py-1 rounded-full bg-primary text-text-secondary text-sm"
+                v-show="index < displayedTagsCount || showAllTags"
+                class="px-3 py-1 rounded-full bg-primary text-text-secondary text-sm tag-item"
               >
                 {{ tech }}
               </span>
+              
+              <button 
+                v-if="selectedProject.technologies.length > displayedTagsCount"
+                @click="showAllTags = !showAllTags"
+                class="px-3 py-1 rounded-full bg-primary/70 text-accent text-sm hover:bg-primary transition-colors flex items-center"
+              >
+                <span v-if="!showAllTags">{{ t('portfolio.showMore') }} ({{ selectedProject.technologies.length - displayedTagsCount }})</span>
+                <span v-else>{{ t('portfolio.showLess') }}</span>
+                <svg v-if="!showAllTags" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
             </div>
           </div>
           
@@ -475,5 +519,13 @@ function updateSearch(value: string) {
 
 .project-card:hover {
   transform: translateY(-5px);
+}
+
+.tag-container {
+  position: relative;
+}
+
+.tag-item {
+  transition: all 0.3s ease;
 }
 </style>

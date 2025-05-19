@@ -180,6 +180,10 @@ watch(() => activeSkillCategory.value, () => {
             <h2 class="profession-highlight text-2xl md:text-3xl font-semibold">
               {{ t('home.title') }}
             </h2>
+            <div class="experience-badge">3+ {{ t('home.yearsExp') }}</div>
+          </div>
+          <div class="profile-picture-container">
+            <img src="/profile.png" alt="Timmy's Profile" class="profile-picture" />
           </div>
           <p class="hero-description text-lg md:text-xl mb-10 max-w-2xl mx-auto">
             {{ t('home.intro') }}
@@ -336,7 +340,7 @@ watch(() => activeSkillCategory.value, () => {
               
               <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
               </div>
             </div>
@@ -534,6 +538,11 @@ watch(() => activeSkillCategory.value, () => {
 
 .profession-container {
   margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .profession-highlight {
@@ -570,6 +579,65 @@ watch(() => activeSkillCategory.value, () => {
 
 .light .profession-highlight:hover {
   text-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+}
+
+.experience-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.3);
+  animation: bounce 2s infinite;
+}
+
+.profile-picture-container {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 1.5rem auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-picture {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: profile-appear 1s ease-out forwards, profile-float 3s ease-in-out infinite 1s;
+}
+
+@keyframes profile-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes profile-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .hero-description {

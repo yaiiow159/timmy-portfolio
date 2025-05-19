@@ -34,7 +34,8 @@
     "name": "Timmy",
     "title": "軟體工程師",
     "intro": "經驗豐富的全端開發者，專精於 Java、Spring Boot、Vue.js 等技術。",
-    "cta": "查看我的作品"
+    "cta": "查看我的作品",
+    "yearsExp": "年經驗"
   },
   "blog": {
     "title": "部落格",
@@ -73,16 +74,17 @@
   },
   "portfolio": {
     "title": "作品集",
-    "subtitle": "查看我的最新專案",
-    "viewProject": "查看專案",
-    "technologies": "使用技術",
-    "viewLive": "查看線上版本",
-    "viewCode": "查看原始碼",
+    "subtitle": "探索我的專案，看看我一直在做什麼",
+    "searchPlaceholder": "搜尋專案...",
+    "noResults": "找不到專案",
+    "tryDifferentSearch": "嘗試不同的搜尋詞或清除過濾器",
+    "clearFilters": "清除過濾器",
+    "viewLive": "查看演示",
+    "viewCode": "查看代碼",
     "viewDetails": "查看詳情",
-    "noResults": "沒有找到專案",
-    "tryDifferentSearch": "請嘗試不同的搜尋條件",
-    "clearFilters": "清除篩選條件",
-    "comments": "評論"
+    "technologies": "技術",
+    "showMore": "顯示更多",
+    "showLess": "顯示更少"
   },
   "resume": {
     "title": "履歷",

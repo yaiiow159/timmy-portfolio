@@ -34,7 +34,8 @@
     "name": "Timmy",
     "title": "Software Engineer",
     "intro": "Experienced full-stack developer with expertise in Java, Spring Boot, Vue.js, and more.",
-    "cta": "View My Work"
+    "cta": "View My Work",
+    "yearsExp": "years experience"
   },
   "blog": {
     "title": "Blog",
@@ -115,7 +116,9 @@
     "descending": "Descending",
     "ascending": "Ascending",
     "add": "Add",
-    "comments": "Comments"
+    "comments": "Comments",
+    "showMore": "Show More",
+    "showLess": "Show Less"
   },
   "admin": {
     "cancel": "Cancel",
@@ -454,13 +457,26 @@
     "developerDescription": "A portfolio website for Timmy"
   },
   "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
     "save": "Save",
-    "update": "Update",
     "edit": "Edit",
-    "cancel": "Cancel",
     "delete": "Delete",
+    "cancel": "Cancel",
     "confirm": "Confirm",
-    "close": "Close",
-    "uploading": "Uploading..."
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "descending": "Descending",
+    "ascending": "Ascending",
+    "add": "Add",
+    "comments": "Comments",
+    "showMore": "Show More",
+    "showLess": "Show Less"
   }
 }

@@ -62,7 +62,7 @@ const currentYear = new Date().getFullYear()
         <p class="text-text-secondary text-sm mb-2 md:mb-0">{{ t('footer.copyright').replace('2025', currentYear.toString()) }}</p>
         
         <div class="flex items-center space-x-3">
-          <p class="text-sm text-text-secondary">{{ t('footer.madeWith') }} <span class="text-red-500">❤️</span></p>
+          <p class="text-sm text-text-secondary">{{ t('footer.madeWith') }} <span class="text-accent">✨</span></p>
           
           <button @click="themeStore.toggleDarkMode"
                   class="ml-3 p-1.5 rounded-full hover:bg-primary/10 dark:hover:bg-dark-200/20 transition-all duration-300"
