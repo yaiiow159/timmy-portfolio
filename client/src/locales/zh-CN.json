@@ -29,6 +29,7 @@
     "logoutSuccess": "已成功退出登录"
   },
   "home": {
+    "contact": "联系我",
     "greeting": "你好，我是",
     "name": "Timmy",
     "title": "软件工程师",

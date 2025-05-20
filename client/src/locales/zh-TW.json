@@ -30,6 +30,7 @@
     "logoutSuccess": "登出成功！"
   },
   "home": {
+    "contact": "聯絡我",
     "greeting": "你好，我是",
     "name": "Timmy",
     "title": "軟體工程師",

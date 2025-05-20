@@ -29,6 +29,7 @@
     "logoutSuccess": "ログアウトしました"
   },
   "home": {
+    "contact": "お問い合わせ",
     "greeting": "こんにちは、私は",
     "name": "Timmy",
     "title": "ソフトウェアエンジニア",

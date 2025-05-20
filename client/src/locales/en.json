@@ -30,6 +30,7 @@
     "logoutSuccess": "Logged out successfully"
   },
   "home": {
+    "contact": "Contact With Me",
     "greeting": "Hello, I'm",
     "name": "Timmy",
     "title": "Software Engineer",
