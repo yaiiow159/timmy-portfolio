@@ -7,15 +7,14 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "80:80"
-    environment:
-      - NODE_ENV=production
+      - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
-      - app-network
-    restart: always
-
+      app-network:
+        aliases:
+          - frontend
   backend:
     build:
       context: .
@@ -24,26 +23,27 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./server/logs:/app/logs
+      - /app/node_modules
     environment:
       - PORT=5000
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-portfolio}
-      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
-      - JWT_SECRET=pK8tQ7zX3vB2nM5cR9fE6hJ1yG4dL0sA
-      - CLOUDINARY_CLOUD_NAME=dn4rfjyva
-      - CLOUDINARY_API_KEY=831168514959354
-      - CLOUDINARY_API_SECRET=YDGKTUI983-FGVSFQ6EAKZQDK
-      - EMAIL_HOST=smtp.gmail.com
-      - EMAIL_PORT=587
-      - EMAIL_SECURE=${EMAIL_SECURE:-false}
-      - EMAIL_USER=examyou076@gmail.com
-      - EMAIL_PASS=fahx rdrh xcur wbul
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://root:root@postgres:5432/timmy_portfolio?schema=public
+      - CORS_ORIGIN=http://localhost:3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
-      - app-network
-    restart: always
+      app-network:
+        aliases:
+          - backend
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/api/health/check"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   postgres:
     image: postgres:16-alpine
@@ -53,12 +53,16 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DB=${POSTGRES_DB:-portfolio}
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=timmy_portfolio
     networks:
       - app-network
-    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d timmy_portfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   app-network:

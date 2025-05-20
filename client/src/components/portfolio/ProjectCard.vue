@@ -14,16 +14,13 @@ const displayTechnologies = props.project.technologies.slice(0, 4)
 const hasMoreTechnologies = props.project.technologies.length > 4
 
 const projectImages = computed(() => {
-  if (props.project.imageUrls && props.project.imageUrls.length > 0) {
-    return props.project.imageUrls;
-  }
-  else if (props.project.imageUrl) {
-    if (typeof props.project.imageUrl === 'string') {
+  if (props.project.imageUrl) {
+    if (Array.isArray(props.project.imageUrl)) {
+      return props.project.imageUrl;
+    } else {
       return [props.project.imageUrl];
     }
-    return props.project.imageUrl;
   }
-
   return [];
 });
 

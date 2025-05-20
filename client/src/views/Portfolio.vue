@@ -41,10 +41,7 @@ function toggleShowAllTags() {
 }
 
 function getProjectImages(project: Project): string[] {
-  if (project.imageUrls && project.imageUrls.length > 0) {
-    return project.imageUrls;
-  }
-  else if (project.imageUrl) {
+  if (project.imageUrl) {
     if (Array.isArray(project.imageUrl)) {
       return project.imageUrl;
     }
@@ -162,7 +159,6 @@ const filteredProjects = computed(() => {
   return result
 })
 
-// Pagination computed properties
 const totalPages = computed(() => {
   return Math.ceil(filteredProjects.value.length / projectsPerPage)
 })
@@ -173,7 +169,6 @@ const paginatedProjects = computed(() => {
   return filteredProjects.value.slice(startIndex, endIndex)
 })
 
-// Pagination methods
 function goToPage(page: number) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
@@ -199,11 +194,9 @@ function selectCategory(category: string) {
   } else {
     selectedCategory.value = category
   }
-  // Reset to first page when changing filters
   currentPage.value = 1
 }
 
-// Reset page when search changes
 function updateSearch(value: string) {
   searchQuery.value = value
   currentPage.value = 1
@@ -363,7 +356,7 @@ function updateSearch(value: string) {
         <div class="h-64 sm:h-80 md:h-96 bg-gray-800 relative overflow-hidden"
              @mouseenter="stopDetailsCarousel" 
              @mouseleave="startDetailsCarousel">
-          <div v-if="selectedProject.imageUrls || selectedProject.imageUrl" class="h-full w-full">
+          <div v-if="selectedProject.imageUrl" class="h-full w-full">
             <transition-group name="fade" tag="div" class="carousel-images h-full w-full relative">
               <img 
                 v-for="(imageUrl, index) in getProjectImages(selectedProject)"

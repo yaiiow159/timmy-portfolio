@@ -4,7 +4,7 @@ import { ref } from 'vue'
 export interface Notification {
   id: string
   type: 'success' | 'error' | 'info' | 'warning'
-  message: string
+  message: string | null
   duration?: number
 }
 

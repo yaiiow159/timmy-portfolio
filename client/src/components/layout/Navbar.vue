@@ -44,14 +44,12 @@ function navigateTo(path: string) {
 <template>
   <header class="fixed w-full top-0 z-50 bg-secondary shadow-md">
     <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <!-- Logo -->
       <div class="flex items-center">
         <router-link to="/" class="text-2xl font-bold text-accent hover:text-accent-light transition-colors">
           Timmy
         </router-link>
       </div>
       
-      <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
         <router-link 
           v-for="item in ['home', 'blog', 'portfolio', 'resume', 'contact']" 
@@ -63,7 +61,6 @@ function navigateTo(path: string) {
           {{ t(`nav.${item}`) }}
         </router-link>
         
-        <!-- Language Selector -->
         <div class="relative">
           <button 
             @click="toggleLanguageMenu" 
@@ -91,7 +88,6 @@ function navigateTo(path: string) {
           </div>
         </div>
         
-        <!-- Theme Toggle -->
         <button 
           @click="themeStore.toggleDarkMode" 
           class="text-text-primary hover:text-accent transition-colors"
@@ -106,9 +102,7 @@ function navigateTo(path: string) {
         </button>
       </div>
       
-      <!-- Mobile Menu Button -->
       <div class="md:hidden flex items-center space-x-4">
-        <!-- Theme Toggle -->
         <button 
           @click="themeStore.toggleDarkMode" 
           class="text-text-primary hover:text-accent transition-colors"
@@ -137,7 +131,6 @@ function navigateTo(path: string) {
       </div>
     </nav>
     
-    <!-- Mobile Menu -->
     <div 
       v-if="isMenuOpen" 
       class="md:hidden bg-secondary shadow-lg animate-fade-in"
@@ -153,7 +146,6 @@ function navigateTo(path: string) {
           {{ t(`nav.${item}`) }}
         </button>
         
-        <!-- Language Selector -->
         <div class="py-2">
           <div class="font-semibold mb-1 text-text-secondary">{{ currentLanguage }}</div>
           <div class="space-y-1">
@@ -172,6 +164,5 @@ function navigateTo(path: string) {
     </div>
   </header>
   
-  <!-- Spacer to prevent content from being hidden under fixed navbar -->
   <div class="h-16"></div>
 </template>

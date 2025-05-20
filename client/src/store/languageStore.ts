@@ -13,7 +13,6 @@ export const useLanguageStore = defineStore('language', () => {
     i18n.global.locale.value = lang
     localStorage.setItem('user-language', lang)
     document.querySelector('html')?.setAttribute('lang', lang)
-    // Update the API language
     updateApiLanguage(lang)
   }
   

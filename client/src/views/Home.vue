@@ -14,6 +14,7 @@ const isLoaded = ref(false)
 const projectCarouselIndices = ref<Record<string, number>>({})
 const activeSkillCategory = ref('all')
 const carouselIntervals = ref<Record<string, number>>({})
+const animationComplete = ref(false)
 
 function getProjectCarouselIndex(projectId: string): number {
   return projectCarouselIndices.value[projectId] || 0
@@ -25,25 +26,25 @@ function setProjectCarouselIndex(projectId: string, index: number): void {
 
 function nextProjectImage(projectId: string): void {
   const project = portfolioStore.featuredProjects.find(p => p.id === projectId)
-  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return
+  if (!project || !project.imageUrl || (Array.isArray(project.imageUrl) && project.imageUrl.length <= 1)) return
   
   const currentIndex = getProjectCarouselIndex(projectId)
-  const nextIndex = (currentIndex + 1) % project.imageUrls.length
+  const nextIndex = (currentIndex + 1) % (Array.isArray(project.imageUrl) ? project.imageUrl.length : 1)
   setProjectCarouselIndex(projectId, nextIndex)
 }
 
 function prevProjectImage(projectId: string): void {
   const project = portfolioStore.featuredProjects.find(p => p.id === projectId)
-  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return
+  if (!project || !project.imageUrl || (Array.isArray(project.imageUrl) && project.imageUrl.length <= 1)) return
   
   const currentIndex = getProjectCarouselIndex(projectId)
-  const prevIndex = (currentIndex - 1 + project.imageUrls.length) % project.imageUrls.length
+  const prevIndex = (currentIndex - 1 + (Array.isArray(project.imageUrl) ? project.imageUrl.length : 1)) % (Array.isArray(project.imageUrl) ? project.imageUrl.length : 1)
   setProjectCarouselIndex(projectId, prevIndex)
 }
 
 function startCarousel(projectId: string): void {
   const project = portfolioStore.featuredProjects.find(p => p.id === projectId)
-  if (!project || !project.imageUrls || project.imageUrls.length <= 1) return
+  if (!project || !project.imageUrl || (Array.isArray(project.imageUrl) && project.imageUrl.length <= 1)) return
   
   stopCarousel(projectId)
   
@@ -59,6 +60,45 @@ function stopCarousel(projectId: string): void {
   }
 }
 
+function animateHeroElements() {
+  setTimeout(() => {
+    const profilePicture = document.querySelector('.profile-picture-inner') as HTMLElement;
+    if (profilePicture) {
+      profilePicture.classList.add('animate-profile');
+    }
+    
+    setTimeout(() => {
+      const professionElement = document.querySelector('.profession-highlight') as HTMLElement;
+      if (professionElement) {
+        professionElement.classList.add('animate-title');
+      }
+      
+      const experienceBadge = document.querySelector('.experience-badge') as HTMLElement;
+      if (experienceBadge) {
+        experienceBadge.classList.add('animate-badge');
+      }
+      
+      setTimeout(() => {
+        const description = document.querySelector('.hero-description') as HTMLElement;
+        if (description) {
+          description.classList.add('animate-description');
+        }
+        
+        setTimeout(() => {
+          const ctaButtons = document.querySelectorAll('.cta-button');
+          ctaButtons.forEach((button, index) => {
+            setTimeout(() => {
+              (button as HTMLElement).classList.add('animate-button');
+            }, index * 200);
+          });
+          
+          animationComplete.value = true;
+        }, 300);
+      }, 300);
+    }, 500);
+  }, 300);
+}
+
 onMounted(async () => {
   try {
     await Promise.all([
@@ -69,20 +109,21 @@ onMounted(async () => {
     portfolioStore.featuredProjects.forEach(project => {
       projectCarouselIndices.value[project.id] = 0
       
-      // Start carousel for each project with multiple images
-      if (project.imageUrls && project.imageUrls.length > 1) {
+      if (project.imageUrl && Array.isArray(project.imageUrl) && project.imageUrl.length > 1) {
         startCarousel(project.id)
       }
     })
     
-    isLoaded.value = true
+    isLoaded.value = true;
+    
+    animateHeroElements();
+    
   } catch (error) {
     console.error('Error fetching data:', error)
     isLoaded.value = true
   }
 })
 
-// Clean up intervals when component is unmounted
 onUnmounted(() => {
   Object.keys(carouselIntervals.value).forEach(projectId => {
     clearInterval(carouselIntervals.value[projectId])
@@ -169,45 +210,57 @@ watch(() => activeSkillCategory.value, () => {
   <div class="min-h-screen" v-if="isLoaded">
     <section class="relative py-20 md:py-32 overflow-hidden hero-section">
       <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-3xl mx-auto text-center">
-          <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6">
-            <span class="block greeting-text">{{ t('home.greeting') }}</span>
-            <div class="name-container inline-block">
-              <span class="name-highlight">{{ t('home.name') }}</span>
+        <div class="hero-content flex flex-col items-center justify-between max-w-5xl mx-auto">
+          <div class="profile-section w-full flex justify-center mb-10">
+            <div class="profile-picture-container">
+              <div class="profile-picture-inner">
+                <img src="/profile.png" alt="Timmy's Profile" class="profile-picture" />
+              </div>
+              <div class="profile-decoration"></div>
+              <div class="profile-particles">
+                <span v-for="i in 12" :key="i" class="particle" :style="{ '--delay': `${i * 0.2}s` }"></span>
+              </div>
             </div>
-          </h1>
-          <div class="profession-container mb-6">
-            <h2 class="profession-highlight text-2xl md:text-3xl font-semibold">
-              {{ t('home.title') }}
-            </h2>
-            <div class="experience-badge">3+ {{ t('home.yearsExp') }}</div>
           </div>
-          <div class="profile-picture-container">
-            <img src="/profile.png" alt="Timmy's Profile" class="profile-picture" />
-          </div>
-          <p class="hero-description text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            {{ t('home.intro') }}
-          </p>
-          <div class="hero-cta flex flex-col sm:flex-row justify-center gap-6">
-            <button 
-              @click="router.push('/portfolio')" 
-              class="cta-button primary-button"
-            >
-              {{ t('home.cta') }}
-            </button>
-            <button 
-              @click="router.push('/contact')" 
-              class="cta-button secondary-button"
-            >
-              {{ t('contact.title') }}
-            </button>
+          
+          <div class="hero-text w-full text-center">
+            <div class="profession-container flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
+              <h2 class="profession-highlight text-2xl md:text-3xl font-semibold">
+                {{ t('home.title') }}
+              </h2>
+              <div class="experience-badge">
+                <span>3+ {{ t('home.yearsExp') }}</span>
+              </div>
+            </div>
+            <p class="hero-description text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+              {{ t('home.intro') }}
+            </p>
+            <div class="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                @click="router.push('/portfolio')" 
+                class="cta-button primary-button"
+              >
+                {{ t('home.cta') }}
+              </button>
+              <button 
+                @click="router.push('/contact')" 
+                class="cta-button secondary-button"
+              >
+                {{ t('home.contact') }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="hero-bg-element top-right"></div>
-      <div class="hero-bg-element bottom-left"></div>
-      <div class="hero-bg-element center"></div>
+      <!-- Background animated elements -->
+      <div class="hero-bg-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+        <div class="floating-square square-1"></div>
+        <div class="floating-square square-2"></div>
+      </div>
     </section>
     
     <section class="py-16 bg-secondary skills-section">
@@ -302,10 +355,10 @@ watch(() => activeSkillCategory.value, () => {
             <div class="h-48 relative overflow-hidden" 
                  @mouseenter="stopCarousel(project.id)" 
                  @mouseleave="startCarousel(project.id)">
-              <div v-if="project.imageUrls && project.imageUrls.length > 0" class="project-image-carousel h-full w-full">
+              <div v-if="project.imageUrl && (Array.isArray(project.imageUrl) ? project.imageUrl.length > 0 : true)" class="project-image-carousel h-full w-full">
                 <transition-group name="fade" tag="div" class="carousel-images h-full w-full">
                   <img 
-                    v-for="(imageUrl, index) in project.imageUrls" 
+                    v-for="(imageUrl, index) in Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl]" 
                     :key="`${project.id}-img-${index}`"
                     v-show="getProjectCarouselIndex(project.id) === index"
                     :src="imageUrl" 
@@ -314,10 +367,10 @@ watch(() => activeSkillCategory.value, () => {
                   />
                 </transition-group>
                 
-                <div v-if="project.imageUrls.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between z-10">
+                <div v-if="Array.isArray(project.imageUrl) && project.imageUrl.length > 1" class="carousel-controls absolute inset-0 flex items-center justify-between z-10">
                   <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev ml-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7m0 0l-7 7-7 7" />
                     </svg>
                   </button>
                   <button @click.prevent="nextProjectImage(project.id)" class="carousel-control carousel-next mr-2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1">
@@ -327,9 +380,9 @@ watch(() => activeSkillCategory.value, () => {
                   </button>
                 </div>
                 
-                <div v-if="project.imageUrls.length > 1" class="carousel-indicators absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+                <div v-if="Array.isArray(project.imageUrl) && project.imageUrl.length > 1" class="carousel-indicators absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
                   <button 
-                    v-for="(_, index) in project.imageUrls" 
+                    v-for="(_, index) in Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl]" 
                     :key="`${project.id}-indicator-${index}`"
                     @click="setProjectCarouselIndex(project.id, index)"
                     class="carousel-indicator w-2 h-2 rounded-full bg-white/50 hover:bg-white"
@@ -470,7 +523,10 @@ watch(() => activeSkillCategory.value, () => {
 .hero-section {
   position: relative;
   overflow: hidden;
-  padding: 8rem 0;
+  padding: 6rem 0;
+  background: linear-gradient(rgba(var(--bg-primary-rgb), 0.7), rgba(var(--bg-primary-rgb), 1)),
+              radial-gradient(circle at 20% 80%, rgba(var(--accent-rgb), 0.05), transparent 25%),
+              radial-gradient(circle at 80% 20%, rgba(var(--accent-rgb), 0.05), transparent 25%);
 }
 
 .hero-title {
@@ -480,16 +536,9 @@ watch(() => activeSkillCategory.value, () => {
 
 .greeting-text {
   color: var(--text-primary);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin-bottom: 0.75rem;
-}
-
-.dark .greeting-text {
-  color: #ffffff;
-}
-
-.light .greeting-text {
-  color: #333333;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
 }
 
 .name-container {
@@ -537,23 +586,15 @@ watch(() => activeSkillCategory.value, () => {
 }
 
 .profession-container {
-  margin: 1.5rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  position: relative;
 }
 
 .profession-highlight {
   display: inline-block;
-  padding: 0.5rem 1.5rem;
   position: relative;
   font-weight: 700;
   transform: translateY(0);
   transition: all 0.3s ease;
-  text-shadow: none;
-  box-shadow: none;
 }
 
 .dark .profession-highlight {
@@ -573,61 +614,103 @@ watch(() => activeSkillCategory.value, () => {
   transform: translateY(-2px);
 }
 
-.dark .profession-highlight:hover {
-  text-shadow: 0 0 25px rgba(var(--accent-rgb), 0.4);
-}
-
-.light .profession-highlight:hover {
-  text-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
-}
-
 .experience-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
   background-color: var(--accent);
   color: white;
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.3);
+  box-shadow: 0 4px 10px rgba(var(--accent-rgb), 0.3);
   animation: bounce 2s infinite;
+  white-space: nowrap;
+}
+
+.profile-section {
+  position: relative;
 }
 
 .profile-picture-container {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 1.5rem auto;
   position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto;
+}
+
+.profile-picture-inner {
+  width: 220px;
+  height: 220px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  border-radius: 50%;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 4px solid var(--accent);
+  animation: profile-appear 1s ease-out forwards, profile-float 4s ease-in-out infinite 1s;
 }
 
 .profile-picture {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.profile-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  border: 3px solid var(--accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: profile-appear 1s ease-out forwards, profile-float 3s ease-in-out infinite 1s;
+  border: 2px dashed var(--accent);
+  opacity: 0.5;
+  animation: spin 30s linear infinite;
+}
+
+.profile-decoration::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background-color: var(--accent);
+  border-radius: 50%;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes profile-appear {
   0% {
     opacity: 0;
-    transform: scale(0.5);
+    transform: translate(-50%, -50%) scale(0.8);
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
 @keyframes profile-float {
   0%, 100% {
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translate(-50%, -60%);
   }
 }
 
@@ -642,9 +725,7 @@ watch(() => activeSkillCategory.value, () => {
 
 .hero-description {
   color: var(--text-secondary);
-  max-width: 36rem;
-  margin: 0 auto 2rem auto;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .hero-cta {
@@ -653,7 +734,7 @@ watch(() => activeSkillCategory.value, () => {
 
 .cta-button {
   display: inline-block;
-  padding: 1rem 2rem;
+  padding: 0.875rem 1.75rem;
   font-weight: 600;
   font-size: 1.125rem;
   text-align: center;
@@ -686,89 +767,6 @@ watch(() => activeSkillCategory.value, () => {
 
 .secondary-button:hover {
   background-color: rgba(var(--accent-rgb), 0.1);
-}
-
-.hero-bg-element {
-  position: absolute;
-  border-radius: 100%;
-  filter: blur(60px);
-}
-
-.hero-bg-element.top-right {
-  top: -6rem;
-  right: -6rem;
-  width: 24rem;
-  height: 24rem;
-  background-color: rgba(var(--accent-rgb), 0.3);
-  animation: pulse-slow 8s infinite alternate;
-}
-
-.hero-bg-element.bottom-left {
-  bottom: -6rem;
-  left: -6rem;
-  width: 24rem;
-  height: 24rem;
-  background-color: rgba(var(--accent-rgb), 0.3);
-  animation: pulse-slow 8s infinite alternate-reverse;
-}
-
-.hero-bg-element.center {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  max-width: 60rem;
-  max-height: 24rem;
-  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-light-rgb), 0.05));
-}
-
-@keyframes pulse-slow {
-  0% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0.5;
-    transform: scale(1.1);
-  }
-}
-
-.project-image-carousel {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.carousel-images {
-  display: flex;
-  transition: transform 0.3s ease;
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.carousel-images img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.carousel-controls {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.project-card:hover .carousel-controls {
-  opacity: 1;
-}
-
-.carousel-indicator {
-  transition: background-color 0.2s ease;
 }
 
 .skill-item {
@@ -840,5 +838,221 @@ watch(() => activeSkillCategory.value, () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.project-image-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-images {
+  display: flex;
+  transition: transform 0.3s ease;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-images img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-controls {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.project-card:hover .carousel-controls {
+  opacity: 1;
+}
+
+.carousel-indicator {
+  transition: background-color 0.2s ease;
+}
+
+.hero-bg-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.floating-circle {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  opacity: 0.1;
+  animation: float 10s linear infinite;
+}
+
+.circle-1 {
+  top: 20%;
+  left: 30%;
+  animation-delay: 2s;
+}
+
+.circle-2 {
+  top: 50%;
+  left: 70%;
+  animation-delay: 4s;
+}
+
+.circle-3 {
+  top: 80%;
+  left: 10%;
+  animation-delay: 6s;
+}
+
+.floating-square {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background-color: var(--accent);
+  opacity: 0.1;
+  animation: float 10s linear infinite;
+}
+
+.square-1 {
+  top: 10%;
+  left: 50%;
+  animation-delay: 1s;
+}
+
+.square-2 {
+  top: 40%;
+  left: 20%;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.profile-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  opacity: 0.5;
+  animation: particle 5s linear infinite;
+}
+
+@keyframes particle {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, 20px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-profile {
+  animation: profile-appear 1s ease-out forwards;
+}
+
+.animate-title {
+  animation: title-appear 1s ease-out forwards;
+}
+
+.animate-badge {
+  animation: badge-appear 1s ease-out forwards;
+}
+
+.animate-description {
+  animation: description-appear 1s ease-out forwards;
+}
+
+.animate-button {
+  animation: button-appear 1s ease-out forwards;
+}
+
+@keyframes profile-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes title-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes badge-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes description-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes button-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

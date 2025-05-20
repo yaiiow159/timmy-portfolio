@@ -7,8 +7,7 @@ export interface Project {
   title: string
   description: string
   technologies: string[]
-  imageUrl?: string | string[]
-  imageUrls?: string[]
+  imageUrl: string
   liveUrl?: string
   codeUrl?: string
   featured: boolean
@@ -20,24 +19,13 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  function normalizeProjectImages(project: any): Project {
-    if (project.imageUrl && !project.imageUrls) {
-      if (typeof project.imageUrl === 'string') {
-        project.imageUrls = [project.imageUrl];
-      } else {
-        project.imageUrls = project.imageUrl;
-      }
-    }
-    return project as Project;
-  }
-
   async function fetchProjects() {
     isLoading.value = true
     error.value = null
     
     try {
       const response = await api.get('/projects')
-      projects.value = response.data.map(normalizeProjectImages)
+      projects.value = response.data
     } catch (err) {
       console.error('Error fetching projects:', err)
       error.value = 'Failed to load projects'
@@ -52,7 +40,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     
     try {
       const response = await api.get('/projects/featured')
-      featuredProjects.value = response.data.map(normalizeProjectImages)
+      featuredProjects.value = response.data
     } catch (err) {
       console.error('Error fetching featured projects:', err)
       error.value = 'Failed to load featured projects'
@@ -60,13 +48,14 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       isLoading.value = false
     }
   }
+
   async function fetchProjectById(id: string) {
     isLoading.value = true
     error.value = null
     
     try {
       const response = await api.get(`/projects/${id}`)
-      return normalizeProjectImages(response.data)
+      return response.data
     } catch (err) {
       console.error(`Error fetching project with ID ${id}:`, err)
       error.value = 'Failed to load project'
