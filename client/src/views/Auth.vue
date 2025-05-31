@@ -29,15 +29,24 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import LoginForm from '../components/LoginForm.vue'
 import RegisterForm from '../components/RegisterForm.vue'
+import { useNotificationStore } from '../store/notificationStore'
 
 const { t } = useI18n()
+const router = useRouter()
+const notificationStore = useNotificationStore()
 const mode = ref<'login' | 'register'>('login')
 
 function handleAuthSuccess() {
-  // Notification is now handled in the authStore login function
-  // Redirection is now handled directly in the authStore login function
+  notificationStore.addNotification({
+    type: 'success',
+    message: t('auth.successMessage'),
+    duration: 5000
+  })
+  
+  router.push('/')
 }
 </script>
 

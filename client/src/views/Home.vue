@@ -48,14 +48,14 @@ function startCarousel(projectId: string): void {
   
   stopCarousel(projectId)
   
-  carouselIntervals.value[projectId] = window.setInterval(() => {
+  carouselIntervals.value[projectId] = globalThis.setInterval(() => {
     nextProjectImage(projectId)
   }, 5000)
 }
 
 function stopCarousel(projectId: string): void {
   if (carouselIntervals.value[projectId]) {
-    clearInterval(carouselIntervals.value[projectId])
+    globalThis.clearInterval(carouselIntervals.value[projectId])
     delete carouselIntervals.value[projectId]
   }
 }
@@ -126,7 +126,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   Object.keys(carouselIntervals.value).forEach(projectId => {
-    clearInterval(carouselIntervals.value[projectId])
+    globalThis.clearInterval(carouselIntervals.value[projectId])
   })
 })
 
@@ -624,7 +624,7 @@ watch(() => activeSkillCategory.value, () => {
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 600;
-  box-shadow: 0 4px 10px rgba(var(--accent-rgb), 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   animation: bounce 2s infinite;
   white-space: nowrap;
 }
