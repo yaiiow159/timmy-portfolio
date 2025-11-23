@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const winston = require('winston');
-const { adminEmail, adminPassword, adminName, missingAdminEnvVars } = require('../config/admin');
+const { adminEmail, adminPassword, adminName } = require('../config/admin');
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -25,14 +25,6 @@ const prisma = new PrismaClient();
 async function main() {
   try {
     logger.info('Starting database initialization...');
-
-    if (!adminEmail || !adminPassword) {
-      logger.warn(
-        `Skipping admin user creation; missing required credentials: ${missingAdminEnvVars.join(', ') || 'ADMIN_EMAIL/ADMIN_PASSWORD'}`
-      );
-      logger.info('Database initialization completed (admin seed skipped)');
-      return;
-    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(adminPassword, salt);
