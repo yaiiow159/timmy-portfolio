@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ResumeDialog from '../components/common/ResumeDialog.vue'
 import ResumeSectionCard from '../components/resume/ResumeSectionCard.vue'
-import { educationEntries, languageSkills, skillGroups, workExperiences } from '../data/resume'
+import type { EducationEntry, LanguageSkill, SkillGroup, WorkExperience } from '../types/resume'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const { t } = useI18n()
+const { t, tm } = useI18n()
 const languageBarsAnimated = ref(false)
 const showDialog = ref(false)
+
+const getLocalizedList = <T>(path: string): T[] => {
+  const value = tm(path)
+  return Array.isArray(value) ? (value as T[]) : []
+}
+
+const skillGroups = computed<SkillGroup[]>(() => getLocalizedList<SkillGroup>('resume.content.skills'))
+const workExperiences = computed<WorkExperience[]>(() => getLocalizedList<WorkExperience>('resume.content.experiences'))
+const educationEntries = computed<EducationEntry[]>(() => getLocalizedList<EducationEntry>('resume.content.education'))
+const languageSkills = computed<LanguageSkill[]>(() => getLocalizedList<LanguageSkill>('resume.content.languages'))
 
 onMounted(() => {
   const tl = gsap.timeline()
@@ -134,7 +144,7 @@ function downloadResume(language: 'zh' | 'en') {
       <div class="resume-header mb-12 text-center">
         <h1 class="text-4xl font-bold mb-4 text-text-primary">{{ t('resume.title') }}</h1>
         <p class="text-lg text-text-secondary mb-6">
-          Full-stack developer with expertise in Java, Spring Boot, Vue.js, and more.
+          {{ t('resume.subtitle') }}
         </p>
 
         <button
