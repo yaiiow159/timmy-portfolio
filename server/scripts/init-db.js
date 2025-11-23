@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const winston = require('winston');
+const { adminEmail, adminPassword, adminName } = require('../config/admin');
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -25,9 +26,6 @@ async function main() {
   try {
     logger.info('Starting database initialization...');
 
-    const adminEmail = 'admin123@gmail.com';
-    const adminPassword = 'admin123';
-    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(adminPassword, salt);
     
@@ -36,7 +34,7 @@ async function main() {
       update: {},
       create: {
         email: adminEmail,
-        name: 'Timmy',  
+        name: adminName,
         password: hashedPassword,
         role: 'ADMIN'
       },
