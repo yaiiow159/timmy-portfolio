@@ -1,8 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const { PrismaClient } = require('@prisma/client');
-const auth = require('../middleware/auth');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 router.get('/', async (req, res) => {
   try {
@@ -67,4 +65,5 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
+
