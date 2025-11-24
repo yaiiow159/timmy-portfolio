@@ -1,7 +1,7 @@
 import axios from 'axios'
-type NotificationType = 'error' | 'success' | 'info' | 'warning'
+import { API_BASE_URL } from '../config/api'
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+type NotificationType = 'error' | 'success' | 'info' | 'warning'
 
 let currentLanguage = 'en'
 
@@ -10,7 +10,7 @@ export function updateApiLanguage(lang: string) {
 }
 
 const api = axios.create({
-  baseURL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -95,8 +95,7 @@ export function getStaticUrl(path: string): string {
   }
 
   if (path.startsWith('/uploads/') || path.startsWith('uploads/')) {
-    const baseUrl = import.meta.env.VITE_API_URL || ''
-    return `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`
+    return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
   }
 
 
