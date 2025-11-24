@@ -1,17 +1,17 @@
-require('./env');
+const dotenv = require('dotenv')
 
-const requiredEnvVars = ['ADMIN_EMAIL', 'ADMIN_PASSWORD'];
-const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+dotenv.config()
 
-if (missingEnvVars.length > 0) {
-  console.warn(
-    `[admin config] Missing environment variables: ${missingEnvVars.join(', ')}. Admin seeding will be skipped.`
-  );
-}
+const requiredEnvVars = ['ADMIN_EMAIL', 'ADMIN_PASSWORD']
+
+requiredEnvVars.forEach((envVar) => {
+  if (!process.env[envVar]) {
+    throw new Error(`Missing required environment variable: ${envVar}`)
+  }
+})
 
 module.exports = {
   adminEmail: process.env.ADMIN_EMAIL,
   adminPassword: process.env.ADMIN_PASSWORD,
-  adminName: process.env.ADMIN_NAME || 'Admin',
-  missingAdminEnvVars: missingEnvVars
-};
+  adminName: process.env.ADMIN_NAME || 'Admin'
+}
