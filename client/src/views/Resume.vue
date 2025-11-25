@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -50,6 +50,15 @@ onMounted(() => {
     start: 'top 80%',
     once: true,
     onEnter: animateLanguageSkills
+  })
+
+  nextTick(() => {
+    const languageSection = document.querySelector('.language-section')
+    if (languageSection && isLanguageSectionInView(languageSection)) {
+      animateLanguageSkills()
+    }
+
+    ScrollTrigger.refresh()
   })
 })
 
@@ -123,6 +132,13 @@ function animateLanguageSkills() {
       }
     )
   })
+}
+
+function isLanguageSectionInView(section: Element) {
+  const rect = section.getBoundingClientRect()
+  const startOffset = window.innerHeight * 0.8
+
+  return rect.top <= startOffset && rect.bottom >= 0
 }
 
 function downloadResume(language: 'zh' | 'en') {
