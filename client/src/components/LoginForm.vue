@@ -41,8 +41,8 @@
         >
       </div>
       
-      <div v-if="authStore.error" class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center">
-        {{ authStore.error }}
+      <div v-if="loginErrorMessage" class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center">
+        {{ loginErrorMessage }}
       </div>
       
       <button 
@@ -78,12 +78,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { useAuthStore } from '../store/authStore'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
+
+const loginErrorMessage = computed(() => authStore.error ? t('errors.auth.loginFailed') : null)
 
 const emit = defineEmits(['login-success', 'switch-mode'])
 
