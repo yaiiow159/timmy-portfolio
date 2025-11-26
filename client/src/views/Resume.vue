@@ -111,17 +111,16 @@ function animateLanguageSkills() {
 
   const languageBars = document.querySelectorAll<HTMLElement>('.language-bar')
   languageBars.forEach((bar) => {
-    const percent = bar.dataset.percent || '0%'
+    const percent = bar.dataset.percent || bar.style.width || '0%'
 
-    gsap.fromTo(
-      bar,
-      { width: '0%' },
-      {
-        width: percent,
-        duration: 1.5,
-        ease: 'power3.out'
+    gsap.from(bar, {
+      width: '0%',
+      duration: 1.2,
+      ease: 'power3.out',
+      onStart: () => {
+        bar.style.width = percent
       }
-    )
+    })
   })
 }
 
@@ -241,7 +240,7 @@ function downloadResume(language: 'zh' | 'en') {
                 <div
                   class="language-bar h-2 rounded-full bg-accent"
                   :data-percent="`${language.level}%`"
-                  :style="{ width: '0%' }"
+                  :style="{ width: `${language.level}%` }"
                 ></div>
               </div>
               <span class="text-sm text-text-secondary language-label">{{ language.proficiency }}</span>
