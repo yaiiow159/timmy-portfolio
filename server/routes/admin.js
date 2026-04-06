@@ -1,10 +1,7 @@
 const express = require('express');
 const auth = require('../middleware/auth');
-<<<<<<< Updated upstream
 const prisma = require('../lib/prisma');
-=======
 const { handleSuccess, handleError } = require('../utils/responseHandler');
->>>>>>> Stashed changes
 
 const router = express.Router();
 

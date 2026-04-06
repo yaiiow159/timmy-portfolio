@@ -1,10 +1,7 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-<<<<<<< Updated upstream
 const prisma = require('../lib/prisma');
-=======
 const { handleSuccess, handleError, handleBadRequest } = require('../utils/responseHandler');
->>>>>>> Stashed changes
 
 const router = express.Router();
 
