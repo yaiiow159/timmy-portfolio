@@ -273,9 +273,6 @@ async function fetchFiles() {
   isLoading.value = true
   try {
     const response = await api.get<File[]>('/files', {
-      headers: {
-        'x-auth-token': authStore.token
-      },
       timeout: 15000
     })
     
@@ -322,17 +319,9 @@ async function deleteFile() {
     isSubmitting.value = true
     
     if (fileToDelete.value.publicId) {
-      await api.delete(`/uploads/${encodeURIComponent(fileToDelete.value.publicId)}`, {
-        headers: {
-          'x-auth-token': authStore.token as string
-        }
-      })
+      await api.delete(`/uploads/${encodeURIComponent(fileToDelete.value.publicId)}`)
     } else {
-      await api.delete(`/files/${encodeURIComponent(fileToDelete.value.path)}`, {
-        headers: {
-          'x-auth-token': authStore.token as string
-        }
-      })
+      await api.delete(`/files/${encodeURIComponent(fileToDelete.value.path)}`)
     }
     
     files.value = files.value.filter(f => f.path !== fileToDelete.value?.path)
@@ -403,7 +392,6 @@ async function batchDeleteFiles() {
     isSubmitting.value = true
     const response = await api.delete('/files/batch', {
       headers: {
-        'x-auth-token': authStore.token as string,
         'Content-Type': 'application/json'
       },
       data: {

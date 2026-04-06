@@ -2,13 +2,11 @@
 import { ref, onUnmounted } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { useAuthStore } from '@/store/authStore'
 import { useI18n } from 'vue-i18n'
 import { blogService } from '@/services/blogService'
 import type { BlogPost } from '@/store/blogStore'
 
 const { t } = useI18n()
-const authStore = useAuthStore()
 
 const props = defineProps<{
   post?: BlogPost
@@ -76,7 +74,7 @@ function removeTag(tag: string) {
 
 async function handleImageUpload(file: File): Promise<{ filePath: string; publicId: string }> {
   try {
-    const result = await blogService.uploadImage(file, authStore.token as string)
+    const result = await blogService.uploadImage(file)
     return result
   } catch (error) {
     console.error('Error uploading image:', error)

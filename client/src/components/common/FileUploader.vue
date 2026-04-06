@@ -153,7 +153,7 @@ async function uploadToCloudinary(files: File[]) {
   
   try {
     for (const file of files) {
-      const result = await fileService.uploadFile(file, authStore.token)
+      const result = await fileService.uploadFile(file)
       results.push(result)
     }
     

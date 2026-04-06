@@ -1,15 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-<<<<<<< Updated upstream
-const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const prisma = require('../lib/prisma');
-=======
-const { PrismaClient } = require('@prisma/client');
-const auth = require('../middleware/auth');
 const { handleSuccess, handleError } = require('../utils/responseHandler');
 const { generateToken } = require('../utils/jwtHelper');
->>>>>>> Stashed changes
 
 const router = express.Router();
 

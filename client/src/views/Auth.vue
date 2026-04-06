@@ -11,14 +11,12 @@
       </div>
       
       <transition name="fade" mode="out-in">
-        <login-form 
-          v-if="mode === 'login'" 
-          @login-success="handleAuthSuccess" 
+        <login-form
+          v-if="mode === 'login'"
           @switch-mode="mode = 'register'"
         />
-        <register-form 
-          v-else 
-          @register-success="handleAuthSuccess" 
+        <register-form
+          v-else
           @switch-mode="mode = 'login'"
         />
       </transition>
@@ -34,11 +32,6 @@ import RegisterForm from '../components/RegisterForm.vue'
 
 const { t } = useI18n()
 const mode = ref<'login' | 'register'>('login')
-
-function handleAuthSuccess() {
-  // Don't redirect here - let authStore handle it
-  // The authStore.login() already redirects to /admin
-}
 </script>
 
 <style scoped>

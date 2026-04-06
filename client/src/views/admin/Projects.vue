@@ -362,7 +362,6 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/services/api';
 import type { Project, ProjectType, VCSType } from '@/types/project';
-import { useAuthStore } from '@/store/authStore';
 import { formatDescription } from '@/utils/textFormatters';
 import RichTextEditor from '@/components/common/RichTextEditor.vue';
 import { projectService } from '@/services/projectService';
@@ -377,7 +376,6 @@ interface AdminProject extends Project {
 }
 
 const { t } = useI18n();
-const authStore = useAuthStore();
 
 const projects = ref<AdminProject[]>([]);
 const loading = ref(true);
@@ -591,8 +589,7 @@ async function uploadImages() {
       try {
         const response = await api.post('/uploads', formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            'x-auth-token': authStore.token as string
+            'Content-Type': 'multipart/form-data'
           }
         });
         
@@ -680,12 +677,11 @@ async function saveProject() {
 
     if (isEditing.value) {
       await projectService.updateProject(
-        { id: currentProject.id, ...projectData },
-        authStore.token as string
+        { id: currentProject.id, ...projectData }
       );
       handleSuccess(t('admin.projectUpdated'));
     } else {
-      await projectService.createProject(projectData, authStore.token as string);
+      await projectService.createProject(projectData);
       handleSuccess(t('admin.projectCreated'));
     }
     
@@ -700,7 +696,7 @@ async function deleteProject() {
   if (!projectIdToDelete.value) return;
   
   try {
-    await projectService.deleteProject(projectIdToDelete.value, authStore.token as string);
+    await projectService.deleteProject(projectIdToDelete.value);
     handleSuccess(t('admin.projectDeleted'));
     await fetchProjects();
     closeDeleteModal();

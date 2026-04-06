@@ -24,11 +24,6 @@ export interface UpdateProjectDTO extends Partial<CreateProjectDTO> {
 }
 
 class ProjectService {
-  private getAuthHeaders(token: string) {
-    return {
-      'x-auth-token': token
-    }
-  }
 
   /**
    * Fetch all projects (public)
@@ -97,11 +92,9 @@ class ProjectService {
   /**
    * Create new project (admin)
    */
-  async createProject(project: CreateProjectDTO, token: string): Promise<Project> {
+  async createProject(project: CreateProjectDTO): Promise<Project> {
     try {
-      const response = await api.post('/projects', project, {
-        headers: this.getAuthHeaders(token)
-      })
+      const response = await api.post('/projects', project)
       return this.normalizeProject(response.data)
     } catch (error) {
       throw handleError(error, {
@@ -114,12 +107,10 @@ class ProjectService {
   /**
    * Update existing project (admin)
    */
-  async updateProject(project: UpdateProjectDTO, token: string): Promise<Project> {
+  async updateProject(project: UpdateProjectDTO): Promise<Project> {
     try {
       const { id, ...data } = project
-      const response = await api.put(`/projects/${id}`, data, {
-        headers: this.getAuthHeaders(token)
-      })
+      const response = await api.put(`/projects/${id}`, data)
       return this.normalizeProject(response.data)
     } catch (error) {
       throw handleError(error, {
@@ -132,11 +123,9 @@ class ProjectService {
   /**
    * Delete project (admin)
    */
-  async deleteProject(id: string, token: string): Promise<void> {
+  async deleteProject(id: string): Promise<void> {
     try {
-      await api.delete(`/projects/${id}`, {
-        headers: this.getAuthHeaders(token)
-      })
+      await api.delete(`/projects/${id}`)
     } catch (error) {
       throw handleError(error, {
         context: ErrorContext.ADMIN,

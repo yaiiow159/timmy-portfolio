@@ -38,11 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            const response = await api.get('/auth/user', {
-                headers: {
-                    'x-auth-token': token.value
-                }
-            })
+            const response = await api.get('/auth/user')
             user.value = response.data
             
             if (user.value && !refreshInterval) {
@@ -70,11 +66,7 @@ export const useAuthStore = defineStore('auth', () => {
         if (!token.value) return
 
         try {
-            const response = await api.post('/auth/refresh', {}, {
-                headers: {
-                    'x-auth-token': token.value
-                }
-            })
+            const response = await api.post('/auth/refresh', {})
             token.value = response.data.token
             localStorage.setItem('auth-token', response.data.token)
         } catch (err) {

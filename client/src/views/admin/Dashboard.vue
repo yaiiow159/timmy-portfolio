@@ -184,14 +184,12 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useActivityStore } from '@/store/activityStore'
-import { useAuthStore } from '@/store/authStore'
 import type { Activity } from '@/types/activity'
 import api from '@/services/api'
 import { handleError, ErrorContext } from '@/utils/errorHandler'
 
 const { t } = useI18n()
 const activityStore = useActivityStore()
-const authStore = useAuthStore()
 
 const stats = ref({
   posts: 0,
@@ -203,11 +201,7 @@ const recentActivity = ref<Activity[]>([])
 
 onMounted(async () => {
   try {
-    const response = await api.get('/admin/stats', {
-      headers: {
-        'x-auth-token': authStore.token
-      }
-    })
+    const response = await api.get('/admin/stats')
     stats.value = {
       posts: response.data.postsCount,
       projects: response.data.projectsCount,

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { blogService, type PaginationParams } from '../services/blogService'
 import { useAuthStore } from './authStore'
 
@@ -32,6 +33,7 @@ export interface Pagination {
 }
 
 export const useBlogStore = defineStore('blog', () => {
+  const { t } = useI18n()
   const posts = ref<BlogPost[]>([])
   const pagination = ref<Pagination>({
     total: 0,
@@ -49,14 +51,14 @@ export const useBlogStore = defineStore('blog', () => {
   async function fetchPosts(params: PaginationParams = {}) {
     isLoading.value = true
     error.value = null
-    
+
     try {
       const response = await blogService.getPosts(params)
       posts.value = response.data
       pagination.value = response.pagination
     } catch (err) {
       console.error('Error fetching blog posts:', err)
-      error.value = 'Failed to load blog posts'
+      error.value = t('errors.blog.createFailed')
     } finally {
       isLoading.value = false
     }
@@ -64,18 +66,18 @@ export const useBlogStore = defineStore('blog', () => {
 
   async function fetchNextPage() {
     if (hasNextPage.value) {
-      await fetchPosts({ 
-        page: pagination.value.page + 1, 
-        limit: pagination.value.limit 
+      await fetchPosts({
+        page: pagination.value.page + 1,
+        limit: pagination.value.limit
       })
     }
   }
 
   async function fetchPrevPage() {
     if (hasPrevPage.value) {
-      await fetchPosts({ 
-        page: pagination.value.page - 1, 
-        limit: pagination.value.limit 
+      await fetchPosts({
+        page: pagination.value.page - 1,
+        limit: pagination.value.limit
       })
     }
   }
@@ -83,13 +85,13 @@ export const useBlogStore = defineStore('blog', () => {
   async function fetchPostById(id: string) {
     isLoading.value = true
     error.value = null
-    
+
     try {
       const response = await blogService.getPostById(id)
       return response
     } catch (err) {
       console.error(`Error fetching blog post with ID ${id}:`, err)
-      error.value = 'Failed to load blog post'
+      error.value = t('errors.general.message')
       return null
     } finally {
       isLoading.value = false
@@ -98,30 +100,30 @@ export const useBlogStore = defineStore('blog', () => {
 
   async function createPost(post: Omit<BlogPost, 'id' | 'comments'>) {
     if (!authStore.isAuthenticated) {
-      throw new Error('Authentication required')
+      throw new Error(t('errors.auth.unauthorized'))
     }
-    
+
     try {
       const postWithAuthor = {
         ...post,
         author: 'Timmy'
       }
-      const response = await blogService.createPost(postWithAuthor, authStore.token as string)
+      const response = await blogService.createPost(postWithAuthor)
       await fetchPosts({ page: 1 })
       return response
     } catch (err) {
       console.error('Error creating post:', err)
-      throw new Error('Failed to create post')
+      throw new Error(t('errors.blog.createFailed'))
     }
   }
 
   async function updatePost(id: string, post: Partial<BlogPost>) {
     if (!authStore.isAuthenticated) {
-      throw new Error('Authentication required')
+      throw new Error(t('errors.auth.unauthorized'))
     }
-    
+
     try {
-      const response = await blogService.updatePost(id, post, authStore.token as string)
+      const response = await blogService.updatePost(id, post)
       const index = posts.value.findIndex(p => p.id === id)
       if (index !== -1) {
         posts.value[index] = { ...posts.value[index], ...response }
@@ -129,22 +131,22 @@ export const useBlogStore = defineStore('blog', () => {
       return response
     } catch (err) {
       console.error('Error updating post:', err)
-      throw new Error('Failed to update post')
+      throw new Error(t('errors.blog.updateFailed'))
     }
   }
 
   async function deletePost(id: string) {
     if (!authStore.isAuthenticated) {
-      throw new Error('Authentication required')
+      throw new Error(t('errors.auth.unauthorized'))
     }
-    
+
     try {
-      await blogService.deletePost(id, authStore.token as string)
-      posts.value = posts.value.filter(p => p.id !== id)
+      await blogService.deletePost(id)
+      // 重新拉取當前頁資料，避免重複操作
       await fetchPosts({ page: pagination.value.page, limit: pagination.value.limit })
     } catch (err) {
       console.error('Error deleting post:', err)
-      throw new Error('Failed to delete post')
+      throw new Error(t('errors.blog.deleteFailed'))
     }
   }
 
@@ -154,33 +156,33 @@ export const useBlogStore = defineStore('blog', () => {
       return response
     } catch (err) {
       console.error('Error adding comment:', err)
-      throw new Error('Failed to add comment')
+      throw new Error(t('blog.commentError'))
     }
   }
 
   async function uploadImage(file: File) {
     if (!authStore.isAuthenticated) {
-      throw new Error('Authentication required')
+      throw new Error(t('errors.auth.unauthorized'))
     }
-    
+
     try {
-      return await blogService.uploadImage(file, authStore.token as string)
+      return await blogService.uploadImage(file)
     } catch (err) {
       console.error('Error uploading image:', err)
-      throw new Error('Failed to upload image')
+      throw new Error(t('errors.blog.uploadFailed'))
     }
   }
 
   async function fetchLatestPosts() {
     isLoading.value = true
     error.value = null
-    
+
     try {
       const latestPosts = await blogService.getLatestPosts()
       return latestPosts
     } catch (err) {
       console.error('Error fetching latest posts:', err)
-      error.value = 'Failed to load latest posts'
+      error.value = t('errors.general.message')
       return []
     } finally {
       isLoading.value = false
