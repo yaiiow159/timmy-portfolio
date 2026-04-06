@@ -3,26 +3,21 @@ const upload = require('../middleware/upload');
 const auth = require('../middleware/auth');
 const cloudinary = require('../config/cloudinary');
 const streamifier = require('streamifier');
+const { handleSuccess, handleError, handleBadRequest, handleNotFound } = require('../utils/responseHandler');
 
 const router = express.Router();
 
-// @route   POST api/uploads
-// @desc    Upload a file to Cloudinary
-// @access  Private
+const getFolderName = (mimetype) => {
+  if (mimetype.startsWith('image/')) return 'images';
+  if (mimetype.startsWith('video/')) return 'videos';
+  return 'files';
+};
+
 router.post('/', auth, upload.single('file'), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ msg: 'No file uploaded' });
-    }
+    if (!req.file) return handleBadRequest(res, 'No file uploaded');
 
-    let folder;
-    if (req.file.mimetype.startsWith('image/')) {
-      folder = 'images';
-    } else if (req.file.mimetype.startsWith('video/')) {
-      folder = 'videos';
-    } else {
-      folder = 'files';
-    }
+    const folder = getFolderName(req.file.mimetype);
 
     const uploadPromise = new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
@@ -42,34 +37,26 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
 
     const result = await uploadPromise;
     
-    res.json({
+    handleSuccess(res, {
       fileName: result.public_id.split('/').pop(),
       filePath: result.secure_url,
       publicId: result.public_id
-    });
+    }, 201);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: 'Server Error' });
+    handleError(res, err);
   }
 });
 
-// @route   DELETE api/uploads/:publicId
-// @desc    Delete a file from Cloudinary
-// @access  Private
 router.delete('/:publicId', auth, async (req, res) => {
   try {
     const publicId = req.params.publicId;
     
     const result = await cloudinary.uploader.destroy(publicId);
     
-    if (result.result === 'ok') {
-      return res.json({ msg: 'File deleted' });
-    } else {
-      return res.status(404).json({ msg: 'File not found or could not be deleted' });
-    }
+    if (result.result === 'ok') return handleSuccess(res, { msg: 'File deleted' });
+    return handleNotFound(res, 'File not found or could not be deleted');
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: 'Server Error' });
+    handleError(res, err);
   }
 });
 

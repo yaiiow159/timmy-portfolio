@@ -9,24 +9,50 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'var(--bg-primary)',
-          light: 'var(--bg-primary)'
+          DEFAULT: 'var(--primary)',
+          dark: 'var(--primary-dark)'
         },
         secondary: {
-          DEFAULT: 'var(--bg-secondary)',
-          light: 'var(--bg-secondary)'
+          DEFAULT: 'var(--secondary)',
+          dark: 'var(--secondary-dark)'
         },
         accent: {
           DEFAULT: 'var(--accent)',
-          light: 'var(--accent-light)'
+          light: 'var(--accent-light)',
+          dark: 'var(--accent-dark)'
+        },
+        'tech-purple': {
+          DEFAULT: 'var(--tech-purple)',
+          light: 'var(--tech-purple-light)',
+          dark: 'var(--tech-purple-dark)'
+        },
+        'tech-cyan': {
+          DEFAULT: 'var(--tech-cyan)',
+          light: 'var(--tech-cyan-light)',
+          dark: 'var(--tech-cyan-dark)'
+        },
+        'tech-green': {
+          DEFAULT: 'var(--tech-green)',
+          light: 'var(--tech-green-light)',
+          dark: 'var(--tech-green-dark)'
+        },
+        'tech-orange': {
+          DEFAULT: 'var(--tech-orange)',
+          light: 'var(--tech-orange-light)',
+          dark: 'var(--tech-orange-dark)'
+        },
+        'tech-red': {
+          DEFAULT: 'var(--tech-red)',
+          light: 'var(--tech-red-light)',
+          dark: 'var(--tech-red-dark)'
         },
         'text-primary': {
           DEFAULT: 'var(--text-primary)',
-          light: 'var(--text-primary)'
+          dark: 'var(--text-primary-dark)'
         },
         'text-secondary': {
           DEFAULT: 'var(--text-secondary)',
-          light: 'var(--text-secondary)'
+          dark: 'var(--text-secondary-dark)'
         },
         dark: {
           100: '#171717',

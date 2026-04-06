@@ -1,14 +1,18 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+<<<<<<< Updated upstream
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const prisma = require('../lib/prisma');
+=======
+const { PrismaClient } = require('@prisma/client');
+const auth = require('../middleware/auth');
+const { handleSuccess, handleError } = require('../utils/responseHandler');
+const { generateToken } = require('../utils/jwtHelper');
+>>>>>>> Stashed changes
 
 const router = express.Router();
 
-// @route   POST api/auth/register
-// @desc    Register user
-// @access  Public
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -22,9 +26,7 @@ router.post('/register', async (req, res) => {
       }
     });
 
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
-    }
+    if (user) return res.status(400).json({ msg: 'User already exists' });
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -37,37 +39,17 @@ router.post('/register', async (req, res) => {
       }
     });
 
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    const token = await generateToken(user.id);
+    handleSuccess(res, { token }, 201);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    handleError(res, err, 'Server error');
   }
 });
 
-// @route POST api/health/check
-// @desc Check if the server is running
-// @access Public
 router.post('/health', (req, res) => {
-  res.status(200).json({ msg: 'Server is running' });
+  handleSuccess(res, { msg: 'Server is running' });
 });
 
-// @route   POST api/auth/login
-// @desc    Authenticate user & get token
-// @access  Public
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -76,40 +58,18 @@ router.post('/login', async (req, res) => {
       where: { email }
     });
 
-    if (!user) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
-    }
+    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
 
     const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
-    }
-
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    const token = await generateToken(user.id);
+    handleSuccess(res, { token });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    handleError(res, err, 'Server error');
   }
 });
 
-// @route   GET api/auth/user
-// @desc    Get user data
-// @access  Private
 router.get('/user', auth, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -122,16 +82,12 @@ router.get('/user', auth, async (req, res) => {
       }
     });
     
-    res.json(user);
+    handleSuccess(res, user);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 
-// @route   POST api/auth/refresh
-// @desc    Refresh authentication token
-// @access  Private
 router.post('/refresh', auth, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -141,28 +97,12 @@ router.post('/refresh', auth, async (req, res) => {
       }
     });
 
-    if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ msg: 'User not found' });
 
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    const token = await generateToken(user.id);
+    handleSuccess(res, { token });
   } catch (err) {
-    console.error('Error refreshing token:', err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err, 'Error refreshing token');
   }
 });
 

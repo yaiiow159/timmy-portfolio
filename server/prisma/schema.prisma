@@ -10,12 +10,15 @@ datasource db {
 model Project {
   id           String   @id @default(uuid())
   title        String
-  description  String
+  description  String   @db.Text
   technologies String[]
   imageUrl     String[]
   liveUrl      String?
   codeUrl      String?
   featured     Boolean  @default(false)
+  projectType  String   @default("personal")  // "personal" or "work"
+  vcsType      String   @default("github")    // "github", "gitlab", "bitbucket", "other"
+  platformType String   @default("web")       // "web", "mobile", "desktop", "script", "api"
   date         DateTime @default(now())
 }
 

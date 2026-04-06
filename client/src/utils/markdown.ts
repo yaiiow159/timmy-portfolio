@@ -2,13 +2,12 @@ import { marked } from 'marked'
 import hljs from 'highlight.js'
 
 marked.setOptions({
-  // @ts-ignore - The highlight property exists in the runtime but is not in the type definition
   highlight: function(code: string, lang: string): string {
     if (lang && hljs.getLanguage(lang)) {
       return hljs.highlight(code, { language: lang }).value
     }
     return hljs.highlightAuto(code).value
-  },
+  } as any,
   breaks: true,
   gfm: true,
   headerIds: true,

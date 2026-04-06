@@ -40,13 +40,8 @@ const notificationStore = useNotificationStore()
 const mode = ref<'login' | 'register'>('login')
 
 function handleAuthSuccess() {
-  notificationStore.addNotification({
-    type: 'success',
-    message: t('auth.successMessage'),
-    duration: 5000
-  })
-  
-  router.push('/')
+  // Don't redirect here - let authStore handle it
+  // The authStore.login() already redirects to /admin
 }
 </script>
 

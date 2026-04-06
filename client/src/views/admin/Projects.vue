@@ -1,26 +1,35 @@
 <template>
-  <div class="admin-projects">
-    <div class="header-container">
-      <h1>{{ t('admin.projectsManagement') }}</h1>
-      <button 
-        @click="openCreateModal()" 
-        class="btn btn-primary"
+  <div class="min-h-screen">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="tech-title text-3xl font-bold mb-2">{{ t('admin.projectsManagement') }}</h1>
+        <p class="text-text-secondary">{{ t('admin.manageProjectsDescription') }}</p>
+      </div>
+      <button
+        @click="openCreateModal()"
+        class="tech-button inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 tech-glow"
       >
-        <i class="fas fa-plus mr-2"></i> {{ t('admin.addProject') }}
+        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        {{ t('admin.addProject') }}
       </button>
     </div>
 
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-      <p>{{ t('common.loading') }}</p>
+    <!-- Loading State -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-20">
+      <div class="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p class="text-text-secondary">{{ t('common.loading') }}</p>
     </div>
     
-    <div v-else-if="projects.length > 0" class="projects-grid">
-      <div v-for="project in projects" :key="project.id" class="project-card">
-        <div class="project-image">
+    <!-- Projects Grid -->
+    <div v-else-if="projects.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="project in projects" :key="project.id" class="project-card tech-card tech-glow">
+        <div class="project-image tech-data-stream">
           <div 
             v-if="project.images && project.images.length > 0" 
-            class="project-image-carousel"
+            class="project-image-carousel tech-hologram-overlay"
             @mouseenter="handleMouseEnter(project.id)"
             @mouseleave="handleMouseLeave(project.id)"
           >
@@ -70,17 +79,17 @@
           </div>
         </div>
         
-        <div class="project-content">
-          <h3 class="project-title">{{ project.title }}</h3>
+        <div class="project-content tech-scan-lines">
+          <h3 class="project-title tech-text-glow">{{ project.title }}</h3>
           <div class="project-description line-clamp-3" v-html="'<p>' + formatDescription(project.description) + '</p>'"></div>
           
           <div class="project-tech">
             <span 
               v-for="(tech, index) in project.technologies" 
               :key="`${project.id}-tech-${index}`"
-              class="tech-tag"
+              class="tech-tag tech-button"
             >
-              <i class="fas fa-tag"></i> {{ tech }}
+              <i class="fas fa-tag tech-glow"></i> {{ tech }}
             </span>
           </div>
           
@@ -94,11 +103,11 @@
           </div>
           
           <div class="project-actions">
-            <button @click="openEditModal(project)" class="btn btn-edit">
-              <i class="fas fa-edit"></i> {{ t('common.edit') }}
+            <button @click="openEditModal(project)" class="btn btn-edit tech-button">
+              <i class="fas fa-edit tech-glow"></i> {{ t('common.edit') }}
             </button>
-            <button @click="openDeleteModal(project.id)" class="btn btn-delete">
-              <i class="fas fa-trash"></i> {{ t('common.delete') }}
+            <button @click="openDeleteModal(project.id)" class="btn btn-delete tech-button">
+              <i class="fas fa-trash tech-glow"></i> {{ t('common.delete') }}
             </button>
           </div>
         </div>
@@ -130,21 +139,88 @@
           </div>
           <div class="form-group">
             <label for="description" class="form-label">{{ t('admin.projectDescription') }}</label>
-            <textarea 
-              id="description" 
-              v-model="currentProject.description" 
-              class="form-control description-textarea" 
+            <RichTextEditor 
+              v-model="currentProject.description"
               :placeholder="t('admin.enterDescription')"
-              rows="5"
-            ></textarea>
+              :rows="8"
+              :show-preview="true"
+            />
           </div>
           <div class="form-group">
-            <label for="github" class="form-label">GitHub URL</label>
-            <input type="text" id="github" v-model="currentProject.codeUrl" class="form-control" placeholder="Enter GitHub URL" />
+            <label class="form-label">{{ t('admin.projectType') }}</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.projectType" value="personal" />
+                <span>{{ t('admin.personalProject') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.projectType" value="work" />
+                <span>{{ t('admin.workProject') }}</span>
+              </label>
+            </div>
           </div>
           <div class="form-group">
-            <label for="live" class="form-label">Live URL</label>
-            <input type="text" id="live" v-model="currentProject.liveUrl" class="form-control" placeholder="Enter live URL" />
+            <label class="form-label">{{ t('admin.vcsType') }}</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.vcsType" value="github" />
+                <i class="fab fa-github"></i>
+                <span>{{ t('admin.github') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.vcsType" value="gitlab" />
+                <i class="fab fa-gitlab"></i>
+                <span>{{ t('admin.gitlab') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.vcsType" value="bitbucket" />
+                <i class="fab fa-bitbucket"></i>
+                <span>{{ t('admin.bitbucket') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.vcsType" value="other" />
+                <i class="fas fa-code-branch"></i>
+                <span>{{ t('admin.other') }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('admin.platformType') }}</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.platformType" value="web" />
+                <i class="fas fa-globe"></i>
+                <span>{{ t('admin.web') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.platformType" value="mobile" />
+                <i class="fas fa-mobile-alt"></i>
+                <span>{{ t('admin.mobile') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.platformType" value="desktop" />
+                <i class="fas fa-desktop"></i>
+                <span>{{ t('admin.desktop') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.platformType" value="script" />
+                <i class="fas fa-terminal"></i>
+                <span>{{ t('admin.script') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="currentProject.platformType" value="api" />
+                <i class="fas fa-server"></i>
+                <span>{{ t('admin.api') }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="codeUrl" class="form-label">{{ t('admin.repositoryUrl') }}</label>
+            <input type="text" id="codeUrl" v-model="currentProject.codeUrl" class="form-control" :placeholder="t('admin.enterRepositoryUrl')" />
+          </div>
+          <div class="form-group">
+            <label for="live" class="form-label">{{ t('admin.liveUrl') }}</label>
+            <input type="text" id="live" v-model="currentProject.liveUrl" class="form-control" :placeholder="t('admin.enterLiveUrl')" />
           </div>
           <div class="form-group">
             <div class="checkbox-group">
@@ -284,20 +360,23 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useNotificationStore } from '@/store/notificationStore';
 import api from '@/services/api';
-import type { Project } from '@/types/project';
+import type { Project, ProjectType, VCSType } from '@/types/project';
 import { useAuthStore } from '@/store/authStore';
 import { formatDescription } from '@/utils/textFormatters';
+import RichTextEditor from '@/components/common/RichTextEditor.vue';
+import { projectService } from '@/services/projectService';
+import { handleSuccess, handleError, ErrorContext } from '@/utils/errorHandler';
 
 interface AdminProject extends Project {
   currentImageIndex: number;
   intervalId?: number;
   images: string[];
+  projectType: ProjectType;
+  vcsType: VCSType;
 }
 
 const { t } = useI18n();
-const notificationStore = useNotificationStore();
 const authStore = useAuthStore();
 
 const projects = ref<AdminProject[]>([]);
@@ -320,6 +399,9 @@ const emptyProject: AdminProject = {
   liveUrl: '',
   codeUrl: '',
   featured: false,
+  projectType: 'personal',
+  vcsType: 'github',
+  platformType: 'web',
   date: '',
   currentImageIndex: 0
 };
@@ -338,19 +420,17 @@ onUnmounted(() => {
 async function fetchProjects() {
   try {
     loading.value = true;
-    const response = await api.get('/projects');
-    projects.value = response.data.map((project: Project) => ({
+    const allProjects = await projectService.getAllProjects();
+    projects.value = allProjects.map((project: Project) => ({
       ...project,
-      images: project.imageUrl ? (Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl]) : [], // Convert imageUrl to images array
-      currentImageIndex: 0
+      images: project.imageUrl ? (Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl]) : [],
+      currentImageIndex: 0,
+      projectType: project.projectType || 'personal',
+      vcsType: project.vcsType || 'github',
+      platformType: project.platformType || 'web'
     }));
     startAllCarousels();
   } catch (error) {
-    notificationStore.addNotification({
-      message: t('admin.errorFetchingProjects'),
-      type: 'error',
-      duration: 5000
-    });
     console.error('Error fetching projects:', error);
   } finally {
     loading.value = false;
@@ -425,16 +505,12 @@ function goToImage(projectId: string, index: number) {
 
 function openCreateModal() {
   isEditing.value = false;
-  currentProject.id = '';
-  currentProject.title = '';
-  currentProject.description = '';
-  currentProject.technologies = [];
-  currentProject.images = [];
-  currentProject.liveUrl = '';
-  currentProject.codeUrl = '';
-  currentProject.featured = false;
-  currentProject.date = '';
-  currentProject.currentImageIndex = 0;
+  Object.assign(currentProject, {
+    ...emptyProject,
+    id: '',
+    projectType: 'personal',
+    vcsType: 'github'
+  });
   
   selectedFiles.value = [];
   
@@ -447,6 +523,8 @@ function openEditModal(project: AdminProject) {
     ...project,
     technologies: [...project.technologies],
     images: project.images ? [...project.images] : [],
+    projectType: project.projectType || 'personal',
+    vcsType: project.vcsType || 'github',
     currentImageIndex: 0
   });
   showModal.value = true;
@@ -523,22 +601,20 @@ async function uploadImages() {
         }
       } catch (uploadError) {
         console.error('Error uploading individual image:', uploadError);
-        notificationStore.addNotification({
-          message: t('admin.errorUploadingImage') + `: ${file.name}`,
-          type: 'error',
-          duration: 5000
+        handleError(uploadError, {
+          context: ErrorContext.ADMIN,
+          showNotification: true,
+          customMessage: t('admin.errorUploadingImage') + `: ${file.name}`
         });
       }
     }
     
     if (currentProject.images.length > 0) {
-      notificationStore.addNotification({
-        message: selectedFiles.value.length > 1 
+      handleSuccess(
+        selectedFiles.value.length > 1 
           ? t('admin.multipleImagesUploaded') 
-          : t('admin.imageUploaded'),
-        type: 'success',
-        duration: 3000
-      });
+          : t('admin.imageUploaded')
+      );
     }
     
     selectedFiles.value = [];
@@ -546,12 +622,12 @@ async function uploadImages() {
       fileInputRef.value.value = '';
     }
   } catch (error) {
-    notificationStore.addNotification({
-      message: t('admin.errorUploadingImage'),
-      type: 'error',
-      duration: 5000
-    });
     console.error('Error uploading image:', error);
+    handleError(error, {
+      context: ErrorContext.ADMIN,
+      showNotification: true,
+      customMessage: t('admin.errorUploadingImage')
+    });
   } finally {
     uploadingImage.value = false;
   }
@@ -594,36 +670,28 @@ async function saveProject() {
       title: currentProject.title,
       description: currentProject.description,
       technologies: currentProject.technologies,
-      imageUrl: currentProject.images.length > 0 ? currentProject.images : undefined, // Convert images back to imageUrl
+      imageUrl: currentProject.images.length > 0 ? currentProject.images : undefined,
       liveUrl: currentProject.liveUrl,
       codeUrl: currentProject.codeUrl,
-      featured: currentProject.featured
+      featured: currentProject.featured,
+      projectType: currentProject.projectType,
+      vcsType: currentProject.vcsType
     };
 
     if (isEditing.value) {
-      await api.put(`/projects/${currentProject.id}`, projectData);
-      notificationStore.addNotification({
-        message: t('admin.projectUpdated'),
-        type: 'success',
-        duration: 3000
-      });
+      await projectService.updateProject(
+        { id: currentProject.id, ...projectData },
+        authStore.token as string
+      );
+      handleSuccess(t('admin.projectUpdated'));
     } else {
-      await api.post('/projects', projectData);
-      notificationStore.addNotification({
-        message: t('admin.projectCreated'),
-        type: 'success',
-        duration: 3000
-      });
+      await projectService.createProject(projectData, authStore.token as string);
+      handleSuccess(t('admin.projectCreated'));
     }
     
     await fetchProjects();
     closeModal();
   } catch (error) {
-    notificationStore.addNotification({
-      message: t('admin.errorSavingProject'),
-      type: 'error',
-      duration: 5000
-    });
     console.error('Error saving project:', error);
   }
 }
@@ -632,20 +700,11 @@ async function deleteProject() {
   if (!projectIdToDelete.value) return;
   
   try {
-    await api.delete(`/projects/${projectIdToDelete.value}`);
-    notificationStore.addNotification({
-      message: t('admin.projectDeleted'),
-      type: 'success',
-      duration: 3000
-    });
+    await projectService.deleteProject(projectIdToDelete.value, authStore.token as string);
+    handleSuccess(t('admin.projectDeleted'));
     await fetchProjects();
     closeDeleteModal();
   } catch (error) {
-    notificationStore.addNotification({
-      message: t('admin.errorDeletingProject'),
-      type: 'error',
-      duration: 5000
-    });
     console.error('Error deleting project:', error);
   }
 }
@@ -1100,6 +1159,26 @@ async function deleteProject() {
         background: linear-gradient(145deg, #2d2d2d, #3a3a3a) !important;
         position: relative;
         z-index: 1;
+        max-height: calc(90vh - 180px);
+        overflow-y: auto;
+        
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 4px;
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+          }
+        }
         
         .form-group {
           margin-bottom: 1.75rem;
@@ -1451,6 +1530,82 @@ async function deleteProject() {
   min-height: 120px;
   line-height: 1.5;
   white-space: pre-wrap;
+}
+
+.radio-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.875rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, transparent, rgba(var(--accent-color-rgb), 0.1));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    &:hover {
+      border-color: var(--accent-color);
+      background-color: rgba(255, 255, 255, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      
+      &::before {
+        opacity: 1;
+      }
+    }
+    
+    input[type="radio"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-color);
+      flex-shrink: 0;
+      
+      &:checked ~ span,
+      &:checked ~ i {
+        color: var(--accent-color);
+        font-weight: 600;
+      }
+    }
+    
+    &:has(input[type="radio"]:checked) {
+      border-color: var(--accent-color);
+      background-color: rgba(var(--accent-color-rgb), 0.15);
+      box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2);
+    }
+    
+    i {
+      font-size: 1.25rem;
+      transition: color 0.3s;
+      flex-shrink: 0;
+    }
+    
+    span {
+      transition: color 0.3s, font-weight 0.3s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 .project-description {

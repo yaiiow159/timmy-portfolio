@@ -1,17 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import api from '@/services/api'
+import { projectService } from '@/services/projectService'
+import type { Project, ProjectType } from '@/types/project'
 
-export interface Project {
-  id: string
-  title: string
-  description: string
-  technologies: string[]
-  imageUrl: string
-  liveUrl?: string
-  codeUrl?: string
-  featured: boolean
-}
+export type { Project }
 
 export const usePortfolioStore = defineStore('portfolio', () => {
   const projects = ref<Project[]>([])
@@ -24,8 +16,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     error.value = null
     
     try {
-      const response = await api.get('/projects')
-      projects.value = response.data
+      projects.value = await projectService.getAllProjects()
     } catch (err) {
       console.error('Error fetching projects:', err)
       error.value = 'Failed to load projects'
@@ -39,11 +30,25 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     error.value = null
     
     try {
-      const response = await api.get('/projects/featured')
-      featuredProjects.value = response.data
+      featuredProjects.value = await projectService.getFeaturedProjects()
     } catch (err) {
       console.error('Error fetching featured projects:', err)
       error.value = 'Failed to load featured projects'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function fetchProjectsByType(type: ProjectType) {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      return await projectService.getProjectsByType(type)
+    } catch (err) {
+      console.error(`Error fetching projects by type ${type}:`, err)
+      error.value = 'Failed to load projects'
+      return []
     } finally {
       isLoading.value = false
     }
@@ -54,8 +59,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     error.value = null
     
     try {
-      const response = await api.get(`/projects/${id}`)
-      return response.data
+      return await projectService.getProjectById(id)
     } catch (err) {
       console.error(`Error fetching project with ID ${id}:`, err)
       error.value = 'Failed to load project'
@@ -72,6 +76,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     error,
     fetchProjects,
     fetchFeaturedProjects,
+    fetchProjectsByType,
     fetchProjectById
   }
 })

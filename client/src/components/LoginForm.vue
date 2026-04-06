@@ -1,56 +1,52 @@
 <template>
-  <div class="login-form bg-white dark:bg-dark-200 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-dark-300">
-    <h2 class="text-2xl font-bold mb-8 text-center gradient-text">{{ t('auth.login') }}</h2>
+  <div class="login-form tech-card p-10 relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50"></div>
+    <h2 class="tech-title text-4xl font-bold mb-10 text-center">{{ t('auth.login') }}</h2>
     
-    <form @submit.prevent="handleSubmit" class="space-y-6">
-      <div class="mb-6">
-        <label class="block text-gray-700 dark:text-gray-300 mb-2 text-lg font-medium" for="email">
+    <form @submit.prevent="handleSubmit" class="space-y-8">
+      <div>
+        <label class="block text-text-secondary mb-3 font-semibold text-sm uppercase tracking-wide" for="email">
           {{ t('auth.email') }}
         </label>
         <input 
           v-model="form.email"
           type="email" 
           id="email"
-          class="w-full px-4 py-3 border border-gray-300 dark:border-dark-400 rounded-lg 
-                 bg-gray-50 dark:bg-dark-300 
-                 text-gray-900 dark:text-gray-100 
-                 text-lg focus:ring-2 focus:ring-accent/50 focus:border-accent 
-                 dark:focus:ring-accent-light/50 dark:focus:border-accent-light
-                 transition-colors"
+          class="tech-input w-full text-lg"
           :placeholder="t('auth.emailPlaceholder')"
           required
         >
       </div>
       
-      <div class="mb-8">
-        <label class="block text-gray-700 dark:text-gray-300 mb-2 text-lg font-medium" for="password">
+      <div>
+        <label class="block text-text-secondary mb-3 font-semibold text-sm uppercase tracking-wide" for="password">
           {{ t('auth.password') }}
         </label>
         <input 
           v-model="form.password"
           type="password" 
           id="password"
-          class="w-full px-4 py-3 border border-gray-300 dark:border-dark-400 rounded-lg 
-                 bg-gray-50 dark:bg-dark-300 
-                 text-gray-900 dark:text-gray-100 
-                 text-lg focus:ring-2 focus:ring-accent/50 focus:border-accent 
-                 dark:focus:ring-accent-light/50 dark:focus:border-accent-light
-                 transition-colors"
+          class="tech-input w-full text-lg"
           :placeholder="t('auth.passwordPlaceholder')"
           required
         >
       </div>
       
+<<<<<<< Updated upstream
       <div v-if="loginErrorMessage" class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center">
         {{ loginErrorMessage }}
+=======
+      <div v-if="authStore.error" class="p-4 bg-red-900/20 border-2 border-red-500 text-red-500 rounded-xl font-medium flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ authStore.error }}
+>>>>>>> Stashed changes
       </div>
       
       <button 
         type="submit"
-        class="w-full bg-accent dark:bg-accent-light hover:bg-accent-light dark:hover:bg-accent 
-               text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02] 
-               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent dark:focus:ring-accent-light
-               disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+        class="tech-button w-full py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 tech-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         :disabled="authStore.isLoading"
       >
         <span v-if="authStore.isLoading" class="flex items-center justify-center">
@@ -63,12 +59,11 @@
         <span v-else>{{ t('auth.login') }}</span>
       </button>
       
-      <div class="mt-6 text-center">
-        <p class="text-gray-600 dark:text-gray-400 text-lg">
+      <div class="mt-8 text-center">
+        <p class="text-text-secondary text-lg">
           {{ t('auth.noAccount') }} 
           <a @click="$emit('switch-mode')" 
-             class="text-accent dark:text-accent-light hover:text-accent-light dark:hover:text-accent 
-                    cursor-pointer font-medium transition-colors">
+             class="text-accent hover:text-tech-purple cursor-pointer font-semibold transition-colors duration-300 underline-offset-4 hover:underline">
             {{ t('auth.register') }}
           </a>
         </p>
@@ -104,9 +99,4 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r;
-  @apply dark:from-blue-400 dark:to-purple-400;
-  @apply from-blue-600 to-purple-600;
-}
 </style>

@@ -36,61 +36,101 @@ const displayExcerpt = computed(() => {
 
 <template>
   <div 
-    class="blog-card bg-secondary rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+    class="blog-card tech-card overflow-hidden group relative"
     :class="{ 'h-full': compact }"
   >
+    <!-- 科技感裝飾背景 -->
+    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+      <div class="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-xl"></div>
+    </div>
+    
     <div :class="{ 'md:flex': !compact }">
-      <div :class="{ 'md:w-1/3 h-48 md:h-auto': !compact, 'h-40': compact }" class="bg-gray-700 relative">
-        <div v-if="post.coverImage" class="h-full w-full">
+      <!-- 圖片區域 -->
+      <div :class="{ 'md:w-1/3 h-48 md:h-auto': !compact, 'h-40': compact }" class="bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
+        <div v-if="post.coverImage" class="h-full w-full relative">
           <img 
             :src="post.coverImage" 
             :alt="post.title" 
-            class="h-full w-full object-cover"
+            class="h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
           />
+          <!-- 圖片覆蓋層 -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
-        <div v-else class="h-full w-full bg-gray-700 flex items-center justify-center text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+        <div v-else class="h-full w-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center tech-text-secondary">
+          <div class="text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="text-xs">No Image</p>
+          </div>
+        </div>
+        
+        <!-- 閱讀時間標籤 -->
+        <div class="absolute top-3 left-3">
+          <div class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full border border-accent/30">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ Math.ceil(post.content.length / 1000) }} min read
+          </div>
         </div>
       </div>
       
-      <div :class="{ 'md:w-2/3': !compact }" class="p-4 md:p-6 flex flex-col h-full">
-        <div class="flex flex-wrap gap-2 mb-2" v-if="!compact && post.tags.length > 0">
+      <!-- 內容區域 -->
+      <div :class="{ 'md:w-2/3': !compact }" class="p-6 flex flex-col h-full relative">
+        <!-- 標籤區域 -->
+        <div class="flex flex-wrap gap-2 mb-4" v-if="!compact && post.tags.length > 0">
           <span 
-            v-for="tag in post.tags.slice(0, 3)" 
+            v-for="tag in post.tags.slice(0, 4)" 
             :key="tag"
-            class="text-xs px-2 py-1 rounded-full bg-accent/20 text-accent"
+            class="text-xs px-3 py-1.5 rounded-full bg-gradient-to-r from-accent/10 to-tech-purple/10 text-accent border border-accent/20 hover:border-accent/40 transition-all duration-300 font-medium hover:scale-105 cursor-pointer"
+            @click="$emit('tag-click', tag)"
           >
-            {{ tag }}
+            #{{ tag }}
           </span>
-          <span v-if="post.tags.length > 3" class="text-xs px-2 py-1 rounded-full bg-accent/10 text-text-secondary">
-            +{{ post.tags.length - 3 }}
+          <span v-if="post.tags.length > 4" class="text-xs px-3 py-1.5 rounded-full bg-gradient-to-r from-accent/10 to-tech-purple/10 text-accent border border-accent/20 hover:border-accent/40 transition-all duration-300 font-medium hover:scale-105">
+            +{{ post.tags.length - 4 }}
           </span>
         </div>
         
-        <h2 class="text-xl font-bold mb-2 text-text-primary hover:text-accent transition-colors line-clamp-2">
+        <!-- 標題 -->
+        <h2 class="text-xl font-bold mb-3 tech-text-primary group-hover:text-accent transition-colors duration-300 line-clamp-2">
           {{ displayTitle }}
         </h2>
         
-        <p class="text-sm text-text-secondary mb-2">
-          {{ t('blog.postedOn') }} {{ formatDate(post.date) }}
-        </p>
+        <!-- 元數據 -->
+        <div class="flex items-center gap-4 text-sm tech-text-secondary mb-4">
+          <div class="flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{{ formatDate(post.date) }}</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>{{ post.author || 'Anonymous' }}</span>
+          </div>
+        </div>
         
-        <p v-if="!compact" class="text-text-secondary mb-4 line-clamp-3">
+        <!-- 摘要 -->
+        <p v-if="!compact" class="text-text-secondary mb-6 line-clamp-3 leading-relaxed flex-grow">
           {{ displayExcerpt }}
         </p>
-        <p v-else class="text-text-secondary mb-4 line-clamp-2 text-sm">
+        <p v-else class="text-text-secondary mb-4 line-clamp-2 text-sm leading-relaxed flex-grow">
           {{ displayExcerpt }}
         </p>
         
+        <!-- 閱讀更多按鈕 -->
         <div class="mt-auto pt-2">
           <router-link 
             :to="`/blog/${post.id}`" 
-            class="inline-flex items-center text-accent hover:text-accent-light transition-colors"
+            class="tech-button tech-button-sm inline-flex items-center gap-2 group-hover:scale-105 transition-all duration-300"
           >
             {{ t('blog.readMore') }}
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </router-link>
@@ -99,3 +139,78 @@ const displayExcerpt = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.blog-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+  z-index: 1;
+}
+
+.blog-card:hover::before {
+  left: 100%;
+}
+
+.blog-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 212, 255, 0.2),
+    0 0 30px rgba(0, 212, 255, 0.1);
+}
+
+.blog-card .tech-button {
+  position: relative;
+  z-index: 2;
+}
+
+/* 標籤動畫 */
+.blog-card .tag {
+  transition: all 0.3s ease;
+}
+
+.blog-card:hover .tag {
+  transform: translateY(-2px);
+}
+
+/* 圖片懸停效果 */
+.blog-card img {
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blog-card:hover img {
+  filter: brightness(1.1) contrast(1.05);
+}
+
+/* 標題懸停效果 */
+.blog-card h2 {
+  transition: all 0.3s ease;
+}
+
+.blog-card:hover h2 {
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+  .blog-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+  
+  .blog-card::before {
+    display: none;
+  }
+}
+</style>

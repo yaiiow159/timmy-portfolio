@@ -15,7 +15,7 @@ import { useAuthStore } from '@/store/authStore'
 const props = defineProps<{
   accept?: string
   multiple?: boolean
-  maxSize?: number // in bytes
+  maxSize?: number
   maxFiles?: number
   label?: string
   helpText?: string

@@ -92,5 +92,10 @@ export const blogService = {
     })
     
     return response.data
+  },
+
+  getLatestPosts: async (): Promise<BlogPost[]> => {
+    const response = await api.get('/posts/latest')
+    return response.data
   }
 }

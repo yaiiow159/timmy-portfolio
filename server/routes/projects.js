@@ -1,11 +1,14 @@
 const express = require('express');
+<<<<<<< Updated upstream
 const prisma = require('../lib/prisma');
+=======
+const { PrismaClient } = require('@prisma/client');
+const { handleSuccess, handleError } = require('../utils/responseHandler');
+const { normalizeImageUrl } = require('../utils/imageUrlNormalizer');
+>>>>>>> Stashed changes
 
 const router = express.Router();
 
-// @route   GET api/projects
-// @desc    Get all projects
-// @access  Public
 router.get('/', async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
@@ -13,16 +16,12 @@ router.get('/', async (req, res) => {
         date: 'desc'
       }
     });
-    res.json(projects);
+    handleSuccess(res, projects);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 
-// @route   GET api/projects/featured
-// @desc    Get featured projects for homepage
-// @access  Public
 router.get('/featured', async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
@@ -40,20 +39,40 @@ router.get('/featured', async (req, res) => {
         imageUrl: true,
         technologies: true,
         liveUrl: true,
-        codeUrl: true
+        codeUrl: true,
+        projectType: true,
+        vcsType: true,
+        platformType: true
       }
     });
     
-    res.json(projects);
+    handleSuccess(res, projects);
   } catch (err) {
-    console.error('Error fetching featured projects:', err);
-    res.status(500).json({ error: 'Failed to fetch featured projects' });
+    handleError(res, err, 'Failed to fetch featured projects');
   }
 });
 
-// @route   GET api/projects/:id
-// @desc    Get project by ID
-// @access  Public
+router.get('/type/:type', async (req, res) => {
+  try {
+    const { type } = req.params;
+    
+    if (type !== 'work' && type !== 'personal') return res.status(400).json({ msg: 'Invalid project type' });
+    
+    const projects = await prisma.project.findMany({
+      where: {
+        projectType: type
+      },
+      orderBy: {
+        date: 'desc'
+      }
+    });
+    
+    handleSuccess(res, projects);
+  } catch (err) {
+    handleError(res, err, 'Failed to fetch projects');
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const project = await prisma.project.findUnique({
@@ -62,46 +81,42 @@ router.get('/:id', async (req, res) => {
       }
     });
     
-    if (!project) {
-      return res.status(404).json({ msg: 'Project not found' });
-    }
-    
-    res.json(project);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+    handleSuccess(res, project);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 
-// @route   POST api/projects
-// @desc    Create a project
-// @access  Private 
 router.post('/', async (req, res) => {
   try {
+    const imageUrl = normalizeImageUrl(req.body.imageUrl);
+
     const project = await prisma.project.create({
       data: {
         title: req.body.title,
         description: req.body.description,
         technologies: req.body.technologies,
-        imageUrl: req.body.imageUrl ? (Array.isArray(req.body.imageUrl[0]) ? req.body.imageUrl[0] : req.body.imageUrl) : [],
+        imageUrl: imageUrl,
         liveUrl: req.body.liveUrl || null,
         codeUrl: req.body.codeUrl || null,
-        featured: req.body.featured || false
+        featured: req.body.featured || false,
+        projectType: req.body.projectType || 'personal',
+        vcsType: req.body.vcsType || 'github',
+        platformType: req.body.platformType || 'web'
       }
     });
     
-    res.json(project);
+    handleSuccess(res, project, 201);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 
-// @route   PUT api/projects/:id
-// @desc    Update a project
-// @access  Private
 router.put('/:id', async (req, res) => {
   try {
+    const imageUrl = normalizeImageUrl(req.body.imageUrl);
+
     const project = await prisma.project.update({
       where: {
         id: req.params.id
@@ -110,28 +125,23 @@ router.put('/:id', async (req, res) => {
         title: req.body.title,
         description: req.body.description,
         technologies: req.body.technologies,
-        imageUrl: req.body.imageUrl ? (Array.isArray(req.body.imageUrl[0]) ? req.body.imageUrl[0] : req.body.imageUrl) : [],
+        imageUrl: imageUrl,
         liveUrl: req.body.liveUrl,
         codeUrl: req.body.codeUrl,
-        featured: req.body.featured
+        featured: req.body.featured,
+        projectType: req.body.projectType || 'personal',
+        vcsType: req.body.vcsType || 'github',
+        platformType: req.body.platformType || 'web'
       }
     });
     
-    res.json(project);
+    handleSuccess(res, project);
   } catch (err) {
-    console.error(err.message);
-    
-    if (err.code === 'P2025') {
-      return res.status(404).json({ msg: 'Project not found' });
-    }
-    
-    res.status(500).send('Server Error');
+    if (err.code === 'P2025') return res.status(404).json({ msg: 'Project not found' });
+    handleError(res, err);
   }
 });
 
-// @route   DELETE api/projects/:id
-// @desc    Delete a project
-// @access 
 router.delete('/:id', async (req, res) => {
   try {
     await prisma.project.delete({
@@ -140,15 +150,10 @@ router.delete('/:id', async (req, res) => {
       }
     });
     
-    res.json({ msg: 'Project removed' });
+    handleSuccess(res, { msg: 'Project removed' });
   } catch (err) {
-    console.error(err.message);
-    
-    if (err.code === 'P2025') {
-      return res.status(404).json({ msg: 'Project not found' });
-    }
-    
-    res.status(500).send('Server Error');
+    if (err.code === 'P2025') return res.status(404).json({ msg: 'Project not found' });
+    handleError(res, err);
   }
 });
 

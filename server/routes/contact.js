@@ -1,18 +1,17 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
+<<<<<<< Updated upstream
 const prisma = require('../lib/prisma');
+=======
+const { handleSuccess, handleError, handleBadRequest } = require('../utils/responseHandler');
+>>>>>>> Stashed changes
 
 const router = express.Router();
 
-// @route   POST api/contact
-// @desc    Send contact message
-// @access  Public
 router.post('/', async (req, res) => {
   const { name, email, message } = req.body;
 
-  if (!name || !email || !message) {
-    return res.status(400).json({ msg: 'Please include name, email and message' });
-  }
+  if (!name || !email || !message) return handleBadRequest(res, 'Please include name, email and message');
   
   try {
     await prisma.contact.create({
@@ -109,10 +108,9 @@ await transporter.sendMail({
     </html>
   `
 });
-    res.json({ msg: 'Message sent successfully' });
+    handleSuccess(res, { msg: 'Message sent successfully' }, 201);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 

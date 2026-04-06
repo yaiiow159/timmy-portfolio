@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia'
 import {ref, computed} from 'vue'
 import api from '../services/api'
-import {useNotificationStore} from './notificationStore'
 import {useI18n} from 'vue-i18n'
 import router from '../router'
+import { handleError, handleSuccess, ErrorContext } from '@/utils/errorHandler'
 
 export interface User {
     id: string
@@ -27,7 +27,6 @@ export const useAuthStore = defineStore('auth', () => {
     const isLoading = ref(false)
     const error = ref<string | null>(null)
     const { t } = useI18n()
-    const notificationStore = useNotificationStore()
 
     const isAuthenticated = computed(() => !!token.value && !!user.value)
     const isAdmin = computed(() => user.value?.role === 'admin')
@@ -46,7 +45,6 @@ export const useAuthStore = defineStore('auth', () => {
             })
             user.value = response.data
             
-            // Start token refresh if not already started
             if (user.value && !refreshInterval) {
                 startTokenRefresh()
             }
@@ -56,11 +54,10 @@ export const useAuthStore = defineStore('auth', () => {
             console.error('Error loading user:', err)
             if (err.response?.status === 401) {
                 logout()
-                error.value = t('errors.auth.sessionExpired')
-                notificationStore.addNotification({
-                    type: 'error',
-                    message: error.value || t('errors.auth.sessionExpired'),
-                    duration: 5000
+                error.value = handleError(err, {
+                    context: ErrorContext.AUTH,
+                    showNotification: true,
+                    customMessage: t('errors.auth.sessionExpired')
                 })
             }
             return null
@@ -98,11 +95,7 @@ export const useAuthStore = defineStore('auth', () => {
             const userData = await loadUser()
             
             if (userData) {
-                notificationStore.addNotification({
-                    type: 'success',
-                    message: t('auth.loginSuccess'),
-                    duration: 3000
-                })
+                handleSuccess(t('auth.loginSuccess'))
                 
                 router.push('/admin')
                 
@@ -112,12 +105,19 @@ export const useAuthStore = defineStore('auth', () => {
             return false
         } catch (err: any) {
             console.error('Login error:', err)
+<<<<<<< Updated upstream
             const detailedMessage = err.response?.data?.msg
             error.value = t('errors.auth.loginFailed')
             notificationStore.addNotification({
                 type: 'error',
                 message: detailedMessage || error.value,
                 duration: 5000
+=======
+            error.value = handleError(err, {
+                context: ErrorContext.AUTH,
+                showNotification: true,
+                customMessage: err.response?.data?.msg || t('errors.auth.loginFailed')
+>>>>>>> Stashed changes
             })
             return false
         } finally {
@@ -137,11 +137,10 @@ export const useAuthStore = defineStore('auth', () => {
             return true
         } catch (err: any) {
             console.error('Registration error:', err)
-            error.value = err.response?.data?.msg ?? t('errors.auth.registerFailed')
-            notificationStore.addNotification({
-                type: 'error',
-                message: error.value || t('errors.auth.registerFailed'),
-                duration: 5000
+            error.value = handleError(err, {
+                context: ErrorContext.AUTH,
+                showNotification: true,
+                customMessage: err.response?.data?.msg || t('errors.auth.registerFailed')
             })
             return false
         } finally {
@@ -158,11 +157,7 @@ export const useAuthStore = defineStore('auth', () => {
             clearInterval(refreshInterval)
             refreshInterval = null
         }
-        notificationStore.addNotification({
-            type: 'info',
-            message: t('auth.logoutSuccess'),
-            duration: 3000
-        })
+        handleSuccess(t('auth.logoutSuccess'))
     }
 
     let refreshInterval: number | null = null

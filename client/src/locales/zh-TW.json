@@ -86,7 +86,17 @@
     "viewProject": "查看專案",
     "technologies": "技術",
     "showMore": "顯示更多",
-    "showLess": "顯示更少"
+    "showLess": "顯示更少",
+    "allProjects": "全部專案",
+    "workProjects": "工作專案",
+    "personalProjects": "個人作品",
+    "allPlatforms": "全部平台",
+    "webProjects": "網頁應用",
+    "mobileProjects": "行動應用",
+    "desktopProjects": "桌面應用",
+    "scriptProjects": "腳本與工具",
+    "apiProjects": "API與後端",
+    "layout": "版面配置"
   },
   "resume": {
     "title": "履歷",
@@ -401,8 +411,27 @@
     "managePosts": "文章管理",
     "managePostsDescription": "管理和編輯您的部落格文章",
     "manageProjects": "專案管理",
+    "manageProjectsDescription": "管理您的專案作品集",
     "projectsManagement": "專案管理",
     "addProject": "新增專案",
+    "projectType": "專案類型",
+    "personalProject": "個人作品",
+    "workProject": "工作專案",
+    "vcsType": "版本控制系統",
+    "github": "GitHub",
+    "gitlab": "GitLab",
+    "bitbucket": "Bitbucket",
+    "other": "其他",
+    "platformType": "平台類型",
+    "web": "網頁應用",
+    "mobile": "行動應用",
+    "desktop": "桌面應用",
+    "script": "腳本/工具",
+    "api": "API/後端",
+    "repositoryUrl": "程式庫連結",
+    "enterRepositoryUrl": "請輸入程式庫連結",
+    "fileManagement": "檔案管理",
+    "welcomeBack": "歡迎回來！這是您的管理中心概覽",
     "viewSite": "查看網站",
     "logout": "登出",
     "projectTitle": "專案標題",
@@ -466,25 +495,50 @@
     "deleteImage": "刪除圖片",
     "deleteTechnology": "刪除技術",
     "deletePostError": "刪除文章失敗",
-    "comments": "評論"
+    "comments": "評論",
+    "projectType": "專案類型",
+    "personalProject": "個人作品",
+    "workProject": "工作專案",
+    "vcsType": "版本控制系統",
+    "github": "GitHub",
+    "gitlab": "GitLab",
+    "bitbucket": "Bitbucket",
+    "other": "其他",
+    "platformType": "平台類型",
+    "web": "Web 應用",
+    "mobile": "行動應用",
+    "desktop": "桌面應用",
+    "script": "腳本/工具",
+    "api": "API/後端",
+    "repositoryUrl": "程式碼庫連結",
+    "enterRepositoryUrl": "請輸入程式碼庫連結"
+  },
+  "editor": {
+    "bold": "粗體",
+    "italic": "斜體",
+    "heading": "標題",
+    "bulletList": "項目符號列表",
+    "numberedList": "編號列表",
+    "link": "連結",
+    "code": "程式碼"
   },
   "contact": {
     "title": "聯絡我",
-    "subtitle": "請填寫以下表單與我聯繫",
+    "subtitle": "歡迎與我聯繫，讓我們一起討論您的下一個專案",
     "name": "您的姓名",
     "email": "您的電子郵件",
+    "subject": "主旨",
     "message": "您的訊息",
-    "send": "發送訊息",
+    "sendMessage": "發送訊息",
     "sending": "發送中...",
-    "success": "訊息已成功發送！",
-    "error": "發送訊息失敗，請稍後再試",
-    "namePlaceholder": "請輸入您的姓名",
-    "emailPlaceholder": "請輸入您的電子郵件",
-    "messagePlaceholder": "請輸入您的訊息",
-    "nameRequired": "請輸入您的姓名",
-    "emailRequired": "請輸入您的電子郵件",
-    "emailInvalid": "請輸入有效的電子郵件",
-    "messageRequired": "請輸入您的訊息"
+    "sendSuccess": "訊息已成功發送！我會盡快回覆您。",
+    "sendError": "發送訊息失敗，請稍後再試",
+    "requiredFields": "請填寫所有必填欄位",
+    "info": "聯絡資訊",
+    "social": "社群媒體",
+    "emailAddress": "電子郵件地址",
+    "phone": "電話",
+    "address": "地址"
   },
   "common": {
     "loading": "載入中...",
@@ -542,7 +596,8 @@
     "successMessage": "操作成功！",
     "errorMessage": "操作失敗，請稍後再試",
     "notFound": "找不到資源",
-    "notFoundMessage": "抱歉，您要找的資源不存在或已被移除。"
+    "notFoundMessage": "抱歉，您要找的資源不存在或已被移除。",
+    "preview": "預覽"
   },
   "blogPost": {
     "readingTime": "閱讀時間",
@@ -568,16 +623,25 @@
     "readMore": "閱讀更多"
   },
   "footer": {
-    "about": "關於我",
-    "posts": "文章",
-    "contact": "聯繫我",
-    "subscribe": "訂閱",
-    "privacy": "隐私政策",
-    "terms": "條款",
-    "copyright": " 2023 Timmy Portfolio",
-    "backToTop": "回到頂部",
-    "language": "語言",
+    "copyright": "© 2025 Timmy Portfolio",
     "madeWith": "製作使用",
-    "developerDescription": "Timmy的個人形象網站"
+    "developerDescription": "熱愛創造優雅解決方案的全端開發者。",
+    "quickLinks": "快速連結",
+    "techStack": "技術棧",
+    "connect": "聯繫方式",
+    "allRightsReserved": "版權所有。"
+  },
+  "errors": {
+    "general": {
+      "title": "錯誤",
+      "message": "發生錯誤，請稍後再試。",
+      "retry": "重試"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "找不到頁面",
+    "description": "您要找的頁面可能已被移除、更名或暫時無法使用。",
+    "backToHome": "返回首頁"
   }
 }

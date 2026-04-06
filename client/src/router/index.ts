@@ -106,15 +106,6 @@ const router = createRouter({
   }
 })
 
-router.afterEach(() => {
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      document.body.style.display = 'none'
-      document.body.offsetHeight
-      document.body.style.display = ''
-    })
-  })
-})
 
 router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()

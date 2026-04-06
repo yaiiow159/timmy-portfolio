@@ -1,17 +1,13 @@
 const express = require('express');
 const auth = require('../middleware/auth');
+<<<<<<< Updated upstream
 const prisma = require('../lib/prisma');
+=======
+const { handleSuccess, handleError } = require('../utils/responseHandler');
+>>>>>>> Stashed changes
 
 const router = express.Router();
 
-prisma.$use(async (params, next) => {
-  const result = await next(params);
-  return result;
-});
-
-// @route   GET api/posts
-// @desc    Get all posts with pagination
-// @access  Public
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -44,7 +40,7 @@ router.get('/', async (req, res) => {
     
     const total = await prisma.post.count({ where });
     
-    res.json({
+    handleSuccess(res, {
       posts,
       pagination: {
         total,
@@ -54,162 +50,34 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 
-// @route   GET api/posts/:id
-// @desc    Get post by ID
-// @access  Public
-router.get('/:id', async (req, res) => {
+router.get('/latest', async (req, res) => {
   try {
-    const post = await prisma.post.findUnique({
-      where: {
-        id: req.params.id
-      },
-      include: {
-        comments: true
-      }
-    });
-    
-    if (!post) {
-      return res.status(404).json({ msg: 'Post not found' });
-    }
-    
-    res.json(post);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
-  }
-});
-
-// @route   POST api/posts
-// @desc    Create a post
-// @access  Private
-router.post('/', auth, async (req, res) => {
-  try {
-    const post = await prisma.post.create({
-      data: {
-        title: req.body.title,
-        content: req.body.content,
-        excerpt: req.body.excerpt,
-        author: req.body.author || 'Timmy',
-        tags: req.body.tags || [],
-        coverImage: req.body.coverImage || null
-      }
-    });
-    
-    res.json(post);
-  } catch (err) {
-    console.error('Error creating post:', err);
-    res.status(500).json({ 
-      error: 'Server Error',
-      message: err.message 
-    });
-  }
-});
-
-// @route   PUT api/posts/:id
-// @desc    Update a post
-// @access  Private
-router.put('/:id', auth, async (req, res) => {
-  try {
-    const post = await prisma.post.update({
-      where: {
-        id: req.params.id
-      },
-      data: {
-        title: req.body.title,
-        content: req.body.content,
-        excerpt: req.body.excerpt,
-        author: req.body.author,
-        tags: req.body.tags,
-        coverImage: req.body.coverImage
-      },
-      include: {
-        comments: true
-      }
-    });
-    
-    res.json(post);
-  } catch (err) {
-    console.error(err.message);
-    
-    if (err.code === 'P2025') {
-      return res.status(404).json({ msg: 'Post not found' });
-    }
-    
-    res.status(500).send('Server Error');
-  }
-});
-
-// @route   DELETE api/posts/:id
-// @desc    Delete a post
-// @access  Private
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    await prisma.post.delete({
-      where: {
-        id: req.params.id
-      }
-    });
-    
-    res.json({ msg: 'Post removed' });
-  } catch (err) {
-    console.error(err.message);
-    
-    if (err.code === 'P2025') {
-      return res.status(404).json({ msg: 'Post not found' });
-    }
-    
-    res.status(500).send('Server Error');
-  }
-});
-
-// @route   POST api/posts/:id/comments
-// @desc    Add comment to a post
-// @access  Public
-router.post('/:id/comments', async (req, res) => {
-  try {
-    const post = await prisma.post.findUnique({
-      where: {
-        id: req.params.id
-      }
-    });
-    
-    if (!post) {
-      return res.status(404).json({ msg: 'Post not found' });
-    }
-    
-    const comment = await prisma.comment.create({
-      data: {
-        name: req.body.name,
-        email: req.body.email,
-        content: req.body.content,
-        postId: req.params.id
-      }
-    });
-    
-    const comments = await prisma.comment.findMany({
-      where: {
-        postId: req.params.id
-      },
+    const posts = await prisma.post.findMany({
+      take: 3,
       orderBy: {
-        date: 'desc'
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        coverImage: true,
+        createdAt: true,
+        author: true,
+        tags: true
       }
     });
     
-    res.json(comments);
+    handleSuccess(res, posts);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err, 'Failed to fetch latest posts');
   }
 });
 
-// @route   GET api/posts/list
-// @desc    Get all posts as a list
-// @access  Public
 router.get('/list', async (req, res) => {
   try {
     const posts = await prisma.post.findMany({
@@ -229,39 +97,123 @@ router.get('/list', async (req, res) => {
       commentsCount: post.comments.length
     }));
     
-    res.json(formattedPosts);
+    handleSuccess(res, formattedPosts);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    handleError(res, err);
   }
 });
 
-// @route   GET api/posts/latest
-// @desc    Get latest posts for homepage
-// @access  Public
-router.get('/latest', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const posts = await prisma.post.findMany({
-      take: 3,
-      orderBy: {
-        createdAt: 'desc'
+    const post = await prisma.post.findUnique({
+      where: {
+        id: req.params.id
       },
-      select: {
-        id: true,
-        title: true,
-        excerpt: true,
-        coverImage: true,
-        createdAt: true,
-        author: true,
-        tags: true
+      include: {
+        comments: true
       }
     });
     
-    res.json(posts);
+    if (!post) return res.status(404).json({ msg: 'Post not found' });
+    handleSuccess(res, post);
   } catch (err) {
-    console.error('Error fetching latest posts:', err);
-    res.status(500).json({ error: 'Failed to fetch latest posts' });
+    handleError(res, err);
   }
 });
+
+router.post('/', auth, async (req, res) => {
+  try {
+    const post = await prisma.post.create({
+      data: {
+        title: req.body.title,
+        content: req.body.content,
+        excerpt: req.body.excerpt,
+        author: req.body.author || 'Timmy',
+        tags: req.body.tags || [],
+        coverImage: req.body.coverImage || null
+      }
+    });
+    
+    handleSuccess(res, post, 201);
+  } catch (err) {
+    handleError(res, err, 'Error creating post');
+  }
+});
+
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const post = await prisma.post.update({
+      where: {
+        id: req.params.id
+      },
+      data: {
+        title: req.body.title,
+        content: req.body.content,
+        excerpt: req.body.excerpt,
+        author: req.body.author,
+        tags: req.body.tags,
+        coverImage: req.body.coverImage
+      },
+      include: {
+        comments: true
+      }
+    });
+    
+    handleSuccess(res, post);
+  } catch (err) {
+    if (err.code === 'P2025') return res.status(404).json({ msg: 'Post not found' });
+    handleError(res, err);
+  }
+});
+
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await prisma.post.delete({
+      where: {
+        id: req.params.id
+      }
+    });
+    
+    handleSuccess(res, { msg: 'Post removed' });
+  } catch (err) {
+    if (err.code === 'P2025') return res.status(404).json({ msg: 'Post not found' });
+    handleError(res, err);
+  }
+});
+
+router.post('/:id/comments', async (req, res) => {
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: req.params.id
+      }
+    });
+    
+    if (!post) return res.status(404).json({ msg: 'Post not found' });
+    
+    const comment = await prisma.comment.create({
+      data: {
+        name: req.body.name,
+        email: req.body.email,
+        content: req.body.content,
+        postId: req.params.id
+      }
+    });
+    
+    const comments = await prisma.comment.findMany({
+      where: {
+        postId: req.params.id
+      },
+      orderBy: {
+        date: 'desc'
+      }
+    });
+    
+    handleSuccess(res, comments, 201);
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
 
 module.exports = router;

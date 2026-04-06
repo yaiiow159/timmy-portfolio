@@ -171,6 +171,22 @@ export const useBlogStore = defineStore('blog', () => {
     }
   }
 
+  async function fetchLatestPosts() {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const latestPosts = await blogService.getLatestPosts()
+      return latestPosts
+    } catch (err) {
+      console.error('Error fetching latest posts:', err)
+      error.value = 'Failed to load latest posts'
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     posts,
     pagination,
@@ -182,6 +198,7 @@ export const useBlogStore = defineStore('blog', () => {
     fetchNextPage,
     fetchPrevPage,
     fetchPostById,
+    fetchLatestPosts,
     createPost,
     updatePost,
     deletePost,
