@@ -105,19 +105,10 @@ export const useAuthStore = defineStore('auth', () => {
             return false
         } catch (err: any) {
             console.error('Login error:', err)
-<<<<<<< Updated upstream
-            const detailedMessage = err.response?.data?.msg
-            error.value = t('errors.auth.loginFailed')
-            notificationStore.addNotification({
-                type: 'error',
-                message: detailedMessage || error.value,
-                duration: 5000
-=======
             error.value = handleError(err, {
                 context: ErrorContext.AUTH,
                 showNotification: true,
                 customMessage: err.response?.data?.msg || t('errors.auth.loginFailed')
->>>>>>> Stashed changes
             })
             return false
         } finally {

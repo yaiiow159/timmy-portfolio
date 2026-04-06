@@ -1,9 +1,5 @@
 import axios from 'axios'
-<<<<<<< Updated upstream
 import { API_BASE_URL } from '../config/api'
-=======
->>>>>>> Stashed changes
-
 type NotificationType = 'error' | 'success' | 'info' | 'warning'
 
 let currentLanguage = 'en'
