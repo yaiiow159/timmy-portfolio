@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api'
-type NotificationType = 'error' | 'success' | 'info' | 'warning'
 
 let currentLanguage = 'en'
 

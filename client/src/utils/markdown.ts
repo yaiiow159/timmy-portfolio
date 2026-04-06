@@ -1,18 +1,20 @@
-import { marked } from 'marked'
+import { marked, Renderer } from 'marked'
 import hljs from 'highlight.js'
 
-marked.setOptions({
-  highlight: function(code: string, lang: string): string {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(code, { language: lang }).value
-    }
-    return hljs.highlightAuto(code).value
-  } as any,
+const renderer = new Renderer()
+
+renderer.code = function({ text, lang }) {
+  const language = lang && hljs.getLanguage(lang) ? lang : 'plaintext'
+  const highlighted = hljs.highlight(text, { language }).value
+  return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`
+}
+
+marked.use({
+  renderer,
   breaks: true,
   gfm: true,
-  headerIds: true,
-  mangle: false
 })
+
 
 export const markdownToHtml = (markdown: string): string => {
   return marked.parse(markdown) as string

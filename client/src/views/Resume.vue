@@ -1,27 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ResumeDialog from '../components/common/ResumeDialog.vue'
-import ResumeSectionCard from '../components/resume/ResumeSectionCard.vue'
-import type { EducationEntry, LanguageSkill, SkillGroup, WorkExperience } from '../types/resume'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const { t, tm } = useI18n()
+const { t } = useI18n()
 const languageBarsAnimated = ref(false)
 const showDialog = ref(false)
-
-const getLocalizedList = <T>(path: string): T[] => {
-  const value = tm(path)
-  return Array.isArray(value) ? (value as T[]) : []
-}
-
-const skillGroups = computed<SkillGroup[]>(() => getLocalizedList<SkillGroup>('resume.content.skills'))
-const workExperiences = computed<WorkExperience[]>(() => getLocalizedList<WorkExperience>('resume.content.experiences'))
-const educationEntries = computed<EducationEntry[]>(() => getLocalizedList<EducationEntry>('resume.content.education'))
-const languageSkills = computed<LanguageSkill[]>(() => getLocalizedList<LanguageSkill>('resume.content.languages'))
 
 onMounted(() => {
   const tl = gsap.timeline()
@@ -154,17 +142,7 @@ function downloadResume(language: 'zh' | 'en') {
 </script>
 
 <template>
-<<<<<<< Updated upstream
-  <div class="min-h-screen py-12 resume-content">
-    <div class="container mx-auto px-4">
-      <div class="resume-header mb-12 text-center">
-        <h1 class="text-4xl font-bold mb-4 text-text-primary">{{ t('resume.title') }}</h1>
-        <p class="text-lg text-text-secondary mb-6">
-          {{ t('resume.subtitle') }}
-        </p>
-
-=======
-  <div class="min-h-screen py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg resume-container">
+  <div class="min-h-screen py-20 resume-container">
     <div class="container mx-auto px-6 md:px-8 resume-content">
       <div class="resume-header mb-20 text-center">
         <h1 class="tech-title text-5xl md:text-6xl font-bold mb-8">{{ t('resume.title') }}</h1>
@@ -172,8 +150,7 @@ function downloadResume(language: 'zh' | 'en') {
           Full-stack developer with expertise in Java, Spring Boot, Vue.js, and more.
         </p>
         <div class="w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mb-10 rounded-full shadow-lg shadow-accent/30"></div>
-        
->>>>>>> Stashed changes
+
         <button
           class="tech-button px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 tech-glow inline-flex items-center"
           @click="showDialog = true"
@@ -184,24 +161,16 @@ function downloadResume(language: 'zh' | 'en') {
           {{ t('resume.downloadPdf') }}
         </button>
       </div>
-<<<<<<< Updated upstream
 
-      <ResumeDialog v-model="showDialog" @download="downloadResume" />
-
-      <ResumeSectionCard :title="t('resume.skills')">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div v-for="group in skillGroups" :key="group.title">
-            <h3 class="text-xl font-semibold mb-3 text-text-primary">{{ group.title }}</h3>
-=======
-      
       <ResumeDialog
         v-model="showDialog"
         @download="downloadResume"
       />
-      
+
+      <!-- Skills -->
       <section class="resume-section mb-16 tech-card p-10">
         <h2 class="tech-title text-4xl font-bold mb-10">{{ t('resume.skills') }}</h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="p-6 rounded-xl bg-gradient-to-br from-accent/5 to-tech-purple/5 border border-accent/10 hover:border-accent/30 transition-all duration-300">
             <h3 class="text-2xl font-bold mb-4 text-accent flex items-center">
@@ -210,15 +179,10 @@ function downloadResume(language: 'zh' | 'en') {
               </svg>
               Backend Development
             </h3>
->>>>>>> Stashed changes
             <ul class="space-y-2">
-              <li v-for="item in group.items" :key="item.label" class="flex items-start">
+              <li class="flex items-start">
                 <span class="text-accent mr-2">•</span>
                 <div>
-<<<<<<< Updated upstream
-                  <span class="font-medium">{{ item.label }}</span>
-                  <span class="text-text-secondary"> {{ item.description }}</span>
-=======
                   <span class="font-medium">Languages / Frameworks:</span>
                   <span class="text-text-secondary"> Spring Boot Framework, Java, Python, Node.js</span>
                 </div>
@@ -239,7 +203,7 @@ function downloadResume(language: 'zh' | 'en') {
               </li>
             </ul>
           </div>
-          
+
           <div class="p-6 rounded-xl bg-gradient-to-br from-accent/5 to-tech-purple/5 border border-accent/10 hover:border-accent/30 transition-all duration-300">
             <h3 class="text-2xl font-bold mb-4 text-accent flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -251,7 +215,7 @@ function downloadResume(language: 'zh' | 'en') {
               <li class="flex items-start">
                 <span class="text-accent mr-2">•</span>
                 <div>
-                  <span class="font-medium">Markup & Styling:</span>
+                  <span class="font-medium">Markup &amp; Styling:</span>
                   <span class="text-text-secondary"> HTML, CSS, Bootstrap, Tailwind</span>
                 </div>
               </li>
@@ -271,13 +235,13 @@ function downloadResume(language: 'zh' | 'en') {
               </li>
             </ul>
           </div>
-          
+
           <div class="p-6 rounded-xl bg-gradient-to-br from-accent/5 to-tech-purple/5 border border-accent/10 hover:border-accent/30 transition-all duration-300">
             <h3 class="text-2xl font-bold mb-4 text-accent flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
               </svg>
-              Databases & Storage
+              Databases &amp; Storage
             </h3>
             <ul class="space-y-2">
               <li class="flex items-start">
@@ -309,7 +273,7 @@ function downloadResume(language: 'zh' | 'en') {
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
               </svg>
-              Cloud & Deployment
+              Cloud &amp; Deployment
             </h3>
             <ul class="space-y-2">
               <li class="flex items-start">
@@ -335,13 +299,13 @@ function downloadResume(language: 'zh' | 'en') {
               </li>
             </ul>
           </div>
-          
+
           <div class="p-6 rounded-xl bg-gradient-to-br from-accent/5 to-tech-purple/5 border border-accent/10 hover:border-accent/30 transition-all duration-300">
             <h3 class="text-2xl font-bold mb-4 text-accent flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              Monitoring & Analysis
+              Monitoring &amp; Analysis
             </h3>
             <ul class="space-y-2">
               <li class="flex items-start">
@@ -354,19 +318,19 @@ function downloadResume(language: 'zh' | 'en') {
               <li class="flex items-start">
                 <span class="text-accent mr-2">•</span>
                 <div>
-                  <span class="font-medium">Logging & Alerting:</span>
+                  <span class="font-medium">Logging &amp; Alerting:</span>
                   <span class="text-text-secondary"> ELK Stack (Elasticsearch, Logstash, Kibana)</span>
                 </div>
               </li>
             </ul>
           </div>
-          
+
           <div class="p-6 rounded-xl bg-gradient-to-br from-accent/5 to-tech-purple/5 border border-accent/10 hover:border-accent/30 transition-all duration-300">
             <h3 class="text-2xl font-bold mb-4 text-accent flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
               </svg>
-              Version Control & Collaboration
+              Version Control &amp; Collaboration
             </h3>
             <ul class="space-y-2">
               <li class="flex items-start">
@@ -374,53 +338,17 @@ function downloadResume(language: 'zh' | 'en') {
                 <div>
                   <span class="font-medium">Tools:</span>
                   <span class="text-text-secondary"> Git, SVN, Nexus Repository</span>
->>>>>>> Stashed changes
                 </div>
               </li>
             </ul>
           </div>
         </div>
-<<<<<<< Updated upstream
-      </ResumeSectionCard>
-
-      <ResumeSectionCard :title="t('resume.experience')">
-        <div
-          v-for="experience in workExperiences"
-          :key="`${experience.role}-${experience.company}`"
-          class="job-entry mb-8 relative pl-6 border-l-2 border-accent"
-        >
-          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
-          <div class="mb-2 job-detail">
-            <h3 class="text-xl font-semibold text-text-primary">{{ experience.role }}</h3>
-            <p class="text-accent">{{ experience.company }}</p>
-            <p class="text-sm text-text-secondary job-date">{{ experience.date }}</p>
-          </div>
-
-          <template v-if="experience.projects?.length">
-            <div v-for="project in experience.projects" :key="project.title" class="job-detail">
-              <h4 class="font-semibold mt-4 mb-2 text-text-primary">{{ project.title }}</h4>
-              <ul class="space-y-2 text-text-secondary">
-                <li v-for="bullet in project.bullets" :key="bullet" class="flex items-start job-detail">
-                  <span class="text-accent mr-2">•</span>
-                  <span>{{ bullet }}</span>
-                </li>
-              </ul>
-            </div>
-          </template>
-          <template v-else>
-            <ul class="space-y-2 text-text-secondary">
-              <li v-for="bullet in experience.bullets" :key="bullet" class="flex items-start job-detail">
-                <span class="text-accent mr-2">•</span>
-                <span>{{ bullet }}</span>
-              </li>
-            </ul>
-          </template>
-=======
       </section>
-      
+
+      <!-- Experience -->
       <section class="resume-section mb-16 tech-card p-10">
         <h2 class="tech-title text-4xl font-bold mb-10">{{ t('resume.experience') }}</h2>
-        
+
         <div class="job-entry mb-12 relative pl-8 border-l-4 border-accent rounded-lg">
           <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-accent to-tech-purple job-bullet shadow-lg shadow-accent/50"></div>
           <div class="mb-2 job-detail">
@@ -428,7 +356,7 @@ function downloadResume(language: 'zh' | 'en') {
             <p class="text-accent">Onework Co., Ltd. — Taipei, Taiwan</p>
             <p class="text-sm tech-text-secondary job-date">Aug 2024 - Apr 2025</p>
           </div>
-          
+
           <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">PDS-Connected IoT Platform (End-to-End Independent Development)</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
@@ -473,7 +401,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
           </ul>
 
-          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Cathay FM-Server Refactoring Project (Architecture & API Design)</h4>
+          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Cathay FM-Server Refactoring Project (Architecture &amp; API Design)</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -497,7 +425,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
           </ul>
         </div>
-        
+
         <div class="job-entry mb-12 relative pl-8 border-l-4 border-accent rounded-lg">
           <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-accent to-tech-purple job-bullet shadow-lg shadow-accent/50"></div>
           <div class="mb-2 job-detail">
@@ -505,12 +433,12 @@ function downloadResume(language: 'zh' | 'en') {
             <p class="text-accent">ESound Technology Co., Ltd. — Taipei, Taiwan</p>
             <p class="text-sm tech-text-secondary job-date">Sep 2023 - Feb 2024</p>
           </div>
-          
-          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Full-Stack Development & Maintenance</h4>
+
+          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Full-Stack Development &amp; Maintenance</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
-              <span>Independently led full-stack development and ongoing maintenance for the Child Placement and Tracking System, including feature enhancements, bug fixes, performance tuning, and system deployment. Covered end-to-end development from backend logic to frontend UI.</span>
+              <span>Independently led full-stack development and ongoing maintenance for the Child Placement and Tracking System, including feature enhancements, bug fixes, performance tuning, and system deployment.</span>
             </li>
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -522,7 +450,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
           </ul>
 
-          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">System Performance & Security Enhancements</h4>
+          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">System Performance &amp; Security Enhancements</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -534,7 +462,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
           </ul>
         </div>
-        
+
         <div class="job-entry mb-12 relative pl-8 border-l-4 border-accent rounded-lg">
           <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-accent to-tech-purple job-bullet shadow-lg shadow-accent/50"></div>
           <div class="mb-2 job-detail">
@@ -543,7 +471,7 @@ function downloadResume(language: 'zh' | 'en') {
             <p class="text-sm tech-text-secondary job-date">Aug 2022 - Sep 2023</p>
           </div>
 
-          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Veri-id System Refactoring & Feature Expansion</h4>
+          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Veri-id System Refactoring &amp; Feature Expansion</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -555,7 +483,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
           </ul>
 
-          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">ACS / 3DS System Optimization & Asynchronous Architecture</h4>
+          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">ACS / 3DS System Optimization &amp; Asynchronous Architecture</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -571,7 +499,7 @@ function downloadResume(language: 'zh' | 'en') {
             </li>
           </ul>
 
-          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Test Automation & Efficiency Improvement</h4>
+          <h4 class="font-semibold mt-4 mb-2 tech-text-primary job-detail">Test Automation &amp; Efficiency Improvement</h4>
           <ul class="space-y-2 tech-text-secondary">
             <li class="flex items-start job-detail">
               <span class="text-accent mr-2">•</span>
@@ -590,34 +518,8 @@ function downloadResume(language: 'zh' | 'en') {
               <span>Collaborated with the Shanghai team to define test workflows and documentation, ensuring consistency and test quality.</span>
             </li>
           </ul>
->>>>>>> Stashed changes
         </div>
-      </ResumeSectionCard>
 
-<<<<<<< Updated upstream
-      <ResumeSectionCard :title="t('resume.education')">
-        <div
-          v-for="education in educationEntries"
-          :key="education.school"
-          class="relative pl-6 border-l-2 border-accent"
-        >
-          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent"></div>
-          <div class="mb-2">
-            <h3 class="text-xl font-semibold text-text-primary">{{ education.school }}</h3>
-            <p class="text-accent">{{ education.degree }}</p>
-            <p class="text-sm text-text-secondary">{{ education.period }}</p>
-          </div>
-
-          <ul class="list-disc list-inside text-text-secondary space-y-2 mt-4">
-            <li v-for="detail in education.description" :key="detail">
-              {{ detail }}
-            </li>
-          </ul>
-        </div>
-      </ResumeSectionCard>
-
-      <ResumeSectionCard :title="t('resume.languages')" customClass="language-section">
-=======
         <div class="job-entry mb-12 relative pl-8 border-l-4 border-accent rounded-lg">
           <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-accent to-tech-purple job-bullet shadow-lg shadow-accent/50"></div>
           <div class="mb-2 job-detail">
@@ -646,10 +548,11 @@ function downloadResume(language: 'zh' | 'en') {
           </ul>
         </div>
       </section>
-      
+
+      <!-- Education -->
       <section class="resume-section mb-16 tech-card p-10">
         <h2 class="tech-title text-4xl font-bold mb-10">{{ t('resume.education') }}</h2>
-        
+
         <div class="relative pl-8 border-l-4 border-accent rounded-lg">
           <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-accent to-tech-purple shadow-lg shadow-accent/50"></div>
           <div class="mb-2">
@@ -657,7 +560,7 @@ function downloadResume(language: 'zh' | 'en') {
             <p class="text-accent">B.B.A. in Information Management</p>
             <p class="text-sm tech-text-secondary">2016 - 2021</p>
           </div>
-          
+
           <p class="tech-text-secondary mt-4">
             Actively pursued IT skills during university, earning certifications including CCNA, MTA, and TQC Java.
             Developed a strong interest in Java, leading to in-depth study of language design and practical application.
@@ -665,27 +568,14 @@ function downloadResume(language: 'zh' | 'en') {
           </p>
         </div>
       </section>
-      
+
+      <!-- Languages -->
       <section class="resume-section language-section tech-card p-10">
         <h2 class="tech-title text-4xl font-bold mb-10">{{ t('resume.languages') }}</h2>
-        
->>>>>>> Stashed changes
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div v-for="language in languageSkills" :key="language.name" class="flex items-center gap-4">
+          <div class="flex items-center gap-4">
             <div class="w-24">
-<<<<<<< Updated upstream
-              <span class="font-medium text-text-primary language-label">{{ language.name }}</span>
-            </div>
-            <div class="flex-grow">
-              <div class="h-2 w-full bg-gray-700 rounded-full">
-                <div
-                  class="language-bar h-2 rounded-full bg-accent"
-                  :data-percent="`${language.level}%`"
-                  :style="{ width: `${language.level}%` }"
-                ></div>
-              </div>
-              <span class="text-sm text-text-secondary language-label">{{ language.proficiency }}</span>
-=======
               <span class="font-medium tech-text-primary language-label">Chinese</span>
             </div>
             <div class="flex-grow">
@@ -695,8 +585,8 @@ function downloadResume(language: 'zh' | 'en') {
               <span class="text-sm tech-text-secondary language-label">Native / Bilingual Proficiency</span>
             </div>
           </div>
-          
-          <div class="flex items-center">
+
+          <div class="flex items-center gap-4">
             <div class="w-24">
               <span class="font-medium tech-text-primary language-label">English</span>
             </div>
@@ -705,40 +595,30 @@ function downloadResume(language: 'zh' | 'en') {
                 <div class="language-bar h-2 rounded-full bg-accent" style="width: 85%"></div>
               </div>
               <span class="text-sm tech-text-secondary language-label">Advanced Proficiency</span>
->>>>>>> Stashed changes
             </div>
           </div>
         </div>
-      </ResumeSectionCard>
+      </section>
     </div>
   </div>
 </template>
 
 <style scoped>
-<<<<<<< Updated upstream
-.resume-content {
-  word-break: break-word;
-}
-
-.job-entry {
-=======
-/* Base container styling */
 .resume-container {
   position: relative;
   min-height: 100vh;
   background-color: var(--bg-primary);
 }
 
-/* Content wrapper */
 .resume-content {
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   z-index: 2;
+  word-break: break-word;
 }
 
-/* Section styling */
 .resume-section {
   background: var(--bg-secondary);
   border-radius: 12px;
@@ -746,25 +626,21 @@ function downloadResume(language: 'zh' | 'en') {
   margin-bottom: 2rem;
   padding: 2rem;
   position: relative;
->>>>>>> Stashed changes
   overflow: hidden;
 }
 
-/* Header styling */
 .resume-header {
   text-align: center;
   margin-bottom: 3rem;
   position: relative;
 }
 
-/* Card styling */
 .tech-card {
   background: var(--bg-secondary) !important;
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
-/* Job entry styling */
 .job-entry {
   position: relative;
   padding-left: 2rem;
@@ -787,7 +663,6 @@ function downloadResume(language: 'zh' | 'en') {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Text styling */
 .tech-title {
   color: var(--text-primary);
   margin-bottom: 1.5rem;
@@ -803,7 +678,6 @@ function downloadResume(language: 'zh' | 'en') {
   opacity: 1 !important;
 }
 
-/* Language bar styling */
 .language-bar {
   transform-origin: left;
   height: 0.5rem;
@@ -812,7 +686,6 @@ function downloadResume(language: 'zh' | 'en') {
   transition: width 1s ease-in-out;
 }
 
-/* Job date styling */
 .job-date {
   display: inline-block;
   margin-bottom: 0.5rem;
@@ -820,7 +693,6 @@ function downloadResume(language: 'zh' | 'en') {
   font-weight: 500;
 }
 
-/* Button styling */
 button {
   position: relative;
   z-index: 10;
@@ -828,7 +700,6 @@ button {
   transition: all 0.3s ease;
 }
 
-/* List styling */
 ul {
   list-style-type: none;
   padding-left: 0;
@@ -848,40 +719,38 @@ li:before {
   top: 0;
 }
 
-/* Dark mode specific styles */
 :global(.dark) {
   .resume-section {
     background: var(--bg-secondary);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   }
-  
+
   .tech-card {
     border-color: var(--border-color);
   }
-  
+
   .job-entry {
     border-left-color: var(--accent);
   }
-  
+
   .tech-text-primary {
     color: rgba(255, 255, 255, 0.95);
   }
-  
+
   .tech-text-secondary {
     color: rgba(255, 255, 255, 0.8);
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .resume-section {
     padding: 1.5rem;
   }
-  
+
   .job-entry {
     padding-left: 1.5rem;
   }
-  
+
   .job-bullet {
     left: -0.6rem;
     width: 1.2rem;

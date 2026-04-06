@@ -32,16 +32,8 @@
         >
       </div>
       
-<<<<<<< Updated upstream
       <div v-if="loginErrorMessage" class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center">
         {{ loginErrorMessage }}
-=======
-      <div v-if="authStore.error" class="p-4 bg-red-900/20 border-2 border-red-500 text-red-500 rounded-xl font-medium flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {{ authStore.error }}
->>>>>>> Stashed changes
       </div>
       
       <button 
