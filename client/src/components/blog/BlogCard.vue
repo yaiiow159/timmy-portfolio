@@ -47,7 +47,7 @@ const displayExcerpt = computed(() => {
     
     <div :class="{ 'md:flex': !compact }">
       <!-- 圖片區域 -->
-      <div :class="{ 'md:w-1/3 h-48 md:h-auto': !compact, 'h-40': compact }" class="bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
+      <div :class="{ 'md:w-1/3 h-40 md:h-auto': !compact, 'h-36': compact }" class="bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
         <div v-if="post.coverImage" class="h-full w-full relative">
           <img 
             :src="post.coverImage" 

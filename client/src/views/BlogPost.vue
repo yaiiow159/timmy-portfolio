@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
-    <div class="container mx-auto px-6 md:px-8">
+  <div class="min-h-screen py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
       <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
         <div class="tech-loading">
           <svg class="w-16 h-16 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,7 +58,7 @@
           </div>
         </div>
         
-        <div class="blog-content tech-card p-8 prose prose-lg max-w-none mb-12">
+        <div class="blog-content tech-card p-4 sm:p-6 md:p-8 prose prose-lg max-w-none mb-12">
           <div v-html="renderedContent"></div>
         </div>
         
@@ -177,7 +177,7 @@
       </div>
     </div>
     
-    <div v-if="post && !isLoading" class="container mx-auto px-6 md:px-8 mt-12">
+    <div v-if="post && !isLoading" class="container mx-auto px-4 sm:px-6 md:px-8 mt-12">
       <div class="max-w-4xl mx-auto">
         <div class="border-t border-accent/10 pt-8">
           <h3 class="tech-title text-xl font-semibold mb-4">{{ t('blog.relatedPosts') }}</h3>

@@ -149,11 +149,11 @@ function downloadResume(language: 'zh' | 'en') {
 </script>
 
 <template>
-  <div class="min-h-screen py-12 resume-content">
-    <div class="container mx-auto px-4">
-      <div class="resume-header mb-12 text-center">
-        <h1 class="text-4xl font-bold mb-4 text-text-primary">{{ t('resume.title') }}</h1>
-        <p class="text-lg text-text-secondary mb-6">
+  <div class="min-h-screen py-8 md:py-12 resume-content tech-grid-bg">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+      <div class="resume-header mb-8 md:mb-12 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-3 md:mb-4 text-text-primary">{{ t('resume.title') }}</h1>
+        <p class="text-base md:text-lg text-text-secondary mb-4 md:mb-6">
           {{ t('resume.subtitle') }}
         </p>
         <button

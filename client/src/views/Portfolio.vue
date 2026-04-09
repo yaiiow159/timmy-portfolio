@@ -220,16 +220,16 @@ function updateSearch(value: string) {
 </script>
 
 <template>
-  <div class="min-h-screen py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
-    <div class="container mx-auto px-6 md:px-8">
-      <div class="portfolio-header mb-20 text-center">
-        <h1 class="tech-title text-5xl md:text-6xl font-bold mb-8">
+  <div class="min-h-screen py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+      <div class="portfolio-header mb-12 md:mb-20 text-center">
+        <h1 class="tech-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8">
           {{ t('portfolio.title') }}
         </h1>
-        <p class="text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
+        <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
           {{ t('portfolio.subtitle') }}
         </p>
-        <div class="w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-8 rounded-full shadow-lg shadow-accent/30"></div>
+        <div class="w-24 md:w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-6 md:mt-8 rounded-full shadow-lg shadow-accent/30"></div>
       </div>
       
       <div class="filter-container mb-16">

@@ -142,7 +142,6 @@ export const useBlogStore = defineStore('blog', () => {
 
     try {
       await blogService.deletePost(id)
-      // 重新拉取當前頁資料，避免重複操作
       await fetchPosts({ page: pagination.value.page, limit: pagination.value.limit })
     } catch (err) {
       console.error('Error deleting post:', err)

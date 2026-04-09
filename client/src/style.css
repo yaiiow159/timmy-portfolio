@@ -17,12 +17,12 @@
 
 html.light {
   color-scheme: light;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f7ff;
-  --text-primary: #4a4a68;
-  --text-secondary: #6b7280;
-  --accent: #8b5cf6;
-  --accent-light: #a78bfa;
+  --bg-primary: #f0f4ff;
+  --bg-secondary: #e8eeff;
+  --text-primary: #1e1b4b;
+  --text-secondary: #4c4f7a;
+  --accent: #7c3aed;
+  --accent-light: #8b5cf6;
   --accent-text-color: #ffffff;
 }
 
@@ -47,10 +47,10 @@ body {
 /* Light theme specific styles */
 html.light body {
   background-image: 
-    radial-gradient(circle at 15% 25%, rgba(167, 139, 250, 0.1) 0%, transparent 35%),
-    radial-gradient(circle at 85% 25%, rgba(96, 165, 250, 0.08) 0%, transparent 35%),
-    radial-gradient(circle at 50% 60%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
-    linear-gradient(135deg, #f0f4ff 0%, #eef2ff 50%, #ede9fe 100%);
+    radial-gradient(ellipse at 0% 0%, rgba(139, 92, 246, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(167, 139, 250, 0.12) 0%, transparent 50%),
+    linear-gradient(160deg, #eef2ff 0%, #ede9fe 35%, #e0e7ff 65%, #ddd6fe 100%);
   background-attachment: fixed;
   position: relative;
 }
@@ -81,41 +81,41 @@ html.light body::before {
 }
 
 .light .bg-primary {
-  background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(124, 58, 237, 0.05);
+  background-color: #eef2ff;
+  box-shadow: 0 1px 3px rgba(109, 40, 217, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
 .light .bg-secondary {
-  background-color: #f5f7ff;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(124, 58, 237, 0.03);
+  background-color: #e8eeff;
+  box-shadow: inset 0 1px 2px rgba(109, 40, 217, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.08);
 }
 
 .light .text-text-primary {
-  color: #4a4a68;
+  color: #1e1b4b;
 }
 
 .light .text-text-secondary {
-  color: #6b7280;
+  color: #4c4f7a;
 }
 
 .light .text-accent {
-  color: #8b5cf6; 
+  color: #7c3aed; 
 }
 
 .light .bg-accent {
-  background-color: #8b5cf6;
+  background-color: #7c3aed;
 }
 
 .light .border-accent {
-  border-color: #8b5cf6; 
+  border-color: #7c3aed; 
 }
 
 .light .gradient-text {
   color: transparent;
   background-clip: text;
-  background-image: linear-gradient(to right, #9333ea, #4338ca);
+  background-image: linear-gradient(to right, #7c3aed, #4338ca);
 }
 
 .fade-in {
@@ -511,20 +511,20 @@ code {
 
 /* 淺色主題變數 */
 .light {
-  --primary: #ffffff;
-  --primary-dark: #f8fafc;
-  --secondary: #f1f5f9;
-  --secondary-dark: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-primary-dark: #1e293b;
-  --text-secondary: #64748b;
-  --text-secondary-dark: #475569;
-  --accent: #0ea5e9;
-  --accent-light: #38bdf8;
-  --accent-dark: #0284c7;
-  --tech-purple: #7c3aed;
-  --tech-purple-light: #8b5cf6;
-  --tech-purple-dark: #6d28d9;
+  --primary: #eef2ff;
+  --primary-dark: #e0e7ff;
+  --secondary: #e8eeff;
+  --secondary-dark: #ddd6fe;
+  --text-primary: #1e1b4b;
+  --text-primary-dark: #312e81;
+  --text-secondary: #4c4f7a;
+  --text-secondary-dark: #3730a3;
+  --accent: #7c3aed;
+  --accent-light: #8b5cf6;
+  --accent-dark: #6d28d9;
+  --tech-purple: #6d28d9;
+  --tech-purple-light: #7c3aed;
+  --tech-purple-dark: #5b21b6;
   --tech-cyan: #0891b2;
   --tech-cyan-light: #06b6d4;
   --tech-cyan-dark: #0e7490;
@@ -1251,45 +1251,50 @@ code {
 
 /* 淺色主題調整 */
 .light .tech-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
-  border-color: rgba(139, 92, 246, 0.15);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(238, 242, 255, 0.85));
+  border-color: rgba(124, 58, 237, 0.2);
+  box-shadow: 0 4px 16px rgba(109, 40, 217, 0.1), 0 1px 4px rgba(109, 40, 217, 0.06);
+}
+
+.light .tech-card:hover {
+  border-color: rgba(124, 58, 237, 0.4);
+  box-shadow: 0 12px 32px rgba(109, 40, 217, 0.18), 0 4px 8px rgba(109, 40, 217, 0.1);
 }
 
 .light .tech-button {
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
   color: white;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .light .tech-button:hover {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #6d28d9, #4f46e5);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
 }
 
 .light .tech-button-outline {
   background: transparent;
-  border: 2px solid #8b5cf6;
-  color: #8b5cf6;
+  border: 2px solid #7c3aed;
+  color: #7c3aed;
   box-shadow: none;
 }
 
 .light .tech-button-outline:hover {
-  background: #8b5cf6;
+  background: #7c3aed;
   color: white;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .light .tech-button-ghost {
-  background: rgba(139, 92, 246, 0.08);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  color: #8b5cf6;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  color: #7c3aed;
   box-shadow: none;
 }
 
 .light .tech-button-ghost:hover {
-  background: rgba(139, 92, 246, 0.15);
-  border-color: #8b5cf6;
+  background: rgba(124, 58, 237, 0.15);
+  border-color: #7c3aed;
 }
 
 /* ===== 統一動畫效果 ===== */
@@ -2210,4 +2215,159 @@ section > * {
 .light #app {
   position: relative;
   z-index: 1;
+}
+
+/* ===== LIGHT THEME ENHANCEMENTS ===== */
+
+/* 亮色格線背景 - 更明顯的格線 */
+.light .tech-grid-bg {
+  background-image: 
+    linear-gradient(rgba(124, 58, 237, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.light .tech-grid-bg::before {
+  background: 
+    radial-gradient(ellipse at 15% 30%, rgba(139, 92, 246, 0.12), transparent 45%),
+    radial-gradient(ellipse at 85% 70%, rgba(99, 102, 241, 0.1), transparent 45%);
+}
+
+/* 亮色 section 背景層次 */
+.light .bg-primary {
+  background-color: #eef2ff !important;
+}
+
+.light .bg-secondary {
+  background-color: #e8eeff !important;
+}
+
+/* 亮色 hero section */
+.light .hero-section {
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+    linear-gradient(160deg, #eef2ff 0%, #ede9fe 50%, #e0e7ff 100%) !important;
+}
+
+/* 亮色 skills section */
+.light .skills-section {
+  background: linear-gradient(135deg, #e8eeff 0%, #ddd6fe 50%, #e0e7ff 100%) !important;
+  position: relative;
+}
+
+.light .skills-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* 亮色 project section */
+.light .project-section {
+  background: linear-gradient(160deg, #eef2ff 0%, #e8eeff 60%, #ede9fe 100%) !important;
+}
+
+/* 亮色 blog section */
+.light .blog-section {
+  background: linear-gradient(135deg, #e8eeff 0%, #ddd6fe 40%, #eef2ff 100%) !important;
+}
+
+/* 亮色 skill icon */
+.light .skill-icon {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(238, 242, 255, 0.8)) !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.1) !important;
+}
+
+.light .skill-icon:hover {
+  box-shadow: 0 8px 20px rgba(109, 40, 217, 0.2) !important;
+  border-color: rgba(124, 58, 237, 0.35) !important;
+}
+
+/* 亮色 input 背景 */
+.light .tech-input,
+.light .tech-textarea,
+.light .tech-select {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(124, 58, 237, 0.25) !important;
+}
+
+.light .tech-input:focus,
+.light .tech-textarea:focus,
+.light .tech-select:focus {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12), 0 2px 8px rgba(124, 58, 237, 0.15) !important;
+}
+
+/* 亮色 navbar */
+.light header {
+  background: rgba(238, 242, 255, 0.92) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 2px 12px rgba(109, 40, 217, 0.08) !important;
+}
+
+/* 亮色 tag/badge */
+.light .bg-gradient-to-r.from-accent\/10 {
+  background: linear-gradient(to right, rgba(124, 58, 237, 0.12), rgba(99, 102, 241, 0.12)) !important;
+}
+
+/* 亮色 tech-glow */
+.light .tech-glow {
+  box-shadow: 0 0 16px rgba(124, 58, 237, 0.2);
+}
+
+.light .tech-glow:hover {
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.35), 0 0 40px rgba(99, 102, 241, 0.15);
+}
+
+/* 亮色 scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: #e8eeff;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7c3aed, #6366f1);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6d28d9, #4f46e5);
+}
+
+/* 亮色頁面主背景漸層覆寫 */
+.light .bg-gradient-to-b.from-primary.to-secondary {
+  background: linear-gradient(180deg, #eef2ff 0%, #e8eeff 40%, #ddd6fe 100%) !important;
+}
+
+/* 亮色 resume section card */
+.light .resume-content {
+  background: linear-gradient(160deg, #eef2ff 0%, #e8eeff 50%, #ede9fe 100%);
+  min-height: 100vh;
+}
+
+/* 亮色 blog sidebar card */
+.light .blog-sidebar .tech-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(232, 238, 255, 0.8)) !important;
+}
+
+/* 亮色 profession highlight */
+.light .profession-highlight {
+  color: #4c1d95 !important;
+  text-shadow: 0 0 3px rgba(124, 58, 237, 0.15) !important;
+}
+
+/* 亮色 experience badge */
+.light .experience-badge {
+  background: linear-gradient(135deg, #7c3aed, #6366f1) !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3) !important;
+}
+
+/* 亮色 section 分隔線 */
+.light section + section {
+  border-top: 1px solid rgba(124, 58, 237, 0.08);
 }

@@ -82,21 +82,21 @@ async function submitForm() {
 </script>
 
 <template>
-  <div class="min-h-screen py-16 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
-    <div class="container mx-auto px-4">
-      <div class="contact-header mb-16 text-center">
-        <h1 class="tech-title text-5xl font-bold mb-6">
+  <div class="min-h-screen py-12 md:py-16 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+      <div class="contact-header mb-10 md:mb-16 text-center">
+        <h1 class="tech-title text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
           {{ t('contact.title') }}
         </h1>
-        <p class="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
+        <p class="text-base sm:text-lg md:text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
           {{ t('contact.subtitle') }}
         </p>
-        <div class="w-32 h-1 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-6 rounded-full"></div>
+        <div class="w-24 md:w-32 h-1 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-4 md:mt-6 rounded-full"></div>
       </div>
       
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         <div class="lg:col-span-2 contact-form">
-          <div class="tech-card p-8">
+          <div class="tech-card p-5 sm:p-6 md:p-8">
             <form @submit.prevent="submitForm" class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -189,8 +189,8 @@ async function submitForm() {
         </div>
         
         <div class="contact-info">
-          <div class="tech-card p-8 mb-8">
-            <h3 class="tech-title text-3xl font-bold mb-8">
+          <div class="tech-card p-5 sm:p-6 md:p-8 mb-6 md:mb-8">
+            <h3 class="tech-title text-2xl md:text-3xl font-bold mb-6 md:mb-8">
               {{ t('contact.info') || '聯絡資訊' }}
             </h3>
             <div class="space-y-6">
@@ -239,8 +239,8 @@ async function submitForm() {
             </div>
           </div>
           
-          <div class="tech-card p-8">
-            <h3 class="tech-title text-3xl font-bold mb-8">
+          <div class="tech-card p-5 sm:p-6 md:p-8">
+            <h3 class="tech-title text-2xl md:text-3xl font-bold mb-6 md:mb-8">
               {{ t('contact.social') || '社群媒體' }}
             </h3>
             <div class="flex flex-wrap gap-4">

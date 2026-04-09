@@ -1,6 +1,6 @@
 <template>
-  <section class="resume-section mb-12 bg-secondary rounded-lg p-6 shadow-lg" :class="customClass">
-    <h2 class="text-2xl font-bold mb-6 text-accent">{{ title }}</h2>
+  <section class="resume-section mb-8 md:mb-12 tech-card p-5 md:p-6" :class="customClass">
+    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 tech-title">{{ title }}</h2>
     <div>
       <slot />
     </div>

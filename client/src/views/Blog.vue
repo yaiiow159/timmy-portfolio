@@ -6,6 +6,7 @@ import gsap from 'gsap'
 import { blogService } from '../services/blogService'
 import { getStaticUrl } from '../services/api'
 import { formatDescription } from '../utils/textFormatters'
+import BlogCard from '../components/blog/BlogCard.vue'
 
 const { t } = useI18n()
 
@@ -175,13 +176,13 @@ function getImageUrl(imagePath: string | undefined): string {
 
 <template>
   <div class="min-h-screen py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
-    <div class="container mx-auto px-6 md:px-8">
-      <div class="blog-header mb-20 text-center">
-        <h1 class="tech-title text-5xl md:text-6xl font-bold mb-8">{{ t('blog.title') }}</h1>
-        <p class="text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+      <div class="blog-header mb-12 md:mb-20 text-center">
+        <h1 class="tech-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8">{{ t('blog.title') }}</h1>
+        <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
           {{ t('blog.subtitle') }}
         </p>
-        <div class="w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-8 rounded-full shadow-lg shadow-accent/30"></div>
+        <div class="w-24 md:w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-6 md:mt-8 rounded-full shadow-lg shadow-accent/30"></div>
       </div>
       
       <div class="flex flex-col lg:flex-row gap-8">
@@ -261,7 +262,7 @@ function getImageUrl(imagePath: string | undefined): string {
           <!-- 文章顯示區域 -->
           <div v-else-if="paginatedPosts.length > 0">
             <!-- 網格佈局 -->
-            <div v-if="layoutMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div v-if="layoutMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
               <BlogCard 
                 v-for="post in paginatedPosts" 
                 :key="post.id"
@@ -271,7 +272,7 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
             
             <!-- 瀑布流佈局 -->
-            <div v-else-if="layoutMode === 'masonry'" class="columns-1 md:columns-2 gap-8 space-y-8">
+            <div v-else-if="layoutMode === 'masonry'" class="columns-1 sm:columns-2 gap-6 md:gap-8 space-y-6 md:space-y-8">
               <div v-for="post in paginatedPosts" :key="post.id" class="break-inside-avoid">
                 <BlogCard 
                   :post="post"
@@ -289,7 +290,7 @@ function getImageUrl(imagePath: string | undefined): string {
               >
                 <div class="flex flex-col md:flex-row">
                   <!-- 圖片區域 -->
-                  <div class="md:w-80 h-48 md:h-auto bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
+                  <div class="w-full md:w-64 lg:w-80 h-48 md:h-auto bg-gradient-to-br from-secondary to-primary relative overflow-hidden flex-shrink-0">
                     <div v-if="post.coverImage" class="h-full w-full relative">
                       <img 
                         :src="getImageUrl(post.coverImage)" 

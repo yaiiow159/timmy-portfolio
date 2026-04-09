@@ -213,7 +213,7 @@ watch(() => activeSkillCategory.value, () => {
       <div class="tech-decoration circle-2"></div>
       <div class="tech-decoration circle-3"></div>
       
-      <div class="container mx-auto px-6 md:px-8 relative z-10">
+      <div class="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         <div class="hero-content flex flex-col items-center justify-between max-w-6xl mx-auto">
           <div class="profile-section w-full flex justify-center mb-16">
             <div class="profile-picture-container">
@@ -267,8 +267,8 @@ watch(() => activeSkillCategory.value, () => {
       </div>
     </section>
     
-    <section class="py-24 bg-secondary skills-section tech-particles">
-      <div class="container mx-auto px-6 md:px-8">
+    <section class="py-16 md:py-24 bg-secondary skills-section tech-particles">
+      <div class="container mx-auto px-4 sm:px-6 md:px-8">
         <div class="text-center mb-20">
           <div class="inline-flex items-center gap-3 mb-6">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
@@ -332,16 +332,16 @@ watch(() => activeSkillCategory.value, () => {
       </div>
     </section>
     
-    <section class="py-24 bg-primary project-section">
-      <div class="container mx-auto px-6 md:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-20 gap-6">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <section class="py-16 md:py-24 bg-primary project-section">
+      <div class="container mx-auto px-4 sm:px-6 md:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 md:mb-20 gap-4 md:gap-6">
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
             </div>
-            <h2 class="tech-title text-4xl md:text-5xl font-bold">
+            <h2 class="tech-title text-3xl md:text-4xl lg:text-5xl font-bold">
               {{ t('portfolio.title') }}
             </h2>
           </div>
@@ -356,7 +356,7 @@ watch(() => activeSkillCategory.value, () => {
           </button>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 max-w-7xl mx-auto">
           <div v-if="portfolioStore.isLoading" v-for="i in 3" :key="i" class="tech-card animate-pulse">
             <div class="h-48 bg-gradient-to-br from-secondary to-primary rounded-t-2xl"></div>
             <div class="p-6">
@@ -465,16 +465,16 @@ watch(() => activeSkillCategory.value, () => {
       </div>
     </section>
     
-    <section class="py-24 bg-secondary tech-particles blog-section">
-      <div class="container mx-auto px-6 md:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-20 gap-6">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <section class="py-16 md:py-24 bg-secondary tech-particles blog-section">
+      <div class="container mx-auto px-4 sm:px-6 md:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 md:mb-20 gap-4 md:gap-6">
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M5 14h5m5-4h5M5 8h5" />
               </svg>
             </div>
-            <h2 class="tech-title text-4xl md:text-5xl font-bold">
+            <h2 class="tech-title text-3xl md:text-4xl lg:text-5xl font-bold">
               {{ t('blog.title') }}
             </h2>
           </div>
@@ -489,7 +489,7 @@ watch(() => activeSkillCategory.value, () => {
           </button>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 max-w-7xl mx-auto">
           <div v-if="blogStore.isLoading" v-for="i in 3" :key="i" class="tech-card animate-pulse">
             <div class="h-48 bg-gradient-to-br from-primary to-secondary rounded-t-2xl"></div>
             <div class="p-6">
@@ -500,7 +500,7 @@ watch(() => activeSkillCategory.value, () => {
             </div>
           </div>
           
-          <div v-else-if="blogStore.posts.length > 0" v-for="post in blogStore.posts.slice(0, 3)" :key="post.id" class="tech-card group cursor-pointer" @click="router.push(`/blog/${post.id}`)">
+          <div v-else-if="blogStore.posts.length > 0" v-for="post in blogStore.posts.slice(0, 3)" :key="post.id" class="tech-card group cursor-pointer relative z-10" @click="router.push(`/blog/${post.id}`)">
             <div class="h-48 relative overflow-hidden rounded-t-2xl">
               <img 
                 v-if="post.coverImage" 
