@@ -629,6 +629,7 @@ code {
   background: linear-gradient(90deg, transparent, var(--accent), var(--tech-purple), var(--accent), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 1;
 }
 
 .tech-card:hover::before {
@@ -1664,25 +1665,6 @@ code {
   position: relative;
 }
 
-.tech-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(var(--accent-rgb), 0) 0%,
-    rgba(var(--accent-rgb), 0.1) 50%,
-    rgba(var(--accent-rgb), 0) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
 .tech-card:hover::before {
   opacity: 1;
 }
@@ -2170,7 +2152,7 @@ code {
 .tech-grid-bg > section,
 .tech-grid-bg > div {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 
 .tech-grid-bg::before,
@@ -2178,34 +2160,23 @@ code {
   z-index: 0;
 }
 
-/* Ensure all text content is visible */
-h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label {
-  position: relative;
-  z-index: 2;
-}
-
 /* Ensure cards and containers are properly layered */
 .tech-card,
 .card {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 
 .tech-card > *,
 .card > * {
   position: relative;
-  z-index: 3;
+  z-index: 1;
 }
 
 /* Ensure sections have proper layering */
 section {
   position: relative;
   z-index: 1;
-}
-
-section > * {
-  position: relative;
-  z-index: 2;
 }
 
 .light body::before {
@@ -2348,6 +2319,17 @@ section > * {
 .light .resume-content {
   background: linear-gradient(160deg, #eef2ff 0%, #e8eeff 50%, #ede9fe 100%);
   min-height: 100vh;
+}
+
+/* Resume section card - 需要 overflow visible 讓 absolute 定位的圓點顯示 */
+.resume-section.tech-card {
+  overflow: visible;
+}
+
+/* 確保 resume-section 的 ::before overlay 不蓋住內容 */
+.resume-section.tech-card::before {
+  z-index: -1;
+  border-radius: 16px;
 }
 
 /* 亮色 blog sidebar card */
