@@ -2,31 +2,16 @@
   "name": "timmy-portfolio",
   "version": "1.0.0",
   "description": "Timmy's portfolio website",
-  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@tiptap/extension-image": "^2.11.7",
-    "@tiptap/extension-link": "^2.11.7",
-    "@tiptap/pm": "^2.11.7",
-    "@tiptap/starter-kit": "^2.11.7",
-    "@tiptap/vue-3": "^2.11.7",
-    "bcryptjs": "^3.0.2",
-    "next": "^14.2.35",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
-    "@types/node": "^20.11.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "eslint": "^8.56.0",
-    "eslint-config-next": "^14.1.0",
-    "typescript": "^5.3.0"
+    "install:server": "npm install --prefix server",
+    "install:client": "npm install --prefix client",
+    "build:client": "npm run build --prefix client",
+    "build": "npm run install:server && npm run install:client && npm run build:client",
+    "start": "node server/server.js",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client"
   }
 }

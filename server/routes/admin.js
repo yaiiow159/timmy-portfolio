@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.get('/stats', adminAuth, async (req, res) => {
   try {
-    // 三個 count 互不依賴，並行執行可將延遲從 3×RTT 降為 1×RTT
     const [postsCount, projectsCount, commentsCount] = await Promise.all([
       prisma.post.count(),
       prisma.project.count(),

@@ -95,7 +95,6 @@ export const blogService = {
     }
   },
 
-  // 只取 tags 清單，避免為了側邊欄分類而載入完整文章內容
   getTags: async (): Promise<string[]> => {
     try {
       const response = await api.get('/posts/tags')

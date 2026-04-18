@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen">
+  <div class="admin-projects min-h-screen">
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="tech-title text-3xl font-bold mb-2">{{ t('admin.projectsManagement') }}</h1>

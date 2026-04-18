@@ -65,7 +65,6 @@ class ProjectService {
   async getProjectsByType(type: ProjectType): Promise<Project[]> {
     try {
       const response = await api.get(`/projects/type/${type}`)
-      // 後端已加分頁，回應為 { projects, pagination }；向下相容舊的陣列格式
       const list = Array.isArray(response.data) ? response.data : (response.data.projects ?? [])
       return this.normalizeProjects(list)
     } catch (error) {

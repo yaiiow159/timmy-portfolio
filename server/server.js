@@ -88,6 +88,8 @@ uploadDirs.forEach((dir) => {
   }
 });
 
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/projects', projectsRoutes);
