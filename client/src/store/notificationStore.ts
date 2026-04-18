@@ -19,7 +19,6 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications.value.push(newNotification)
     
     if (notification.duration) {
-      // 保留計時器參照可在手動關閉時同步清除，避免延遲回呼誤刪其他通知
       const timerId = setTimeout(() => {
         removeNotification(id)
       }, notification.duration)
