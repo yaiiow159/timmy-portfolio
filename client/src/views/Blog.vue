@@ -35,7 +35,7 @@ async function fetchPosts() {
     posts.value = response.data
     totalPostsCount.value = response.pagination.total
   } catch (error) {
-    handleError(error, { context: ErrorContext.GENERAL, showNotification: true })
+    handleError(error, { context: ErrorContext.PUBLIC, showNotification: true })
   } finally {
     isLoading.value = false
   }
@@ -47,7 +47,8 @@ async function fetchAllTags() {
     const response = await blogService.getPosts({ limit: 1000 })
     const tagSet = new Set(response.data.flatMap(post => post.tags))
     allTags.value = [...tagSet].sort()
-  } catch {
+  } catch (error) {
+    handleError(error, { context: ErrorContext.PUBLIC, showNotification: false })
     allTags.value = []
   }
 }
