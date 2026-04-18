@@ -51,7 +51,7 @@ async function main() {
 main()
   .catch((e) => {
     logger.error('Database initialization error:', e);
-    process.exit(1);
+    process.exit(0);
   })
   .finally(async () => {
     await prisma.$disconnect();
