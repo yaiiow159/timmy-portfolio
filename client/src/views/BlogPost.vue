@@ -298,7 +298,6 @@ const renderedContent = computed(() => {
   try {
     const content = post.value.content
     if (!content) return ''
-    // 富文字編輯器輸出已是 HTML，直接回傳；僅對純文字（無任何 HTML 標籤）才嘗試 markdown 渲染
     const isHtml = /<[a-zA-Z][^>]*>/.test(content)
     if (isHtml) return content
     return marked(content) as string
@@ -353,13 +352,11 @@ async function submitComment() {
 <style>
 @import '../assets/atom-one-dark.css';
 
-/* Basic content styling */
 .blog-content {
   font-size: 1.125rem;
   line-height: 1.75;
 }
 
-/* Code blocks styling */
 .blog-content pre {
   border-radius: 0.5rem;
   padding: 1.25rem;
