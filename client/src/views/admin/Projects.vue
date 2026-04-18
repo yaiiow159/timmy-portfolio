@@ -38,6 +38,7 @@
                   :src="image" 
                   :alt="`${project.title} - Image ${index + 1}`"
                   class="carousel-image"
+                  loading="lazy"
                   v-show="project.currentImageIndex === index"
                 />
               </transition-group>
@@ -84,9 +85,9 @@
             <span 
               v-for="(tech, index) in project.technologies" 
               :key="`${project.id}-tech-${index}`"
-              class="tech-tag tech-button"
+              class="tech-tag"
             >
-              <i class="fas fa-tag tech-glow"></i> {{ tech }}
+              <i class="fas fa-tag"></i> {{ tech }}
             </span>
           </div>
           
@@ -100,11 +101,11 @@
           </div>
           
           <div class="project-actions">
-            <button @click="openEditModal(project)" class="btn btn-edit tech-button">
-              <i class="fas fa-edit tech-glow"></i> {{ t('common.edit') }}
+            <button @click="openEditModal(project)" class="btn btn-edit">
+              <i class="fas fa-edit"></i> {{ t('common.edit') }}
             </button>
-            <button @click="openDeleteModal(project.id)" class="btn btn-delete tech-button">
-              <i class="fas fa-trash tech-glow"></i> {{ t('common.delete') }}
+            <button @click="openDeleteModal(project.id)" class="btn btn-delete">
+              <i class="fas fa-trash"></i> {{ t('common.delete') }}
             </button>
           </div>
         </div>

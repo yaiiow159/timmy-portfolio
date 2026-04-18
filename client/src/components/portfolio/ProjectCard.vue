@@ -75,6 +75,7 @@ onUnmounted(stopCarousel)
             v-show="index === currentImageIndex"
             :src="imageUrl" 
             :alt="`${project.title} - Image ${index + 1}`" 
+            loading="lazy"
             class="h-full w-full object-cover absolute top-0 left-0 transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
           />
         </transition-group>

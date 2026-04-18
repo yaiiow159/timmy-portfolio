@@ -1,6 +1,7 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
 const prisma = require('../lib/prisma');
+const logger = require('../config/logger');
 const { handleSuccess, handleError, handleBadRequest } = require('../utils/responseHandler');
 
 const router = express.Router();
@@ -39,7 +40,10 @@ router.post('/', async (req, res) => {
     const safeEmail = escapeHtml(email);
     const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
 
-    await transporter.sendMail({
+    // 先回應 201，不等 SMTP 完成，避免 SMTP 延遲拖慢 API 回應時間
+    handleSuccess(res, { msg: 'Message sent successfully' }, 201);
+
+    transporter.sendMail({
       from: process.env.EMAIL_USER,
       // 通知寄給網站擁有者，而非回覆給訪客
       to: process.env.EMAIL_USER,
@@ -113,10 +117,9 @@ router.post('/', async (req, res) => {
         </body>
         </html>
       `
-    });
-
-    handleSuccess(res, { msg: 'Message sent successfully' }, 201);
+    }).catch(mailErr => logger.error('Failed to send contact email:', mailErr));
   } catch (err) {
+    // 僅在儲存聯絡資料失敗時才返回錯誤，email 發送失敗不影響 API 回應
     handleError(res, err);
   }
 });

@@ -8,12 +8,20 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const projects = await prisma.project.findMany({
-      orderBy: {
-        date: 'desc'
-      }
-    });
-    handleSuccess(res, projects);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        orderBy: { date: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.project.count()
+    ]);
+
+    handleSuccess(res, { projects, pagination: { total, page, limit, pages: Math.ceil(total / limit) } });
   } catch (err) {
     handleError(res, err);
   }
@@ -52,19 +60,24 @@ router.get('/featured', async (req, res) => {
 router.get('/type/:type', async (req, res) => {
   try {
     const { type } = req.params;
-    
     if (type !== 'work' && type !== 'personal') return res.status(400).json({ msg: 'Invalid project type' });
-    
-    const projects = await prisma.project.findMany({
-      where: {
-        projectType: type
-      },
-      orderBy: {
-        date: 'desc'
-      }
-    });
-    
-    handleSuccess(res, projects);
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const where = { projectType: type };
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        orderBy: { date: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.project.count({ where })
+    ]);
+
+    handleSuccess(res, { projects, pagination: { total, page, limit, pages: Math.ceil(total / limit) } });
   } catch (err) {
     handleError(res, err, 'Failed to fetch projects');
   }

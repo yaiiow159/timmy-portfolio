@@ -20,6 +20,11 @@ model Project {
   vcsType      String   @default("github")    // "github", "gitlab", "bitbucket", "other"
   platformType String   @default("web")       // "web", "mobile", "desktop", "script", "api"
   date         DateTime @default(now())
+
+  // 加速首頁精選、依類型篩選及依日期排序等高頻查詢
+  @@index([date])
+  @@index([featured])
+  @@index([projectType])
 }
 
 model Post {
@@ -32,6 +37,9 @@ model Post {
   coverImage String?
   date       DateTime  @default(now())
   comments   Comment[]
+
+  // 加速分頁排序和最新文章查詢
+  @@index([date])
 }
 
 model Comment {
@@ -70,4 +78,7 @@ model Activity {
   targetId    String? 
   targetType  String?  
   date        DateTime @default(now())
+
+  // 加速依時間排序的活動記錄查詢
+  @@index([date])
 }

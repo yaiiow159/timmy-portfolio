@@ -62,6 +62,19 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/tags', async (req, res) => {
+  try {
+    // 只撈 tags 欄位而非整篇文章，大幅降低資料庫傳輸量
+    const posts = await prisma.post.findMany({
+      select: { tags: true }
+    });
+    const tagSet = new Set(posts.flatMap(p => p.tags));
+    handleSuccess(res, [...tagSet].sort());
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
 router.get('/latest', async (req, res) => {
   try {
     const posts = await prisma.post.findMany({

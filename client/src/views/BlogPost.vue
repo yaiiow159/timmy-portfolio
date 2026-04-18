@@ -183,7 +183,7 @@
           <h3 class="tech-title text-xl font-semibold mb-4">{{ t('blog.relatedPosts') }}</h3>
           <div class="space-y-4">
             <div 
-              v-for="relatedPost in blogStore.posts.filter((p: BlogPost) => p.id !== post?.id).slice(0, 3)" 
+              v-for="relatedPost in relatedPosts" 
               :key="relatedPost.id"
               class="flex gap-4 tech-card p-4 hover:scale-[1.02] transition-all duration-300"
             >
@@ -287,6 +287,11 @@ onMounted(async () => {
     }, '-=0.3')
   }
 })
+
+// 避免在 template 中每次 render 都執行 filter + slice，改以 computed 快取
+const relatedPosts = computed(() =>
+  blogStore.posts.filter((p: BlogPost) => p.id !== post.value?.id).slice(0, 3)
+)
 
 const renderedContent = computed(() => {
   if (!post.value) return ''

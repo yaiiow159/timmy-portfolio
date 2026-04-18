@@ -3,6 +3,9 @@ const { json, urlencoded } = require('express');
 const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
+// gzip 壓縮回應，減少傳輸量；rate-limit 防止 API 被濫用
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const { existsSync, mkdirSync } = require('fs');
 
 const env = require('./config/env');
@@ -18,6 +21,18 @@ const filesRouter = require('./routes/files');
 const activityRoutes = require('./routes/activity');
 
 const app = express();
+
+// 所有回應啟用 gzip 壓縮，降低 JSON/HTML 的網路傳輸量
+app.use(compression());
+
+// 每 15 分鐘最多 200 次 API 請求，防止暴力攻擊或爬蟲
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+app.use('/api', apiLimiter);
 
 const corsOrigins = env.corsOrigins;
 
@@ -83,7 +98,17 @@ app.use('/api/files', filesRouter);
 app.use('/api/activities', activityRoutes);
 
 if (env.nodeEnv === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
+  // 雜湊命名的靜態資源設 1 年快取 + immutable，避免不必要的重新驗證
+  app.use(express.static(path.join(__dirname, '../client/dist'), {
+    maxAge: '1y',
+    immutable: true,
+    setHeaders(res, filePath) {
+      // index.html 不能長期快取，否則部署新版後使用者無法取得最新 HTML
+      if (filePath.endsWith('index.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    }
+  }));
 
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api/')) {

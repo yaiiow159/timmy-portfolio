@@ -7,9 +7,12 @@ const router = express.Router();
 
 router.get('/stats', adminAuth, async (req, res) => {
   try {
-    const postsCount = await prisma.post.count();
-    const projectsCount = await prisma.project.count();
-    const commentsCount = await prisma.comment.count();
+    // 三個 count 互不依賴，並行執行可將延遲從 3×RTT 降為 1×RTT
+    const [postsCount, projectsCount, commentsCount] = await Promise.all([
+      prisma.post.count(),
+      prisma.project.count(),
+      prisma.comment.count()
+    ]);
     
     handleSuccess(res, { postsCount, projectsCount, commentsCount });
   } catch (err) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, ref, nextTick, watch } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './Navbar.vue'
 import Footer from './Footer.vue'
@@ -9,7 +9,6 @@ import { useLanguageStore } from '@/store/languageStore'
 const themeStore = useThemeStore()
 const languageStore = useLanguageStore()
 const route = useRoute()
-const isContentVisible = ref(true)
 
 const themeClasses = computed(() => {
   return themeStore.isDarkMode 
@@ -21,12 +20,6 @@ const bgGradientClass = computed(() => {
   return themeStore.isDarkMode
     ? 'bg-gradient-radial from-dark-300 to-black'
     : 'bg-gradient-radial from-gray-100 to-white'
-})
-
-watch(() => route.fullPath, async () => {
-  isContentVisible.value = false
-  await nextTick()
-  isContentVisible.value = true
 })
 
 onMounted(() => {
@@ -42,9 +35,10 @@ onMounted(() => {
     <Navbar />
     
     <main class="flex-grow container-custom py-8">
-      <router-view v-slot="{ Component, route }" v-if="isContentVisible">
-        <transition :name="(route.meta.transition as string) || 'fade-in'" mode="out-in">
-          <component :is="Component" :key="route.fullPath" />
+      <!-- 移除 v-if 翻頁強制 unmount；改用 CSS transition 達到換頁淡入效果 -->
+      <router-view v-slot="{ Component }">
+        <transition name="page-fade" mode="out-in">
+          <component :is="Component" :key="route.path" />
         </transition>
       </router-view>
     </main>
@@ -52,3 +46,16 @@ onMounted(() => {
     <Footer />
   </div>
 </template>
+
+<style scoped>
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '../store/blogStore'
 import { blogService } from '../services/blogService'
@@ -43,10 +43,8 @@ async function fetchPosts() {
 
 async function fetchAllTags() {
   try {
-    // 先取完整標籤清單可避免分類只反映當前分頁，造成使用者誤判內容分布
-    const response = await blogService.getPosts({ limit: 1000 })
-    const tagSet = new Set(response.data.flatMap(post => post.tags))
-    allTags.value = [...tagSet].sort()
+    // 呼叫專用 /tags endpoint，僅回傳去重標籤陣列，避免載入完整文章內容
+    allTags.value = await blogService.getTags()
   } catch (error) {
     handleError(error, { context: ErrorContext.PUBLIC, showNotification: false })
     allTags.value = []
@@ -57,10 +55,22 @@ onMounted(async () => {
   await Promise.all([fetchPosts(), fetchAllTags()])
 })
 
-// 篩選條件改變時重置頁碼，避免沿用舊頁碼導致結果看似空白
-watch([searchQuery, selectedCategory], () => {
+// 搜尋框使用 debounce 避免每次按鍵都觸發 API，分類切換則立即生效
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(searchQuery, () => {
+  currentPage.value = 1
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => fetchPosts(), 300)
+})
+
+watch(selectedCategory, () => {
   currentPage.value = 1
   fetchPosts()
+})
+
+onUnmounted(() => {
+  if (searchTimer) clearTimeout(searchTimer)
 })
 
 const categories = computed(() => allTags.value)
