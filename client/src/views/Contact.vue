@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import gsap from 'gsap'
 import { contactService } from '../services/contactService'
 import { handleError, ErrorContext } from '@/utils/errorHandler'
 
@@ -16,36 +15,6 @@ const contactForm = ref({
 const isSubmitting = ref(false)
 const formError = ref('')
 const formSuccess = ref(false)
-
-let entranceTl: gsap.core.Timeline | null = null
-
-onMounted(() => {
-  entranceTl = gsap.timeline()
-  
-  entranceTl.from('.contact-header', {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out'
-  })
-  .from('.contact-form', {
-    y: 30,
-    opacity: 0,
-    duration: 0.5,
-    ease: 'power3.out'
-  }, '-=0.3')
-  .from('.contact-info', {
-    y: 30,
-    opacity: 0,
-    duration: 0.5,
-    ease: 'power3.out'
-  }, '-=0.3')
-})
-
-onUnmounted(() => {
-  entranceTl?.kill()
-  entranceTl = null
-})
 
 async function submitForm() {
   if (!contactForm.value.name || !contactForm.value.email || !contactForm.value.message) {
@@ -275,4 +244,27 @@ async function submitForm() {
 </template>
 
 <style scoped>
+/* 入場動畫改由 CSS keyframes 負責，確保頁面內容在轉場後一定可見 */
+.contact-header {
+  animation: contactSlideIn 0.6s ease-out both;
+}
+
+.contact-form {
+  animation: contactSlideIn 0.5s 0.15s ease-out both;
+}
+
+.contact-info {
+  animation: contactSlideIn 0.5s 0.3s ease-out both;
+}
+
+@keyframes contactSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Project } from '../store/portfolioStore'
-import gsap from 'gsap'
 import { projectService } from '../services/projectService'
 import ProjectCard from '../components/portfolio/ProjectCard.vue'
 
 const { t } = useI18n()
 
 const isLoading = ref(true)
-// 防止 async fetch 結束時元件已離開導致 GSAP 對不存在的 DOM 操作
+// 防止 async fetch 結束後元件已離頁，isMounted 作為離頁守衛
 const isMounted = ref(false)
 const selectedCategory = ref('')
 const selectedProjectType = ref<'all' | 'work' | 'personal'>('all')
@@ -29,8 +28,6 @@ const currentPage = ref(1)
 const projectsPerPage = 6
 
 const layoutMode = ref<'grid' | 'masonry' | 'list'>('grid')
-
-let entranceTl: gsap.core.Timeline | null = null
 
 const categories = computed(() => {
   const allTechnologies = projects.value.flatMap(project => project.technologies)
@@ -118,39 +115,11 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
 
-    // 若使用者在 fetch 期間已離頁，DOM 已不存在，不執行入場動畫
-    if (!isMounted.value) return
-    await nextTick()
-
-    entranceTl = gsap.timeline()
-    
-    entranceTl.from('.portfolio-header', {
-      y: 30,
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power3.out'
-    })
-    .from('.filter-container', {
-      y: 20,
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power3.out'
-    }, '-=0.3')
-    .from('.project-card', {
-      y: 30,
-      opacity: 0,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: 'power2.out'
-    }, '-=0.2')
   }
 })
 
 onUnmounted(() => {
   isMounted.value = false
-  // 離頁時強制結束動畫，防止半途的 from() 讓元素殘留 opacity:0
-  entranceTl?.kill()
-  entranceTl = null
   stopDetailsCarousel()
 })
 
@@ -795,5 +764,25 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
 
 .tag-item {
   transition: all 0.3s ease;
+}
+
+/* 入場動畫改由 CSS keyframes 負責，確保頁面內容在轉場後一定可見 */
+.portfolio-header {
+  animation: portfolioSlideIn 0.6s ease-out both;
+}
+
+.filter-container {
+  animation: portfolioSlideIn 0.5s 0.15s ease-out both;
+}
+
+@keyframes portfolioSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
