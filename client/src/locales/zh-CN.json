@@ -564,7 +564,8 @@
     "noActivities": "目前没有任何活动",
     "viewDetails": "查看详情",
     "loading": "加载中...",
-    "loadMore": "加载更多"
+    "loadMore": "加载更多",
+    "postPublished": "发布了新文章"
   },
   "notFound": {
     "title": "404",

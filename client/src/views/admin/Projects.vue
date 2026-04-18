@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen">
-    <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="tech-title text-3xl font-bold mb-2">{{ t('admin.projectsManagement') }}</h1>
@@ -17,13 +16,11 @@
       </button>
     </div>
 
-    <!-- Loading State -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-20">
       <div class="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
       <p class="text-text-secondary">{{ t('common.loading') }}</p>
     </div>
     
-    <!-- Projects Grid -->
     <div v-else-if="projects.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="project in projects" :key="project.id" class="project-card tech-card tech-glow">
         <div class="project-image tech-data-stream">
@@ -81,7 +78,7 @@
         
         <div class="project-content tech-scan-lines">
           <h3 class="project-title tech-text-glow">{{ project.title }}</h3>
-          <div class="project-description line-clamp-3" v-html="'<p>' + formatDescription(project.description) + '</p>'"></div>
+          <div class="project-description line-clamp-3">{{ getProjectPreviewText(project.description) }}</div>
           
           <div class="project-tech">
             <span 
@@ -362,7 +359,6 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/services/api';
 import type { Project, ProjectType, VCSType } from '@/types/project';
-import { formatDescription } from '@/utils/textFormatters';
 import RichTextEditor from '@/components/common/RichTextEditor.vue';
 import { projectService } from '@/services/projectService';
 import { handleSuccess, handleError, ErrorContext } from '@/utils/errorHandler';
@@ -429,7 +425,7 @@ async function fetchProjects() {
     }));
     startAllCarousels();
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    handleError(error, { context: ErrorContext.ADMIN, showNotification: true });
   } finally {
     loading.value = false;
   }
@@ -529,8 +525,10 @@ function openEditModal(project: AdminProject) {
 }
 
 function closeModal() {
-  showModal.value = false;
+  // 關閉彈窗時主動釋放預覽資源，避免反覆開關造成記憶體累積
+  selectedFiles.value.forEach(file => URL.revokeObjectURL(getPreviewUrl(file)));
   selectedFiles.value = [];
+  showModal.value = false;
   if (fileInputRef.value) {
     fileInputRef.value.value = '';
   }
@@ -548,19 +546,7 @@ function closeDeleteModal() {
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    selectedFiles.value = Array.from(input.files);
-    selectedFiles.value.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target && e.target.result) {
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  } else {
-    selectedFiles.value = [];
-  }
+  selectedFiles.value = input.files ? Array.from(input.files) : [];
 }
 
 function getPreviewUrl(file: File): string {
@@ -568,11 +554,12 @@ function getPreviewUrl(file: File): string {
 }
 
 function removeSelectedFile(index: number) {
+  // 單筆移除時同步釋放預覽資源，避免殘留無主記憶體引用
+  URL.revokeObjectURL(getPreviewUrl(selectedFiles.value[index]));
+
   selectedFiles.value.splice(index, 1);
-  if (fileInputRef.value) {
-    if (selectedFiles.value.length === 0) {
-      fileInputRef.value.value = '';
-    }
+  if (fileInputRef.value && selectedFiles.value.length === 0) {
+    fileInputRef.value.value = '';
   }
 }
 
@@ -661,6 +648,16 @@ function removeTechnology(index: number) {
   currentProject.technologies.splice(index, 1);
 }
 
+function getProjectPreviewText(rawDescription: string): string {
+  const plainText = (rawDescription || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (plainText.length <= 180) return plainText
+  return `${plainText.slice(0, 180)}...`
+}
+
 async function saveProject() {
   try {
     const projectData = {
@@ -688,7 +685,7 @@ async function saveProject() {
     await fetchProjects();
     closeModal();
   } catch (error) {
-    console.error('Error saving project:', error);
+    handleError(error, { context: ErrorContext.ADMIN, showNotification: true });
   }
 }
 
@@ -701,7 +698,7 @@ async function deleteProject() {
     await fetchProjects();
     closeDeleteModal();
   } catch (error) {
-    console.error('Error deleting project:', error);
+    handleError(error, { context: ErrorContext.ADMIN, showNotification: true });
   }
 }
 </script>
@@ -1610,6 +1607,7 @@ async function deleteProject() {
 }
 
 .project-description.line-clamp-3 {
+  line-clamp: 3;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;

@@ -3,9 +3,8 @@ import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Project } from '../store/portfolioStore'
 import gsap from 'gsap'
-import { portfolioService } from '../services/portfolioService'
+import { projectService } from '../services/projectService'
 import ProjectCard from '../components/portfolio/ProjectCard.vue'
-import { formatDescription } from '@/utils/textFormatters'
 
 const { t } = useI18n()
 
@@ -108,7 +107,7 @@ function stopDetailsCarousel() {
 onMounted(async () => {
   try {
     isLoading.value = true
-    projects.value = await portfolioService.getProjects()
+    projects.value = await projectService.getAllProjects()
   } catch (error) {
     console.error('Error fetching projects:', error)
   } finally {
@@ -217,6 +216,16 @@ function updateSearch(value: string) {
   searchQuery.value = value
   currentPage.value = 1
 }
+
+function getProjectPlainDescription(description: string, maxLength?: number): string {
+  const plainText = (description || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (!maxLength || plainText.length <= maxLength) return plainText
+  return `${plainText.slice(0, maxLength)}...`
+}
 </script>
 
 <template>
@@ -233,7 +242,6 @@ function updateSearch(value: string) {
       </div>
       
       <div class="filter-container mb-16">
-        <!-- Project Type Filter -->
         <div class="mb-10 flex justify-center gap-5 flex-wrap">
           <button
             @click="selectedProjectType = 'all'; currentPage = 1"
@@ -258,7 +266,6 @@ function updateSearch(value: string) {
           </button>
         </div>
         
-        <!-- Platform Type Filter -->
         <div class="mb-10 flex justify-center gap-4 flex-wrap">
           <button
             @click="selectedPlatformType = 'all'; currentPage = 1"
@@ -322,7 +329,6 @@ function updateSearch(value: string) {
             </div>
           </div>
           
-          <!-- 佈局切換按鈕 -->
           <div class="flex items-center gap-2">
             <span class="text-sm tech-text-secondary mr-2">{{ t('portfolio.layout') }}:</span>
             <div class="flex bg-secondary rounded-xl p-1">
@@ -404,9 +410,7 @@ function updateSearch(value: string) {
         </div>
       </div>
       
-      <!-- 項目顯示區域 -->
       <div v-else-if="filteredProjects.length > 0" class="mb-16 max-w-7xl mx-auto">
-        <!-- 網格佈局 -->
         <div v-if="layoutMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <ProjectCard 
             v-for="project in paginatedProjects" 
@@ -416,7 +420,6 @@ function updateSearch(value: string) {
           />
         </div>
         
-        <!-- 瀑布流佈局 -->
         <div v-else-if="layoutMode === 'masonry'" class="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
           <div v-for="project in paginatedProjects" :key="project.id" class="break-inside-avoid">
             <ProjectCard 
@@ -426,7 +429,6 @@ function updateSearch(value: string) {
           </div>
         </div>
         
-        <!-- 列表佈局 -->
         <div v-else-if="layoutMode === 'list'" class="space-y-6">
           <div 
             v-for="project in paginatedProjects" 
@@ -434,7 +436,6 @@ function updateSearch(value: string) {
             class="tech-card overflow-hidden group hover:scale-[1.02] transition-all duration-300"
           >
             <div class="flex flex-col md:flex-row">
-              <!-- 圖片區域 -->
               <div class="md:w-80 h-48 md:h-auto bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
                 <div v-if="getProjectImages(project).length > 0" class="h-full w-full relative">
                   <img 
@@ -450,7 +451,6 @@ function updateSearch(value: string) {
                   </svg>
                 </div>
                 
-                <!-- 特色標籤 -->
                 <div v-if="project.featured" class="absolute top-3 right-3">
                   <div class="bg-gradient-to-r from-accent to-tech-purple text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg tech-glow">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -461,7 +461,6 @@ function updateSearch(value: string) {
                 </div>
               </div>
               
-              <!-- 內容區域 -->
               <div class="flex-1 p-6">
                 <div class="flex flex-col h-full">
                   <div class="mb-4">
@@ -484,9 +483,8 @@ function updateSearch(value: string) {
                     </div>
                   </div>
                   
-                  <p class="text-text-secondary mb-6 leading-relaxed flex-grow" v-html="formatDescription(project.description, 200)"></p>
+                  <p class="text-text-secondary mb-6 leading-relaxed flex-grow">{{ getProjectPlainDescription(project.description, 200) }}</p>
                   
-                  <!-- 技術標籤 -->
                   <div class="mb-6">
                     <div class="flex flex-wrap gap-2">
                       <span 
@@ -502,7 +500,6 @@ function updateSearch(value: string) {
                     </div>
                   </div>
                   
-                  <!-- 操作按鈕 -->
                   <div class="flex gap-3">
                     <a 
                       v-if="project.liveUrl"
@@ -558,7 +555,6 @@ function updateSearch(value: string) {
         </button>
       </div>
       
-      <!-- Pagination Controls -->
       <div v-if="totalPages > 1" class="flex justify-center mt-20">
         <div class="flex items-center space-x-4 bg-secondary p-5 rounded-2xl shadow-2xl border border-accent/20">
           <button 
@@ -664,7 +660,7 @@ function updateSearch(value: string) {
           <h2 class="tech-title text-4xl font-bold mb-6">{{ selectedProject.title }}</h2>
           
           <div class="mb-10">
-            <p class="text-text-secondary text-lg leading-relaxed" v-html="formatDescription(selectedProject.description)"></p>
+            <p class="text-text-secondary text-lg leading-relaxed">{{ getProjectPlainDescription(selectedProject.description) }}</p>
           </div>
           
           <div class="mb-10">

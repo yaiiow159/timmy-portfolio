@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import i18n from '../i18n'
 import { blogService, type PaginationParams } from '../services/blogService'
+import { fileService } from '../services/fileService'
 import { useAuthStore } from './authStore'
 
 export interface BlogPost {
@@ -32,8 +33,9 @@ export interface Pagination {
   pages: number
 }
 
+const t = i18n.global.t
+
 export const useBlogStore = defineStore('blog', () => {
-  const { t } = useI18n()
   const posts = ref<BlogPost[]>([])
   const pagination = ref<Pagination>({
     total: 0,
@@ -58,7 +60,7 @@ export const useBlogStore = defineStore('blog', () => {
       pagination.value = response.pagination
     } catch (err) {
       console.error('Error fetching blog posts:', err)
-      error.value = t('errors.blog.createFailed')
+      error.value = t('errors.general.message')
     } finally {
       isLoading.value = false
     }
@@ -106,7 +108,7 @@ export const useBlogStore = defineStore('blog', () => {
     try {
       const postWithAuthor = {
         ...post,
-        author: 'Timmy'
+        author: authStore.user?.name ?? 'Timmy'
       }
       const response = await blogService.createPost(postWithAuthor)
       await fetchPosts({ page: 1 })
@@ -165,7 +167,7 @@ export const useBlogStore = defineStore('blog', () => {
     }
 
     try {
-      return await blogService.uploadImage(file)
+      return await fileService.uploadFile(file)
     } catch (err) {
       console.error('Error uploading image:', err)
       throw new Error(t('errors.blog.uploadFailed'))

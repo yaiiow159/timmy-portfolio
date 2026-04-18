@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Project } from '@/store/portfolioStore'
 import { ref, onMounted, computed, onUnmounted } from 'vue'
-import { formatDescription } from '@/utils/textFormatters'
 
 const props = defineProps<{
   project: Project
@@ -44,6 +43,16 @@ const stopCarousel = () => {
   }
 }
 
+const getProjectPlainDescription = (description: string) => {
+  const plainText = (description || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (plainText.length <= 120) return plainText
+  return `${plainText.slice(0, 120)}...`
+}
+
 onMounted(startCarousel)
 onUnmounted(stopCarousel)
 </script>
@@ -52,13 +61,11 @@ onUnmounted(stopCarousel)
   <div class="project-card tech-card overflow-hidden h-full flex flex-col group relative"
        @mouseenter="stopCarousel" 
        @mouseleave="startCarousel">
-    <!-- 科技感裝飾背景 -->
     <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
       <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent"></div>
       <div class="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-xl"></div>
     </div>
     
-    <!-- 圖片區域 -->
     <div class="h-64 bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
       <div v-if="projectImages.length > 0" class="h-full w-full relative">
         <transition-group name="fade" tag="div" class="h-full w-full">
@@ -72,10 +79,8 @@ onUnmounted(stopCarousel)
           />
         </transition-group>
         
-        <!-- 圖片覆蓋層 -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         
-        <!-- 輪播控制 -->
         <div v-if="projectImages.length > 1" class="absolute inset-0 flex items-center justify-between px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 carousel-controls">
           <button @click.prevent="prevImage" class="tech-button p-2 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +94,6 @@ onUnmounted(stopCarousel)
           </button>
         </div>
         
-        <!-- 輪播指示器 -->
         <div v-if="projectImages.length > 1" class="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
           <button 
             v-for="(_, index) in projectImages" 
@@ -109,7 +113,6 @@ onUnmounted(stopCarousel)
         </div>
       </div>
       
-      <!-- 特色標籤 -->
       <div v-if="project.featured" class="absolute top-3 right-3">
         <div class="bg-gradient-to-r from-accent to-tech-purple text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg tech-glow">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -119,7 +122,6 @@ onUnmounted(stopCarousel)
         </div>
       </div>
       
-      <!-- 項目類型標籤 -->
       <div class="absolute top-3 left-3">
         <div class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full border border-accent/30">
           {{ project.projectType || 'Project' }}
@@ -127,9 +129,7 @@ onUnmounted(stopCarousel)
       </div>
     </div>
     
-    <!-- 內容區域 -->
     <div class="p-6 flex flex-col flex-grow relative">
-      <!-- 標題區域 -->
       <div class="mb-4">
         <h3 class="text-xl font-bold mb-2 tech-text-primary group-hover:text-accent transition-colors duration-300">
           {{ project.title }}
@@ -142,10 +142,8 @@ onUnmounted(stopCarousel)
         </div>
       </div>
       
-      <!-- 描述 -->
-      <p class="text-text-secondary mb-5 line-clamp-3 flex-grow leading-relaxed text-sm" v-html="formatDescription(project.description, 120)"></p>
+      <p class="text-text-secondary mb-5 line-clamp-3 flex-grow leading-relaxed text-sm">{{ getProjectPlainDescription(project.description) }}</p>
       
-      <!-- 技術標籤 -->
       <div class="mb-6">
         <div class="flex flex-wrap gap-2">
           <span 
@@ -161,7 +159,6 @@ onUnmounted(stopCarousel)
         </div>
       </div>
       
-      <!-- 操作按鈕 -->
       <div class="flex gap-2 mt-auto">
         <a 
           v-if="project.liveUrl"
@@ -273,7 +270,6 @@ onUnmounted(stopCarousel)
 .carousel-controls button:active {
   transform: scale(0.95);
 }
-/* 響應式調整 */
 @media (max-width: 768px) {
   .project-card:hover {
     transform: translateY(-6px) scale(1.01);

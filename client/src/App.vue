@@ -6,9 +6,14 @@ import { onMounted } from 'vue'
 
 const authStore = useAuthStore()
 
-onMounted(() => {
+onMounted(async () => {
+  // 重新整理後先還原登入身份，可避免首屏短暫誤判為未登入造成閃爍
   if (authStore.token) {
-    authStore.loadUser()
+    try {
+      await authStore.loadUser()
+    } catch {
+      // 身分失效已在狀態層統一處理，這裡僅避免重複拋錯干擾首屏渲染
+    }
   }
 })
 </script>

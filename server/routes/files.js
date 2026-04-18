@@ -1,31 +1,21 @@
 const express = require('express');
-const multer = require('multer');
-const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
+const upload = require('../middleware/upload');
 const cloudinary = require('../config/cloudinary');
 const streamifier = require('streamifier');
 const { handleSuccess, handleError, handleBadRequest } = require('../utils/responseHandler');
-
-const upload = multer({ 
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }
-});
+const { getFolderName } = require('../utils/uploadHelpers');
 
 const router = express.Router();
 
-const getFolderName = (mimetype) => {
-  if (mimetype.startsWith('image/')) return 'images';
-  if (mimetype.startsWith('video/')) return 'videos';
-  return 'files';
-};
-
-router.get('/', auth, async (req, res) => {
+router.get('/', adminAuth, async (req, res) => {
   try {
-    const result = await cloudinary.api.resources({
+    const cloudinaryResourcesResponse = await cloudinary.api.resources({
       type: 'upload',
       max_results: 500
     });
     
-    const files = result.resources.map(resource => {
+    const files = cloudinaryResourcesResponse.resources.map(resource => {
       const pathParts = resource.public_id.split('/');
       const fileName = pathParts[pathParts.length - 1];
       const folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'root';
@@ -47,7 +37,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.post('/', auth, upload.single('file'), async (req, res) => {
+router.post('/', adminAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return handleBadRequest(res, 'No file uploaded');
 
@@ -69,15 +59,15 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
       streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
     });
 
-    const result = await uploadPromise;
+    const uploadResponse = await uploadPromise;
     
     handleSuccess(res, {
       name: req.file.originalname,
-      path: result.public_id,
-      size: result.bytes,
-      url: result.secure_url,
-      publicId: result.public_id,
-      type: result.format,
+      path: uploadResponse.public_id,
+      size: uploadResponse.bytes,
+      url: uploadResponse.secure_url,
+      publicId: uploadResponse.public_id,
+      type: uploadResponse.format,
       folder: folder
     }, 201);
   } catch (error) {
@@ -85,19 +75,19 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
   }
 });
 
-router.delete('/batch', auth, async (req, res) => {
+router.delete('/batch', adminAuth, async (req, res) => {
   try {
     const { files } = req.body;
     
     if (!Array.isArray(files) || files.length === 0) return handleBadRequest(res, 'Invalid files array');
 
-    const results = await Promise.allSettled(files.map(async (publicId) => {
+    const settledResults = await Promise.allSettled(files.map(async (publicId) => {
       try {
-        const result = await cloudinary.uploader.destroy(publicId);
+        const deleteResponse = await cloudinary.uploader.destroy(publicId);
         return { 
-          status: result.result === 'ok' ? 'success' : 'failed',
+          status: deleteResponse.result === 'ok' ? 'success' : 'failed',
           filename: publicId,
-          result
+          result: deleteResponse
         };
       } catch (error) {
         return { 
@@ -108,25 +98,25 @@ router.delete('/batch', auth, async (req, res) => {
       }
     }));
     
-    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.status === 'success').length;
+    const successCount = settledResults.filter(r => r.status === 'fulfilled' && r.value.status === 'success').length;
     const failCount = files.length - successCount;
     
     handleSuccess(res, {
       message: `Successfully deleted ${successCount} files. Failed to delete ${failCount} files.`,
-      results: results.map(r => r.status === 'fulfilled' ? r.value : { status: 'failed', error: r.reason })
+      results: settledResults.map(r => r.status === 'fulfilled' ? r.value : { status: 'failed', error: r.reason })
     });
   } catch (error) {
     handleError(res, error, 'Error batch deleting files');
   }
 });
 
-router.delete('/:publicId', auth, async (req, res) => {
+router.delete('/:publicId', adminAuth, async (req, res) => {
   try {
     const publicId = req.params.publicId;
     
-    const result = await cloudinary.uploader.destroy(publicId);
+    const deleteResponse = await cloudinary.uploader.destroy(publicId);
     
-    if (result.result === 'ok') return handleSuccess(res, { message: 'File deleted successfully' });
+    if (deleteResponse.result === 'ok') return handleSuccess(res, { message: 'File deleted successfully' });
     return res.status(404).json({ message: 'File not found or could not be deleted' });
   } catch (error) {
     handleError(res, error, 'Error deleting file');

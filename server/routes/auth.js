@@ -9,13 +9,24 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
+  const normalizedName = typeof name === 'string' ? name.trim() : '';
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+  // 基本欄位驗證，避免空白資料或格式錯誤的帳號進入資料庫
+  if (!normalizedName) return res.status(400).json({ msg: 'Name is required' });
+  if (!normalizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return res.status(400).json({ msg: 'Valid email is required' });
+  }
+  if (!password || password.length < 8) {
+    return res.status(400).json({ msg: 'Password must be at least 8 characters' });
+  }
 
   try {
     let user = await prisma.user.findFirst({
       where: {
         OR: [
-          { email },
-          { name }
+          { email: normalizedEmail },
+          { name: normalizedName }
         ]
       }
     });
@@ -27,8 +38,8 @@ router.post('/register', async (req, res) => {
 
     user = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: normalizedName,
+        email: normalizedEmail,
         password: hashedPassword
       }
     });
@@ -46,10 +57,18 @@ router.post('/health', (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+  if (!normalizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return res.status(400).json({ msg: 'Valid email is required' });
+  }
+  if (!password || typeof password !== 'string') {
+    return res.status(400).json({ msg: 'Password is required' });
+  }
 
   try {
     const user = await prisma.user.findUnique({
-      where: { email }
+      where: { email: normalizedEmail }
     });
 
     if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
@@ -75,6 +94,9 @@ router.get('/user', auth, async (req, res) => {
         role: true
       }
     });
+
+    // 憑證仍有效但帳號已不存在時回 401，讓前端立即清理過期登入狀態
+    if (!user) return res.status(401).json({ msg: 'User not found' });
     
     handleSuccess(res, user);
   } catch (err) {

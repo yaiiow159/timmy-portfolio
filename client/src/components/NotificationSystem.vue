@@ -98,7 +98,6 @@ const notificationStore = useNotificationStore()
   color: var(--notification-color, var(--accent));
 }
 
-/* Transition animations */
 .notification-enter-active,
 .notification-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

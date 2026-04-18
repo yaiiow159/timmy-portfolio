@@ -537,6 +537,13 @@ code {
   --tech-red: #dc2626;
   --tech-red-light: #ef4444;
   --tech-red-dark: #b91c1c;
+
+  /* 亮色模式下的 RGB 變數，讓 tech-card 背景切換為淺色，避免深色文字被黑底吞掉 */
+  --bg-primary-rgb: 240, 244, 255;
+  --bg-secondary-rgb: 232, 238, 255;
+  --accent-rgb: 124, 58, 237;
+  --tech-purple-rgb: 109, 40, 217;
+  --tech-cyan-rgb: 8, 145, 178;
 }
 
 /* 全局科技感樣式 */

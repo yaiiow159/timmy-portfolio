@@ -1,5 +1,5 @@
 import { useNotificationStore } from '@/store/notificationStore'
-import { useI18n } from 'vue-i18n'
+import i18n from '@/i18n'
 
 export enum ErrorContext {
   ADMIN = 'admin',
@@ -21,7 +21,7 @@ export function handleError(
 ): string {
   const { context, showNotification = true, customMessage, duration = 5000 } = options
   const notificationStore = useNotificationStore()
-  const { t } = useI18n()
+  const t = i18n.global.t
 
   let errorMessage = customMessage || error.response?.data?.msg || error.message || t('errors.general')
 

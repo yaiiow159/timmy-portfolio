@@ -1,69 +1,56 @@
 const { Router } = require('express');
 const router = Router();
 const prisma = require('../lib/prisma');
+const adminAuth = require('../middleware/adminAuth');
+const { handleSuccess, handleError, handleBadRequest } = require('../utils/responseHandler');
 
 router.get('/', async (req, res) => {
   try {
-    const { limit = 10, page = 1 } = req.query;
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const parsedLimit = Math.max(1, parseInt(req.query.limit) || 10);
+    const parsedPage = Math.max(1, parseInt(req.query.page) || 1);
+    const skip = (parsedPage - 1) * parsedLimit;
 
     const [activities, total] = await Promise.all([
       prisma.activity.findMany({
         skip,
-        take: parseInt(limit),
-        orderBy: {
-          date: 'desc'
-        }
+        take: parsedLimit,
+        orderBy: { date: 'desc' }
       }),
       prisma.activity.count()
     ]);
 
-    res.json({
+    // 統一分頁回應格式可降低前端狀態管理額外分支與相容成本
+    handleSuccess(res, {
       activities,
-      total,
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(total / parseInt(limit))
+      pagination: {
+        total,
+        page: parsedPage,
+        limit: parsedLimit,
+        pages: Math.ceil(total / parsedLimit)
+      }
     });
   } catch (error) {
-    console.error('Error fetching activities:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch activities',
-      message: error.message 
-    });
+    handleError(res, error, 'Failed to fetch activities');
   }
 });
 
-router.post('/', async (req, res) => {
+// 建立活動紀錄前再驗證管理角色，可避免一般帳號偽造後台操作軌跡
+router.post('/', adminAuth, async (req, res) => {
   try {
     const { type, title, description, userName, targetId, targetType } = req.body;
-    
+
     if (!type || !title || !description || !userName) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        message: 'Type, title, description, and userName are required'
-      });
+      return handleBadRequest(res, 'Type, title, description, and userName are required');
     }
-    
+
     const activity = await prisma.activity.create({
-      data: {
-        type,
-        title,
-        description,
-        userName,
-        targetId,
-        targetType
-      }
+      data: { type, title, description, userName, targetId, targetType }
     });
-    
-    res.status(201).json(activity);
+
+    handleSuccess(res, activity, 201);
   } catch (error) {
-    console.error('Error creating activity:', error);
-    res.status(500).json({ 
-      error: 'Failed to create activity',
-      message: error.message 
-    });
+    handleError(res, error, 'Failed to create activity');
   }
 });
 
 module.exports = router;
-

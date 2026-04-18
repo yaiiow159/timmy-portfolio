@@ -566,7 +566,8 @@
     "noActivities": "No activities found",
     "viewDetails": "View Details",
     "loading": "Loading...",
-    "loadMore": "Load More"
+    "loadMore": "Load More",
+    "postPublished": "Published a new post"
   },
   "notFound": {
     "title": "404",

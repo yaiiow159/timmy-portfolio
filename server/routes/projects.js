@@ -1,5 +1,5 @@
 const express = require('express');
-const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const prisma = require('../lib/prisma');
 const { handleSuccess, handleError } = require('../utils/responseHandler');
 const { normalizeImageUrl } = require('../utils/imageUrlNormalizer');
@@ -85,7 +85,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', adminAuth, async (req, res) => {
   try {
     const imageUrl = normalizeImageUrl(req.body.imageUrl);
 
@@ -110,7 +110,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', adminAuth, async (req, res) => {
   try {
     const imageUrl = normalizeImageUrl(req.body.imageUrl);
 
@@ -139,7 +139,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', adminAuth, async (req, res) => {
   try {
     await prisma.project.delete({
       where: {

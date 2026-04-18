@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {ref, computed} from 'vue'
-import api from '../services/api'
-import {useI18n} from 'vue-i18n'
+import api, { registerUnauthorizedHandler } from '../services/api'
+import i18n from '../i18n'
 import router from '../router'
 import { handleError, handleSuccess, ErrorContext } from '@/utils/errorHandler'
 
@@ -21,15 +21,18 @@ export interface RegisterData extends LoginCredentials {
     name: string
 }
 
+const t = i18n.global.t
+
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('auth-token'))
     const user = ref<User | null>(null)
     const isLoading = ref(false)
     const error = ref<string | null>(null)
-    const { t } = useI18n()
 
     const isAuthenticated = computed(() => !!token.value && !!user.value)
     const isAdmin = computed(() => user.value?.role === 'admin')
+
+    let refreshInterval: number | null = null
 
     async function loadUser() {
         if (!token.value) return
@@ -39,7 +42,11 @@ export const useAuthStore = defineStore('auth', () => {
 
         try {
             const response = await api.get('/auth/user')
-            user.value = response.data
+            // 先統一角色大小寫可避免後端格式差異影響前端權限判斷
+            user.value = {
+                ...response.data,
+                role: response.data.role?.toLowerCase() ?? 'user'
+            }
             
             if (user.value && !refreshInterval) {
                 startTokenRefresh()
@@ -88,9 +95,7 @@ export const useAuthStore = defineStore('auth', () => {
             
             if (userData) {
                 handleSuccess(t('auth.loginSuccess'))
-                
                 router.push('/admin')
-                
                 return true
             }
             
@@ -143,22 +148,24 @@ export const useAuthStore = defineStore('auth', () => {
         handleSuccess(t('auth.logoutSuccess'))
     }
 
-    let refreshInterval: number | null = null
-
     function startTokenRefresh() {
         if (refreshInterval) {
             clearInterval(refreshInterval)
         }
-        
         refreshInterval = window.setInterval(() => {
             refreshToken()
         }, 15 * 60 * 1000)
     }
 
-    if (token.value) {
-        loadUser()
-        startTokenRefresh()
-    }
+    // 401 屬於被動失效情境，靜默清理可避免重複彈出登出提示干擾使用流程
+    registerUnauthorizedHandler(() => {
+        token.value = null
+        user.value = null
+        if (refreshInterval) {
+            clearInterval(refreshInterval)
+            refreshInterval = null
+        }
+    })
 
     return {
         token,

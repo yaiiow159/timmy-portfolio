@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import i18n from '@/i18n'
 import { projectService } from '@/services/projectService'
 import type { Project, ProjectType } from '@/types/project'
 
 export type { Project }
+
+const t = i18n.global.t
 
 export const usePortfolioStore = defineStore('portfolio', () => {
   const projects = ref<Project[]>([])
@@ -19,7 +22,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       projects.value = await projectService.getAllProjects()
     } catch (err) {
       console.error('Error fetching projects:', err)
-      error.value = 'Failed to load projects'
+      error.value = t('errors.portfolio.errorFetchingProjects')
     } finally {
       isLoading.value = false
     }
@@ -33,7 +36,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       featuredProjects.value = await projectService.getFeaturedProjects()
     } catch (err) {
       console.error('Error fetching featured projects:', err)
-      error.value = 'Failed to load featured projects'
+      error.value = t('errors.portfolio.errorFetchingProjects')
     } finally {
       isLoading.value = false
     }
@@ -47,7 +50,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       return await projectService.getProjectsByType(type)
     } catch (err) {
       console.error(`Error fetching projects by type ${type}:`, err)
-      error.value = 'Failed to load projects'
+      error.value = t('errors.portfolio.errorFetchingProjects')
       return []
     } finally {
       isLoading.value = false
@@ -62,7 +65,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       return await projectService.getProjectById(id)
     } catch (err) {
       console.error(`Error fetching project with ID ${id}:`, err)
-      error.value = 'Failed to load project'
+      error.value = t('errors.portfolio.errorFetchingProjects')
       return null
     } finally {
       isLoading.value = false

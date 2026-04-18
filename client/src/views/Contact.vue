@@ -42,7 +42,7 @@ onMounted(() => {
 
 async function submitForm() {
   if (!contactForm.value.name || !contactForm.value.email || !contactForm.value.message) {
-    formError.value = t('contact.requiredFields') || '請填寫所有必填欄位'
+    formError.value = t('contact.requiredFields')
     return
   }
   
@@ -73,7 +73,7 @@ async function submitForm() {
     formError.value = handleError(error, {
       context: ErrorContext.PUBLIC,
       showNotification: true,
-      customMessage: t('contact.sendError') || '發送失敗，請稍後再試'
+      customMessage: t('contact.sendError')
     })
   } finally {
     isSubmitting.value = false

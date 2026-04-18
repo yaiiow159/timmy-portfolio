@@ -51,7 +51,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Admin.vue'),
     meta: { 
       transition: 'fade-in',
-      requiresAuth: true
+      requiresAuth: true,
+      requiresAdmin: true
     },
     children: [
       {
@@ -109,8 +110,10 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()
+  const requiresAuth = Boolean(to.meta.requiresAuth)
+  const requiresAdmin = Boolean(to.meta.requiresAdmin)
   
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  if (requiresAuth && !authStore.isAuthenticated) {
     if (authStore.token && !authStore.user) {
       try {
         await authStore.loadUser()
@@ -118,14 +121,20 @@ router.beforeEach(async (to, _from, next) => {
           next()
           return
         }
-      } catch (error) {
-        console.error('Error loading user in navigation guard:', error)
+      } catch {
+        // 初始化身份失敗時直接導回登入頁，避免守衛卡住造成白屏
       }
     }
     next('/auth')
-  } else {
-    next()
+    return
   }
+
+  if (requiresAdmin && !authStore.isAdmin) {
+    next('/')
+    return
+  }
+
+  next()
 })
 
 export default router

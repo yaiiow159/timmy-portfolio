@@ -1,6 +1,5 @@
 <template>
   <div class="admin-files min-h-screen bg-primary dark:bg-primary-dark p-6 space-y-6">
-    <!-- Header section with improved layout -->
     <div class="flex justify-between items-center mb-6 bg-secondary dark:bg-secondary-dark p-6 rounded-lg shadow-md">
       <h1 class="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
         {{ t('admin.manageFiles') }}
@@ -30,16 +29,6 @@
           {{ t('admin.refresh') }}
         </button>
         
-        <button 
-          @click="showEditProjectModal = true"
-          class="bg-accent hover:bg-accent-light text-white px-4 py-2 rounded-md flex items-center shadow-sm transition-colors duration-200"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          {{ t('admin.editProject') }}
-        </button>
       </div>
     </div>
 
@@ -132,7 +121,6 @@
       </div>
     </div>
 
-    <!-- Delete confirmation modal with consistent styling -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -178,51 +166,6 @@
       </div>
     </div>
 
-    <div v-if="showEditProjectModal" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-          <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
-        </div>
-
-        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-accent dark:bg-accent-dark sm:mx-0 sm:h-10 sm:w-10">
-                <svg class="h-6 w-6 text-accent-light dark:text-accent-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-lg leading-6 font-medium text-text-primary dark:text-text-primary-dark">
-                  {{ t('admin.editProject') }}
-                </h3>
-                <div class="mt-2">
-                  <p class="text-sm text-text-secondary dark:text-text-secondary-dark">
-                    {{ t('admin.editProjectDescription') }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button
-              @click="saveProjectChanges"
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-accent text-base font-medium text-white hover:bg-accent-light focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
-              :disabled="isSubmitting"
-            >
-              {{ t('admin.saveChanges') }}
-            </button>
-            <button
-              @click="showEditProjectModal = false"
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 bg-white dark:bg-gray-900 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              {{ t('admin.cancel') }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -233,13 +176,15 @@ import { useAuthStore } from '@/store/authStore'
 import { useNotificationStore } from '@/store/notificationStore'
 import api, { getStaticUrl } from '@/services/api'
 import { useRouter } from 'vue-router'
+import { formatFileSize } from '@/utils/fileUpload'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 const router = useRouter()
 
-interface File {
+// 避免與瀏覽器原生檔案型別衝突，降低型別推斷錯誤機率
+interface CloudinaryFile {
   name: string;
   path: string;
   size: number;
@@ -248,49 +193,33 @@ interface File {
   publicId?: string;
 }
 
-const files = ref<File[]>([])
+const files = ref<CloudinaryFile[]>([])
 const isLoading = ref(true)
 const isSubmitting = ref(false)
 const showDeleteModal = ref(false)
-const fileToDelete = ref<File | null>(null)
-const selectedFiles = ref<File[]>([])
-const showEditProjectModal = ref(false)
+const fileToDelete = ref<CloudinaryFile | null>(null)
+const selectedFiles = ref<CloudinaryFile[]>([])
 
 function isImageFile(path: string): boolean {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
   return imageExtensions.some(ext => path.toLowerCase().endsWith(ext))
 }
 
-function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-}
 
 async function fetchFiles() {
   isLoading.value = true
   try {
-    const response = await api.get<File[]>('/files', {
+    const response = await api.get<CloudinaryFile[]>('/files', {
       timeout: 15000
     })
     
-    console.log('Files response:', response.data)
     files.value = Array.isArray(response.data) 
-      ? response.data.map((file: File) => ({
+      ? response.data.map((file: CloudinaryFile) => ({
           ...file,
           url: getStaticUrl(file.url)
         }))
       : []
   } catch (error: any) {
-    console.error('Error fetching files:', error)
-    
-    if (error.response) {
-      console.error('Error response data:', error.response.data)
-      console.error('Error response status:', error.response.status)
-    }
-    
     notificationStore.addNotification({
       type: 'error',
       message: t('admin.fetchFilesError'),
@@ -307,7 +236,7 @@ function refreshFiles() {
   fetchFiles()
 }
 
-function confirmDelete(file: File) {
+function confirmDelete(file: CloudinaryFile) {
   fileToDelete.value = file
   showDeleteModal.value = true
 }
@@ -376,7 +305,7 @@ function handleImageLoad(event: Event) {
   img.classList.add('opacity-100');
 }
 
-function toggleFileSelection(file: File) {
+function toggleFileSelection(file: CloudinaryFile) {
   const index = selectedFiles.value.findIndex(f => f.path === file.path)
   if (index === -1) {
     selectedFiles.value.push(file)
@@ -423,26 +352,6 @@ async function batchDeleteFiles() {
   }
 }
 
-async function saveProjectChanges() {
-  try {
-    isSubmitting.value = true
-    notificationStore.addNotification({
-      type: 'success',
-      message: t('admin.projectChangesSaved'),
-      duration: 3000
-    })
-  } catch (error) {
-    console.error('Error saving project changes:', error)
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('admin.saveProjectChangesError'),
-      duration: 5000
-    })
-  } finally {
-    isSubmitting.value = false
-    showEditProjectModal.value = false
-  }
-}
 
 onMounted(() => {
   if (!authStore.isAuthenticated) {
@@ -461,7 +370,7 @@ onMounted(() => {
 
 .aspect-w-16 {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  padding-bottom: 56.25%;
 }
 
 .aspect-w-16 > * {

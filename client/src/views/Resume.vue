@@ -169,7 +169,6 @@ function downloadResume(language: 'zh' | 'en') {
 
       <ResumeDialog v-model="showDialog" @download="downloadResume" />
 
-      <!-- Skills -->
       <ResumeSectionCard :title="t('resume.skills')">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="group in skillGroups" :key="group.title">
@@ -187,7 +186,6 @@ function downloadResume(language: 'zh' | 'en') {
         </div>
       </ResumeSectionCard>
 
-      <!-- Work Experience -->
       <ResumeSectionCard :title="t('resume.experience')">
         <div
           v-for="experience in workExperiences"
@@ -223,7 +221,6 @@ function downloadResume(language: 'zh' | 'en') {
         </div>
       </ResumeSectionCard>
 
-      <!-- Education -->
       <ResumeSectionCard :title="t('resume.education')">
         <div
           v-for="education in educationEntries"
@@ -244,7 +241,6 @@ function downloadResume(language: 'zh' | 'en') {
         </div>
       </ResumeSectionCard>
 
-      <!-- Languages -->
       <ResumeSectionCard :title="t('resume.languages')" customClass="language-section">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="language in languageSkills" :key="language.name" class="flex items-center gap-4">

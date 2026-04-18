@@ -39,14 +39,12 @@ const displayExcerpt = computed(() => {
     class="blog-card tech-card overflow-hidden group relative"
     :class="{ 'h-full': compact }"
   >
-    <!-- 科技感裝飾背景 -->
     <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
       <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent"></div>
       <div class="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-xl"></div>
     </div>
     
     <div :class="{ 'md:flex': !compact }">
-      <!-- 圖片區域 -->
       <div :class="{ 'md:w-1/3 h-40 md:h-auto': !compact, 'h-36': compact }" class="bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
         <div v-if="post.coverImage" class="h-full w-full relative">
           <img 
@@ -54,7 +52,6 @@ const displayExcerpt = computed(() => {
             :alt="post.title" 
             class="h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
           />
-          <!-- 圖片覆蓋層 -->
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
         <div v-else class="h-full w-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center tech-text-secondary">
@@ -66,7 +63,6 @@ const displayExcerpt = computed(() => {
           </div>
         </div>
         
-        <!-- 閱讀時間標籤 -->
         <div class="absolute top-3 left-3">
           <div class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full border border-accent/30">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,9 +73,7 @@ const displayExcerpt = computed(() => {
         </div>
       </div>
       
-      <!-- 內容區域 -->
       <div :class="{ 'md:w-2/3': !compact }" class="p-6 flex flex-col h-full relative">
-        <!-- 標籤區域 -->
         <div class="flex flex-wrap gap-2 mb-4" v-if="!compact && post.tags.length > 0">
           <span 
             v-for="tag in post.tags.slice(0, 4)" 
@@ -94,12 +88,10 @@ const displayExcerpt = computed(() => {
           </span>
         </div>
         
-        <!-- 標題 -->
         <h2 class="text-xl font-bold mb-3 tech-text-primary group-hover:text-accent transition-colors duration-300 line-clamp-2">
           {{ displayTitle }}
         </h2>
         
-        <!-- 元數據 -->
         <div class="flex items-center gap-4 text-sm tech-text-secondary mb-4">
           <div class="flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,7 +107,6 @@ const displayExcerpt = computed(() => {
           </div>
         </div>
         
-        <!-- 摘要 -->
         <p v-if="!compact" class="text-text-secondary mb-6 line-clamp-3 leading-relaxed flex-grow">
           {{ displayExcerpt }}
         </p>
@@ -123,7 +114,6 @@ const displayExcerpt = computed(() => {
           {{ displayExcerpt }}
         </p>
         
-        <!-- 閱讀更多按鈕 -->
         <div class="mt-auto pt-2">
           <router-link 
             :to="`/blog/${post.id}`" 
@@ -176,7 +166,6 @@ const displayExcerpt = computed(() => {
   z-index: 2;
 }
 
-/* 標籤動畫 */
 .blog-card .tag {
   transition: all 0.3s ease;
 }
@@ -185,7 +174,6 @@ const displayExcerpt = computed(() => {
   transform: translateY(-2px);
 }
 
-/* 圖片懸停效果 */
 .blog-card img {
   transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -194,7 +182,6 @@ const displayExcerpt = computed(() => {
   filter: brightness(1.1) contrast(1.05);
 }
 
-/* 標題懸停效果 */
 .blog-card h2 {
   transition: all 0.3s ease;
 }
@@ -203,7 +190,6 @@ const displayExcerpt = computed(() => {
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-/* 響應式調整 */
 @media (max-width: 768px) {
   .blog-card:hover {
     transform: translateY(-4px) scale(1.01);

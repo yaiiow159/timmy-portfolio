@@ -1,11 +1,11 @@
 const express = require('express');
-const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const prisma = require('../lib/prisma');
 const { handleSuccess, handleError } = require('../utils/responseHandler');
 
 const router = express.Router();
 
-router.get('/stats', auth, async (req, res) => {
+router.get('/stats', adminAuth, async (req, res) => {
   try {
     const postsCount = await prisma.post.count();
     const projectsCount = await prisma.project.count();

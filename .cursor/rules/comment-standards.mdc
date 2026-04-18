@@ -1,0 +1,43 @@
+---
+description: 強制所有程式碼註解使用繁體中文，且只解釋「為什麼」而非「做什麼」
+alwaysApply: true
+---
+
+# 註解規範
+
+## 語言要求
+
+所有程式碼註解一律使用**繁體中文**。
+
+## 內容要求
+
+註解只解釋「為什麼」，不描述「做什麼」（程式碼本身已說明做什麼）。
+
+```ts
+// ❌ 錯誤 — 描述行為（what）
+// 遞增計數器
+count++
+
+// ❌ 錯誤 — 英文
+// retry limit reached; trigger circuit breaker
+count++
+
+// ✅ 正確 — 繁體中文 + 說明原因（why）
+// 達到重試上限，遞增以觸發熔斷機制
+count++
+```
+
+```ts
+// ❌ 錯誤 — 描述程式碼結構（what）
+// 定義介面
+interface User { ... }
+
+// ✅ 正確 — 說明設計決策（why）
+// 將角色限縮為三種以配合後端 RBAC 權限表
+interface User { role: 'admin' | 'editor' | 'user' }
+```
+
+## 例外
+
+- 對外公開的 API / SDK 文件（JSDoc `/** */`）可使用英文，因為對象是外部開發者
+- `TODO` / `FIXME` 標記後的說明仍須使用繁體中文

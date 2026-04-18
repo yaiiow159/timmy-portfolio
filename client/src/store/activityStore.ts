@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import i18n from '@/i18n'
 import api from '@/services/api'
 import type { Activity, ActivityResponse } from '@/types/activity'
 
@@ -17,50 +19,56 @@ export interface ActivityPaginatedResponse {
   }
 }
 
-export const useActivityStore = defineStore('activity', {
-  state: () => ({
-    activities: [] as Activity[],
-    loading: false,
-    error: null as string | null
-  }),
+const t = i18n.global.t
 
-  actions: {
-    async fetchActivities(params: ActivityPaginationParams = {}): Promise<ActivityPaginatedResponse> {
-      this.loading = true
-      this.error = null
-      try {
-        const response = await api.get<ActivityResponse>('/activities', {
-          params
-        })
-        
-        this.activities = response.data.activities
-        
-        return {
-          activities: response.data.activities,
-          pagination: response.data.pagination || {
-            total: response.data.activities.length,
-            page: params.page || 1,
-            limit: params.limit || 10,
-            pages: Math.ceil(response.data.activities.length / (params.limit || 10))
-          }
+export const useActivityStore = defineStore('activity', () => {
+  const activities = ref<Activity[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  async function fetchActivities(params: ActivityPaginationParams = {}): Promise<ActivityPaginatedResponse> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await api.get<ActivityResponse>('/activities', { params })
+      activities.value = response.data.activities
+
+      const safeLimit = Math.max(1, params.limit || 10)
+      return {
+        activities: response.data.activities,
+        pagination: response.data.pagination || {
+          total: response.data.activities.length,
+          page: params.page || 1,
+          limit: safeLimit,
+          pages: Math.ceil(response.data.activities.length / safeLimit)
         }
-      } catch (error) {
-        console.error('Error fetching activities:', error)
-        this.error = 'Failed to fetch activities'
-        throw error
-      } finally {
-        this.loading = false
       }
-    },
-
-    async createActivity(activity: Omit<Activity, 'id' | 'date'>) {
-      try {
-        const response = await api.post<Activity>('/activities', activity)
-        return response.data
-      } catch (error) {
-        this.error = '無法創建活動記錄'
-        throw error
-      }
+    } catch (err) {
+      console.error('Error fetching activities:', err)
+      error.value = t('activity.errorLoading')
+      throw err
+    } finally {
+      loading.value = false
     }
+  }
+
+  async function createActivity(activity: Omit<Activity, 'id' | 'date'>) {
+    try {
+      const response = await api.post<Activity>('/activities', activity)
+      return response.data
+    } catch (err) {
+      console.error('Error creating activity:', err)
+      error.value = t('activity.errorLoading')
+      throw err
+    }
+  }
+
+  return {
+    activities,
+    loading,
+    error,
+    fetchActivities,
+    createActivity
   }
 })

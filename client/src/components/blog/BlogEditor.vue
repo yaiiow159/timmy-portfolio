@@ -3,7 +3,7 @@ import { ref, onUnmounted } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useI18n } from 'vue-i18n'
-import { blogService } from '@/services/blogService'
+import { fileService } from '@/services/fileService'
 import type { BlogPost } from '@/store/blogStore'
 
 const { t } = useI18n()
@@ -74,7 +74,7 @@ function removeTag(tag: string) {
 
 async function handleImageUpload(file: File): Promise<{ filePath: string; publicId: string }> {
   try {
-    const result = await blogService.uploadImage(file)
+    const result = await fileService.uploadFile(file)
     return result
   } catch (error) {
     console.error('Error uploading image:', error)
@@ -405,17 +405,14 @@ function onEditorReady(editor: any) {
   width: 98px;
 }
 
-/* 字體選擇器 */
 .ql-snow .ql-picker.ql-font {
   width: 108px;
 }
 
-/* 標題選擇器 */
 .ql-snow .ql-picker.ql-header {
   width: 98px;
 }
 
-/* 下拉選單選項容器 */
 .ql-snow .ql-picker-options {
   background-color: var(--color-secondary);
   border: 1px solid var(--color-border);
@@ -426,7 +423,6 @@ function onEditorReady(editor: any) {
   color: var(--color-text-primary);
 }
 
-/* 下拉選單選項 */
 .ql-snow .ql-picker-item {
   padding: 4px 8px;
   border-radius: 2px;
@@ -434,13 +430,11 @@ function onEditorReady(editor: any) {
   color: var(--color-text-primary);
 }
 
-/* 下拉選單選項懸停 */
 .ql-snow .ql-picker-item:hover {
   background-color: var(--color-primary);
   color: var(--color-text-primary);
 }
 
-/* 編輯器容器 */
 .ql-container {
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
@@ -452,7 +446,6 @@ function onEditorReady(editor: any) {
   overflow-y: auto;
 }
 
-/* 編輯器內容區 */
 .ql-editor {
   padding: 16px !important;
   min-height: 300px;
@@ -462,7 +455,6 @@ function onEditorReady(editor: any) {
   color: var(--color-text-primary);
 }
 
-/* 編輯器內容區佔位符 */
 .ql-editor.ql-blank::before {
   font-style: normal;
   color: var(--color-text-secondary);
@@ -471,12 +463,10 @@ function onEditorReady(editor: any) {
   right: 16px;
 }
 
-/* 編輯器內容區塊元素 */
 .ql-editor p, .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6, .ql-editor blockquote, .ql-editor pre {
   margin-bottom: 1rem;
 }
 
-/* 編輯器標題樣式 */
 .ql-editor h1 {
   font-size: 2rem;
   font-weight: 700;
@@ -507,14 +497,12 @@ function onEditorReady(editor: any) {
   font-weight: 600;
 }
 
-/* 編輯器引用樣式 */
 .ql-editor blockquote {
   border-left: 4px solid var(--color-accent);
   padding-left: 16px;
   color: var(--color-text-secondary);
 }
 
-/* 編輯器代碼塊樣式 */
 .ql-editor pre {
   background-color: var(--color-primary-dark);
   border-radius: 4px;
@@ -524,7 +512,6 @@ function onEditorReady(editor: any) {
   color: var(--color-text-primary-dark);
 }
 
-/* 編輯器列表樣式 */
 .ql-editor ol, .ql-editor ul {
   padding-left: 1.5rem;
   margin-bottom: 1rem;
@@ -534,14 +521,12 @@ function onEditorReady(editor: any) {
   margin-bottom: 0.5rem;
 }
 
-/* 編輯器圖片樣式 */
 .ql-editor img {
   max-width: 100%;
   height: auto;
   border-radius: 4px;
 }
 
-/* 編輯器連結樣式 */
 .ql-editor a {
   color: var(--color-accent);
   text-decoration: none;
@@ -551,7 +536,6 @@ function onEditorReady(editor: any) {
   text-decoration: underline;
 }
 
-/* 編輯器表格樣式 */
 .ql-editor table {
   width: 100%;
   border-collapse: collapse;
@@ -569,12 +553,10 @@ function onEditorReady(editor: any) {
   font-weight: 600;
 }
 
-/* 懸停效果 */
 .group:hover .group-hover\:opacity-100 {
   opacity: 1;
 }
 
-/* 暗黑模式變數 */
 :root {
   --color-primary: #ffffff;
   --color-primary-dark: #1a1a1a;
@@ -603,7 +585,6 @@ function onEditorReady(editor: any) {
   --color-text-secondary-dark: #d1d5db;
 }
 
-/* 編輯器容器 */
 .editor-container {
   color: var(--color-text-primary) !important;
 }

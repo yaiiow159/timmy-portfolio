@@ -567,7 +567,6 @@ watch(() => activeSkillCategory.value, () => {
   position: relative;
   z-index: 2;
 }
-/* ===== PROFESSION TITLE ===== */
 .profession-container {
   position: relative;
   z-index: 10;
@@ -589,7 +588,6 @@ watch(() => activeSkillCategory.value, () => {
 }
 
 
-/* ===== EXPERIENCE BADGE ===== */
 .experience-badge {
   display: inline-flex;
   align-items: center;
@@ -624,7 +622,6 @@ watch(() => activeSkillCategory.value, () => {
   50%, 100% { left: 100%; }
 }
 
-/* ===== PROFILE SECTION ===== */
 .profile-section {
   position: relative;
   z-index: 10;
@@ -669,7 +666,6 @@ watch(() => activeSkillCategory.value, () => {
   object-fit: cover;
 }
 
-/* ===== DECORATIVE ELEMENTS (BACKGROUND) ===== */
 .profile-decoration {
   position: absolute;
   width: 200px;
@@ -750,7 +746,6 @@ watch(() => activeSkillCategory.value, () => {
   }
 }
 
-/* ===== HERO TEXT CONTENT ===== */
 .hero-description {
   color: var(--text-secondary) !important;
   line-height: 1.8;
@@ -834,7 +829,6 @@ watch(() => activeSkillCategory.value, () => {
   border-color: var(--accent);
 }
 
-/* ===== SKILL ITEMS ===== */
 .skill-item {
   transition: transform 0.3s ease, opacity 0.3s ease;
   position: relative;
@@ -880,7 +874,6 @@ watch(() => activeSkillCategory.value, () => {
   color: var(--accent);
 }
 
-/* ===== SKILLS SECTION ===== */
 .skills-section {
   position: relative;
   overflow: hidden;
@@ -936,7 +929,6 @@ watch(() => activeSkillCategory.value, () => {
   padding: 1rem;
 }
 
-/* ===== TRANSITIONS ===== */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease;
@@ -947,7 +939,6 @@ watch(() => activeSkillCategory.value, () => {
   opacity: 0;
 }
 
-/* ===== PROJECT CAROUSEL ===== */
 .project-image-carousel {
   position: relative;
   width: 100%;
@@ -986,7 +977,6 @@ watch(() => activeSkillCategory.value, () => {
   transition: background-color 0.2s ease;
 }
 
-/* ===== BACKGROUND DECORATIVE ELEMENTS ===== */
 .hero-bg-elements {
   position: absolute;
   top: 0;
@@ -1051,7 +1041,6 @@ watch(() => activeSkillCategory.value, () => {
   animation-delay: 3s;
 }
 
-/* ===== KEYFRAME ANIMATIONS ===== */
 @keyframes float {
   0% {
     transform: translateY(0);
@@ -1173,7 +1162,6 @@ watch(() => activeSkillCategory.value, () => {
   }
 }
 
-/* ===== ENHANCED SECTIONS ===== */
 .project-section,
 .blog-section {
   position: relative;
@@ -1197,7 +1185,6 @@ watch(() => activeSkillCategory.value, () => {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
 }
 
-/* ===== ENHANCED TECH PULSE ===== */
 .tech-pulse {
   animation: tech-pulse-animation 2s ease-in-out infinite;
 }
@@ -1211,7 +1198,6 @@ watch(() => activeSkillCategory.value, () => {
   }
 }
 
-/* ===== RESPONSIVE IMPROVEMENTS ===== */
 @media (max-width: 768px) {
   .hero-section {
     padding: 4rem 0;

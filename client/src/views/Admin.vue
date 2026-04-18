@@ -1,15 +1,11 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-primary to-secondary tech-grid-bg">
-    <!-- Tech decoration elements -->
     <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50 z-50"></div>
     
     <div class="flex">
-      <!-- Sidebar -->
       <div class="w-72 min-h-screen bg-gradient-to-b from-secondary/95 to-primary/95 backdrop-blur-xl border-r border-accent/20 shadow-2xl relative overflow-hidden">
-        <!-- Sidebar decoration -->
         <div class="absolute inset-0 bg-gradient-to-b from-accent/5 to-transparent pointer-events-none"></div>
         
-        <!-- Logo Section -->
         <div class="relative p-8 border-b border-accent/10">
           <div class="flex items-center mb-2">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-tech-purple flex items-center justify-center mr-4 shadow-lg shadow-accent/30 tech-glow">
@@ -25,7 +21,6 @@
           </div>
         </div>
         
-        <!-- Navigation -->
         <nav class="relative mt-6 px-4 space-y-2">
           <router-link 
             to="/admin" 
@@ -114,7 +109,6 @@
         </nav>
       </div>
       
-      <!-- Main Content -->
       <div class="flex-1 overflow-auto p-8">
         <router-view v-slot="{ Component }">
           <transition
@@ -161,7 +155,6 @@ async function logout() {
 </script>
 
 <style scoped>
-/* Admin Navigation Item */
 .admin-nav-item {
   @apply flex items-center px-4 py-3.5 text-text-secondary rounded-xl transition-all duration-300 relative overflow-hidden;
   @apply hover:text-accent hover:translate-x-1;
@@ -202,7 +195,6 @@ async function logout() {
   box-shadow: 0 10px 15px -3px rgba(var(--accent-rgb), 0.3);
 }
 
-/* Page Transition */
 .page-fade-enter-active,
 .page-fade-leave-active {
   transition: all 0.3s ease;

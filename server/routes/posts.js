@@ -1,5 +1,5 @@
 const express = require('express');
-const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const prisma = require('../lib/prisma');
 const { handleSuccess, handleError } = require('../utils/responseHandler');
 
@@ -10,18 +10,29 @@ router.get('/', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
-    const sortBy = req.query.sortBy || 'date';
+    const tag = req.query.tag || '';
+    const ALLOWED_SORT_FIELDS = ['date', 'title', 'author'];
+    const rawSortBy = req.query.sortBy || 'date';
+    const sortBy = ALLOWED_SORT_FIELDS.includes(rawSortBy) ? rawSortBy : 'date';
     const sortOrder = req.query.sortOrder === 'asc' ? 'asc' : 'desc';
     
     const skip = (page - 1) * limit;
     
-    const where = search ? {
-      OR: [
-        { title: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } },
-        { excerpt: { contains: search, mode: 'insensitive' } }
-      ]
-    } : {};
+    const conditions = [];
+    if (search) {
+      conditions.push({
+        OR: [
+          { title: { contains: search, mode: 'insensitive' } },
+          { content: { contains: search, mode: 'insensitive' } },
+          { excerpt: { contains: search, mode: 'insensitive' } }
+        ]
+      });
+    }
+    if (tag) {
+      // 使用陣列包含查詢可避免模糊比對誤命中相似標籤
+      conditions.push({ tags: { has: tag } });
+    }
+    const where = conditions.length > 0 ? { AND: conditions } : {};
     
     const posts = await prisma.post.findMany({
       where,
@@ -56,14 +67,14 @@ router.get('/latest', async (req, res) => {
     const posts = await prisma.post.findMany({
       take: 3,
       orderBy: {
-        createdAt: 'desc'
+        date: 'desc'
       },
       select: {
         id: true,
         title: true,
         excerpt: true,
         coverImage: true,
-        createdAt: true,
+        date: true,
         author: true,
         tags: true
       }
@@ -79,7 +90,7 @@ router.get('/list', async (req, res) => {
   try {
     const posts = await prisma.post.findMany({
       orderBy: {
-        createdAt: 'desc'
+        date: 'desc'
       },
       include: {
         comments: true
@@ -90,7 +101,7 @@ router.get('/list', async (req, res) => {
       id: post.id,
       title: post.title,
       excerpt: post.excerpt,
-      createdAt: post.createdAt,
+      date: post.date,
       commentsCount: post.comments.length
     }));
     
@@ -118,7 +129,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', adminAuth, async (req, res) => {
   try {
     const post = await prisma.post.create({
       data: {
@@ -137,7 +148,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', adminAuth, async (req, res) => {
   try {
     const post = await prisma.post.update({
       where: {
@@ -163,7 +174,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', adminAuth, async (req, res) => {
   try {
     await prisma.post.delete({
       where: {

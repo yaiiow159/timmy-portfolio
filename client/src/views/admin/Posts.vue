@@ -1,12 +1,10 @@
 <template>
   <div class="min-h-screen">
-    <!-- Header -->
     <div class="mb-8">
       <h1 class="tech-title text-3xl font-bold mb-2">{{ t('admin.managePosts') }}</h1>
       <p class="text-text-secondary">{{ t('admin.managePostsDescription') }}</p>
     </div>
 
-    <!-- New Post Button -->
     <div class="mb-6">
       <router-link
         :to="{ name: 'AdminNewPost' }"
@@ -19,7 +17,6 @@
       </router-link>
     </div>
 
-    <!-- Search and Filter -->
     <div class="tech-card p-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="relative">
@@ -79,7 +76,6 @@
       </div>
     </div>
 
-    <!-- Posts Table -->
     <div class="tech-card overflow-hidden">
       <div v-if="!posts.length" class="p-12 text-center tech-hologram-overlay">
         <svg class="mx-auto h-16 w-16 text-text-secondary dark:text-text-secondary-dark tech-glow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -309,11 +305,11 @@ function formatDate(date: string) {
   })
 }
 
-function confirmDelete(post: BlogPost | null) {
+async function confirmDelete(post: BlogPost | null) {
   if (!post) return
   
   try {
-    blogStore.deletePost(post.id)
+    await blogStore.deletePost(post.id)
     posts.value = posts.value.filter(p => p.id !== post.id)
     notificationStore.addNotification({
       type: 'success',
@@ -335,7 +331,8 @@ function confirmDelete(post: BlogPost | null) {
 
 async function fetchPosts() {
   try {
-    await blogStore.fetchPosts()
+    // 後台需要看到所有文章，傳高上限確保不被預設的分頁 10 筆截斷
+    await blogStore.fetchPosts({ limit: 500 })
     posts.value = blogStore.posts
   } catch (error) {
     console.error('fetch posts error:', error)
@@ -355,6 +352,7 @@ onMounted(() => {
 
 <style scoped>
 .line-clamp-1 {
+  line-clamp: 1;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;

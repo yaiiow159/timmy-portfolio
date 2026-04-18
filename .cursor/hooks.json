@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "prompt",
+        "matcher": "Write|StrReplace|EditNotebook",
+        "timeout": 30,
+        "prompt": "You are a strict senior code reviewer. Before this file edit is applied, evaluate the proposed change against the project's dev-standards.\n\n## Dev Standards Checklist\n\n### Core Principles\n- [ ] Is the logic simple and readable? (No over-engineering)\n- [ ] Does each function/class have a single responsibility?\n- [ ] Are all I/O operations and external inputs wrapped in explicit error handling?\n\n### Thinking Process\n- [ ] Does the change introduce any library NOT already present in the project?\n- [ ] Is this the minimum-footprint change needed? (Avoid breaking stable code)\n- [ ] Are there any security risks? (Hardcoded secrets, injection vulnerabilities, exposed keys)\n\n### Implementation Standards\n- [ ] Do comments explain WHY, not WHAT?\n- [ ] Are variable/function names descriptive? (No `data`, `info`, `temp`, `val`)\n- [ ] Does the naming follow the language convention (camelCase for TS/JS, snake_case for Python)?\n\n### Library/Framework Awareness\n- If the change involves a library or framework (Vue, React, Prisma, etc.), confirm the usage matches current official docs — use Context7 (resolve-library-id → query-docs) to verify if uncertain.\n\n## Your Task\n\nReview the proposed change in the hook input below. If ALL checklist items pass, respond ONLY with:\n{\"permission\": \"allow\"}\n\nIf any item FAILS, respond ONLY with:\n{\"permission\": \"ask\", \"user_message\": \"<concise list of issues found, one bullet per violation>\", \"agent_message\": \"<same list for the agent to self-correct before proceeding>\"}\n\nHook input: $ARGUMENTS"
+      }
+    ]
+  }
+}

@@ -1,19 +1,14 @@
 const express = require('express');
 const upload = require('../middleware/upload');
-const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const cloudinary = require('../config/cloudinary');
 const streamifier = require('streamifier');
 const { handleSuccess, handleError, handleBadRequest, handleNotFound } = require('../utils/responseHandler');
+const { getFolderName } = require('../utils/uploadHelpers');
 
 const router = express.Router();
 
-const getFolderName = (mimetype) => {
-  if (mimetype.startsWith('image/')) return 'images';
-  if (mimetype.startsWith('video/')) return 'videos';
-  return 'files';
-};
-
-router.post('/', auth, upload.single('file'), async (req, res) => {
+router.post('/', adminAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return handleBadRequest(res, 'No file uploaded');
 
@@ -47,7 +42,7 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
   }
 });
 
-router.delete('/:publicId', auth, async (req, res) => {
+router.delete('/:publicId', adminAuth, async (req, res) => {
   try {
     const publicId = req.params.publicId;
     

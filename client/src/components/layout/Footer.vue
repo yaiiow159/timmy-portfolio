@@ -25,15 +25,12 @@ const socialLinks = [
 
 <template>
   <footer class="relative overflow-hidden py-16 mt-20 bg-gradient-to-b from-secondary to-primary tech-grid-bg border-t border-accent/10">
-    <!-- Tech decoration elements -->
     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50"></div>
     <div class="tech-decoration circle-1 opacity-30"></div>
     <div class="tech-decoration circle-2 opacity-30"></div>
     
     <div class="container relative z-10 mx-auto px-6 md:px-8">
-      <!-- Main Footer Content -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-        <!-- Brand Section -->
         <div class="lg:col-span-1">
           <div class="flex items-center mb-6">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-tech-purple flex items-center justify-center mr-3 shadow-lg shadow-accent/30">
@@ -53,7 +50,6 @@ const socialLinks = [
           </div>
         </div>
         
-        <!-- Quick Links -->
         <div class="lg:col-span-1">
           <h4 class="text-lg font-bold mb-6 text-accent flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -76,7 +72,6 @@ const socialLinks = [
           </ul>
         </div>
         
-        <!-- Tech Stack -->
         <div class="lg:col-span-1">
           <h4 class="text-lg font-bold mb-6 text-accent flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +89,6 @@ const socialLinks = [
           </div>
         </div>
         
-        <!-- Social Links -->
         <div class="lg:col-span-1">
           <h4 class="text-lg font-bold mb-6 text-accent flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

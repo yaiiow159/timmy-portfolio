@@ -2,7 +2,6 @@
   <div class="admin-dashboard min-h-screen bg-gradient-to-b from-primary to-secondary tech-grid-bg">
     <div class="container mx-auto px-4 py-8">
 
-      <!-- Header -->
       <div class="dashboard-header tech-card p-8 mb-8">
         <div class="flex items-center justify-between">
           <div>
@@ -23,7 +22,6 @@
         </div>
       </div>
 
-      <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <div class="stat-card tech-card p-8 transition-all duration-300 hover:-translate-y-2 tech-glow">
           <div class="flex items-center justify-between">
@@ -89,7 +87,6 @@
         </div>
       </div>
 
-      <!-- Recent Activity -->
       <div class="tech-card p-8 mb-8">
         <div class="flex items-center justify-between mb-6">
           <h2 class="tech-title text-2xl font-bold">
@@ -111,7 +108,6 @@
         </div>
       </div>
 
-      <!-- Quick Actions -->
       <div class="tech-card p-8">
         <h2 class="tech-title text-2xl font-bold mb-6">
           {{ t('admin.quickActions') }}

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '../store/blogStore'
-import gsap from 'gsap'
 import { blogService } from '../services/blogService'
 import { getStaticUrl } from '../services/api'
+import { handleError, ErrorContext } from '../utils/errorHandler'
 import { formatDescription } from '../utils/textFormatters'
 import BlogCard from '../components/blog/BlogCard.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const searchQuery = ref('')
 const selectedCategory = ref('')
@@ -17,85 +17,54 @@ const currentPage = ref(1)
 const postsPerPage = 6
 const posts = ref<BlogPost[]>([])
 const totalPostsCount = ref(0)
+const allTags = ref<string[]>([])
 
 const layoutMode = ref<'grid' | 'masonry' | 'list'>('grid')
 
-onMounted(async () => {
+async function fetchPosts() {
   try {
     isLoading.value = true
     const response = await blogService.getPosts({
       page: currentPage.value,
       limit: postsPerPage,
+      search: searchQuery.value || undefined,
+      tag: selectedCategory.value || undefined,
       sortBy: 'date',
       sortOrder: 'desc'
     })
     posts.value = response.data
     totalPostsCount.value = response.pagination.total
   } catch (error) {
-    console.error('Error fetching blog posts:', error)
+    handleError(error, { context: ErrorContext.GENERAL, showNotification: true })
   } finally {
     isLoading.value = false
-    
-    const tl = gsap.timeline()
-    
-    tl.from('.blog-header', {
-      y: 30,
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power3.out'
-    })
-    .from('.blog-card', {
-      y: 30,
-      opacity: 0,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: 'power3.out'
-    }, '-=0.3')
-    .from('.blog-sidebar', {
-      x: 30,
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power3.out'
-    }, '-=0.4')
   }
-})
+}
 
-const categories = computed(() => {
-  const allTags = posts.value.flatMap(post => post.tags)
-  return [...new Set(allTags)].sort()
-})
-
-const filteredPosts = computed(() => {
-  let result = posts.value
-  
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(post => 
-      post.title.toLowerCase().includes(query) || 
-      post.excerpt.toLowerCase().includes(query) ||
-      post.content.toLowerCase().includes(query) ||
-      post.tags.some(tag => tag.toLowerCase().includes(query))
-    )
+async function fetchAllTags() {
+  try {
+    // 先取完整標籤清單可避免分類只反映當前分頁，造成使用者誤判內容分布
+    const response = await blogService.getPosts({ limit: 1000 })
+    const tagSet = new Set(response.data.flatMap(post => post.tags))
+    allTags.value = [...tagSet].sort()
+  } catch {
+    allTags.value = []
   }
-  
-  if (selectedCategory.value) {
-    result = result.filter(post => 
-      post.tags.includes(selectedCategory.value)
-    )
-  }
-  
-  return result
+}
+
+onMounted(async () => {
+  await Promise.all([fetchPosts(), fetchAllTags()])
 })
 
-const paginatedPosts = computed(() => {
-  const startIndex = (currentPage.value - 1) * postsPerPage
-  const endIndex = startIndex + postsPerPage
-  return filteredPosts.value.slice(startIndex, endIndex)
+// 篩選條件改變時重置頁碼，避免沿用舊頁碼導致結果看似空白
+watch([searchQuery, selectedCategory], () => {
+  currentPage.value = 1
+  fetchPosts()
 })
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredPosts.value.length / postsPerPage)
-})
+const categories = computed(() => allTags.value)
+
+const totalPages = computed(() => Math.ceil(totalPostsCount.value / postsPerPage))
 
 const pageNumbers = computed(() => {
   const pages = []
@@ -107,25 +76,9 @@ const pageNumbers = computed(() => {
 
 async function changePage(page: number) {
   if (page < 1 || page > totalPages.value) return
-  
   currentPage.value = page
   window.scrollTo({ top: 0, behavior: 'smooth' })
-  
-  try {
-    isLoading.value = true
-    const response = await blogService.getPosts({
-      page: currentPage.value,
-      limit: postsPerPage,
-      sortBy: 'date',
-      sortOrder: 'desc'
-    })
-    posts.value = response.data
-    totalPostsCount.value = response.pagination.total
-  } catch (error) {
-    console.error('Error fetching blog posts:', error)
-  } finally {
-    isLoading.value = false
-  }
+  await fetchPosts()
 }
 
 function nextPage() {
@@ -142,7 +95,7 @@ function prevPage() {
 
 function formatDate(dateString: string) {
   const date = new Date(dateString)
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(locale.value, {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
@@ -150,22 +103,15 @@ function formatDate(dateString: string) {
 }
 
 function selectCategory(category: string) {
-  if (selectedCategory.value === category) {
-    selectedCategory.value = ''
-  } else {
-    selectedCategory.value = category
-  }
-  currentPage.value = 1
+  selectedCategory.value = selectedCategory.value === category ? '' : category
 }
 
 function updateSearch(value: string) {
   searchQuery.value = value
-  currentPage.value = 1
 }
 
 function handleTagClick(tag: string) {
   selectedCategory.value = tag
-  currentPage.value = 1
 }
 
 function getImageUrl(imagePath: string | undefined): string {
@@ -206,7 +152,6 @@ function getImageUrl(imagePath: string | undefined): string {
                 </div>
               </div>
               
-              <!-- 佈局切換按鈕 -->
               <div class="flex items-center gap-2">
                 <span class="text-sm tech-text-secondary mr-2">Layout:</span>
                 <div class="flex bg-secondary rounded-xl p-1">
@@ -259,21 +204,18 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
           </div>
           
-          <!-- 文章顯示區域 -->
-          <div v-else-if="paginatedPosts.length > 0">
-            <!-- 網格佈局 -->
+          <div v-else-if="posts.length > 0">
             <div v-if="layoutMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
               <BlogCard 
-                v-for="post in paginatedPosts" 
+                v-for="post in posts" 
                 :key="post.id"
                 :post="post"
                 @tag-click="handleTagClick"
               />
             </div>
             
-            <!-- 瀑布流佈局 -->
             <div v-else-if="layoutMode === 'masonry'" class="columns-1 sm:columns-2 gap-6 md:gap-8 space-y-6 md:space-y-8">
-              <div v-for="post in paginatedPosts" :key="post.id" class="break-inside-avoid">
+              <div v-for="post in posts" :key="post.id" class="break-inside-avoid">
                 <BlogCard 
                   :post="post"
                   @tag-click="handleTagClick"
@@ -281,15 +223,13 @@ function getImageUrl(imagePath: string | undefined): string {
               </div>
             </div>
             
-            <!-- 列表佈局 -->
             <div v-else-if="layoutMode === 'list'" class="space-y-6">
               <div 
-                v-for="post in paginatedPosts" 
+                v-for="post in posts" 
                 :key="post.id"
                 class="blog-card tech-card overflow-hidden group hover:scale-[1.02] transition-all duration-300"
               >
                 <div class="flex flex-col md:flex-row">
-                  <!-- 圖片區域 -->
                   <div class="w-full md:w-64 lg:w-80 h-48 md:h-auto bg-gradient-to-br from-secondary to-primary relative overflow-hidden flex-shrink-0">
                     <div v-if="post.coverImage" class="h-full w-full relative">
                       <img 
@@ -305,7 +245,6 @@ function getImageUrl(imagePath: string | undefined): string {
                       </svg>
                     </div>
                     
-                    <!-- 閱讀時間標籤 -->
                     <div class="absolute top-3 left-3">
                       <div class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full border border-accent/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -316,7 +255,6 @@ function getImageUrl(imagePath: string | undefined): string {
                     </div>
                   </div>
                   
-                  <!-- 內容區域 -->
                   <div class="flex-1 p-6">
                     <div class="flex flex-col h-full">
                       <div class="mb-4">
@@ -341,7 +279,6 @@ function getImageUrl(imagePath: string | undefined): string {
                       
                       <p class="text-text-secondary mb-6 leading-relaxed flex-grow">{{ post.excerpt || formatDescription(post.content, 200) }}</p>
                       
-                      <!-- 技術標籤 -->
                       <div class="mb-6">
                         <div class="flex flex-wrap gap-2">
                           <span 
@@ -358,7 +295,6 @@ function getImageUrl(imagePath: string | undefined): string {
                         </div>
                       </div>
                       
-                      <!-- 閱讀更多按鈕 -->
                       <div class="flex gap-3">
                         <router-link 
                           :to="`/blog/${post.id}`" 
@@ -385,7 +321,6 @@ function getImageUrl(imagePath: string | undefined): string {
             <p class="text-text-secondary">{{ t('blog.tryDifferent') }}</p>
           </div>
           
-          <!-- Pagination Controls -->
           <div v-if="totalPages > 1 && !isLoading" class="flex justify-center mt-20">
             <div class="flex items-center space-x-4 bg-secondary p-5 rounded-2xl shadow-2xl border border-accent/20">
               <button 
@@ -426,7 +361,6 @@ function getImageUrl(imagePath: string | undefined): string {
         </div>
         
         <div class="lg:w-1/3 blog-sidebar">
-          <!-- 分類標籤雲 -->
           <div class="tech-card p-8 mb-8">
             <h3 class="tech-title text-2xl font-bold mb-6 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -458,7 +392,6 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
           </div>
           
-          <!-- 最近文章 -->
           <div class="tech-card p-8">
             <h3 class="tech-title text-2xl font-bold mb-6 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -501,7 +434,6 @@ function getImageUrl(imagePath: string | undefined): string {
 </template>
 
 <style scoped>
-/* Add any component-specific styles here */
 .blog-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }

@@ -42,7 +42,8 @@ export const fileService = {
       .map(([key, value]) => `${key}_${value}`)
       .join(',')
 
-    return `https://res.cloudinary.com/dn4rfjyva/image/upload/${transformations}/${publicId}`
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${publicId}`
   },
 
   getImageThumbnail(publicId: string, width = 200, height = 200): string {

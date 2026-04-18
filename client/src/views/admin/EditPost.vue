@@ -31,7 +31,7 @@ import { useNotificationStore } from '@/store/notificationStore'
 import BlogEditor from '@/components/blog/BlogEditor.vue'
 import type { BlogPost } from '@/store/blogStore'
 import { useAuthStore } from '@/store/authStore'
-import api from '@/services/api'
+import { useActivityStore } from '@/store/activityStore'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -39,6 +39,7 @@ const router = useRouter()
 const blogStore = useBlogStore()
 const notificationStore = useNotificationStore()
 const authStore = useAuthStore()
+const activityStore = useActivityStore()
 
 const isEditing = computed(() => !!route.params.id)
 const isLoading = ref(false)
@@ -69,6 +70,14 @@ onMounted(async () => {
           author: post.author,
           date: post.date
         }
+      } else {
+        // 後端回傳空值時立即導回列表，避免使用者在無效資料上誤編輯
+        notificationStore.addNotification({
+          type: 'error',
+          message: t('admin.postNotFound'),
+          duration: 4000
+        })
+        router.push('/admin/posts')
       }
     } catch (error) {
       console.error('Error loading post:', error)
@@ -106,10 +115,10 @@ async function handleSave(postData: Partial<BlogPost>) {
       })
     } else {
       const response = await blogStore.createPost(completePostData)
-      
-      await api.post('/activities', {
+
+      await activityStore.createActivity({
         type: 'POST_CREATED',
-        title: '發布了新文章',
+        title: t('activity.postPublished'),
         description: `《${completePostData.title}》`,
         userName: authStore.user?.name ?? 'Anonymous',
         targetId: response.id,

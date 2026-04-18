@@ -638,6 +638,15 @@
       "retry": "重試"
     }
   },
+  "activity": {
+    "recentActivity": "最近活動",
+    "errorLoading": "載入活動記錄時發生錯誤",
+    "noActivities": "目前沒有任何活動",
+    "viewDetails": "查看詳情",
+    "loading": "載入中...",
+    "loadMore": "載入更多",
+    "postPublished": "發布了新文章"
+  },
   "notFound": {
     "title": "404",
     "heading": "找不到頁面",

@@ -7,6 +7,14 @@ export function updateApiLanguage(lang: string) {
   currentLanguage = lang
 }
 
+type UnauthorizedHandler = () => void
+let unauthorizedHandler: UnauthorizedHandler | null = null
+
+// 透過回呼注入保持模組解耦，避免循環依賴導致初始化順序錯誤
+export function registerUnauthorizedHandler(fn: UnauthorizedHandler): void {
+  unauthorizedHandler = fn
+}
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -19,7 +27,12 @@ const api = axios.create({
 api.interceptors.request.use(config => {
   if (config.headers) {
     config.headers['Accept-Language'] = currentLanguage
-    const token = localStorage.getItem('auth-token')
+    let token: string | null = null
+    try {
+      token = localStorage.getItem('auth-token')
+    } catch (storageError) {
+      console.warn('Failed to read auth token from localStorage:', storageError)
+    }
     if (token) {
       config.headers['x-auth-token'] = token
     }
@@ -30,6 +43,15 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
+    // 收到 401 後立即清理本地登入狀態，避免前端持續以失效憑證重試受保護請求
+    if (error.response?.status === 401) {
+      try {
+        localStorage.removeItem('auth-token')
+      } catch (storageError) {
+        console.warn('Failed to remove auth token from localStorage:', storageError)
+      }
+      unauthorizedHandler?.()
+    }
     return Promise.reject(error)
   }
 )
