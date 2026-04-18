@@ -30,7 +30,8 @@ onMounted(() => {
     y: 30,
     opacity: 0,
     duration: 0.6,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false,
   }).from(
     '.resume-section',
     {
@@ -38,7 +39,8 @@ onMounted(() => {
       opacity: 0,
       duration: 0.5,
       stagger: 0.2,
-      ease: 'power3.out'
+      ease: 'power3.out',
+      immediateRender: false,
     },
     '-=0.3'
   )
@@ -66,48 +68,33 @@ function animateWorkExperience() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: entry as gsap.DOMTarget,
-        start: 'top 80%',
-        toggleActions: 'play none none none'
-      }
+        start: 'top 85%',
+        once: true,
+      },
     })
 
-    tl.from(entry as gsap.TweenTarget, {
-      x: -50,
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power3.out'
-    })
-      .from(
+    tl.fromTo(
+      entry as gsap.TweenTarget,
+      { x: -50, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' },
+    )
+      .fromTo(
         entry.querySelectorAll('.job-detail'),
-        {
-          y: 20,
-          opacity: 0,
-          duration: 0.4,
-          stagger: 0.1,
-          ease: 'power3.out'
-        },
-        '-=0.2'
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power3.out' },
+        '-=0.2',
       )
-      .from(
+      .fromTo(
         entry.querySelectorAll('.job-bullet'),
-        {
-          scale: 0.5,
-          opacity: 0,
-          duration: 0.3,
-          stagger: 0.05,
-          ease: 'back.out(1.7)'
-        },
-        '-=0.2'
+        { scale: 0.5, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'back.out(1.7)' },
+        '-=0.2',
       )
-      .from(
+      .fromTo(
         entry.querySelector('.job-date'),
-        {
-          width: 0,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power3.inOut'
-        },
-        '-=0.3'
+        { width: 0, opacity: 0 },
+        { width: 'auto', opacity: 1, duration: 0.5, ease: 'power3.inOut' },
+        '-=0.3',
       )
   })
 }

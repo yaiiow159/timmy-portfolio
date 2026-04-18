@@ -2205,8 +2205,7 @@ code {
   }
 }
 
-/* ===== Z-INDEX LAYERING FIX ===== */
-/* Ensure all content is properly layered above backgrounds */
+
 .tech-grid-bg > section,
 .tech-grid-bg > div {
   position: relative;
@@ -2215,10 +2214,9 @@ code {
 
 .tech-grid-bg::before,
 .tech-grid-bg::after {
-  z-index: 0;
+  z-index: -1;
 }
 
-/* Ensure cards and containers are properly layered */
 .tech-card,
 .card {
   position: relative;
@@ -2231,7 +2229,6 @@ code {
   z-index: 1;
 }
 
-/* Ensure sections have proper layering */
 section {
   position: relative;
   z-index: 1;
@@ -2336,6 +2333,7 @@ section {
 /* 亮色 navbar */
 .light header {
   background: rgba(238, 242, 255, 0.92) !important;
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(124, 58, 237, 0.12) !important;
   box-shadow: 0 2px 12px rgba(109, 40, 217, 0.08) !important;
@@ -2581,10 +2579,6 @@ section {
 .light .hero-orb-2 {
   background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
 }
-
-/* ===== STATUS RGB VARIABLES FIX =====
-   --tech-green-rgb / --tech-orange-rgb / --tech-red-rgb 用於 .tech-status-* 但原本遺漏定義，
-   在此補齊讓 rgba() 能正確解析，避免背景與邊框呈現為透明 */
 :root {
   --tech-green-rgb: 16, 185, 129;
   --tech-orange-rgb: 245, 158, 11;

@@ -272,28 +272,16 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(var(--accent-rgb), 0.05);
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .navbar-ctrl-btn:hover,
 .navbar-ctrl-btn--active {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: rgba(0, 212, 255, 0.3);
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: rgba(var(--accent-rgb), 0.3);
   color: var(--accent);
-}
-
-:global(.light) .navbar-ctrl-btn {
-  color: #64748b;
-  background: rgba(124, 58, 237, 0.05);
-  border-color: rgba(124, 58, 237, 0.15);
-}
-:global(.light) .navbar-ctrl-btn:hover,
-:global(.light) .navbar-ctrl-btn--active {
-  background: rgba(124, 58, 237, 0.1);
-  border-color: rgba(124, 58, 237, 0.35);
-  color: #7c3aed;
 }
 
 .navbar-icon-btn {
@@ -310,34 +298,27 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .navbar-icon-btn:hover {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: rgba(0, 212, 255, 0.2);
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: rgba(var(--accent-rgb), 0.2);
   color: var(--accent);
 }
-:global(.light) .navbar-icon-btn:hover {
-  background: rgba(124, 58, 237, 0.1);
-  border-color: rgba(124, 58, 237, 0.2);
-  color: #7c3aed;
-}
 
-/* ── Language dropdown ── */
+/* ── Language dropdown ──
+   使用 CSS 變數取代 hardcoded 深色值，--bg-secondary-rgb 與 --accent-rgb
+   已在 :root（dark）及 html.light 分別定義，主題切換自動生效 */
 .navbar-dropdown {
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
   min-width: 150px;
-  background: rgba(18, 18, 18, 0.95);
+  background: rgba(var(--bg-secondary-rgb), 0.97);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 212, 255, 0.18);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
   border-radius: 10px;
   padding: 6px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(var(--accent-rgb), 0.08);
   z-index: 100;
-}
-:global(.light) .navbar-dropdown {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(124, 58, 237, 0.2);
-  box-shadow: 0 8px 28px rgba(109, 40, 217, 0.15);
 }
 
 .navbar-dropdown-item {
@@ -353,27 +334,22 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-.navbar-dropdown-item:hover { background: rgba(0, 212, 255, 0.1); color: var(--accent); }
+.navbar-dropdown-item:hover {
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent);
+}
 .navbar-dropdown-item--active {
-  background: rgba(0, 212, 255, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
   color: var(--accent);
   font-weight: 600;
 }
-:global(.light) .navbar-dropdown-item { color: #475569; }
-:global(.light) .navbar-dropdown-item:hover { background: rgba(124, 58, 237, 0.08); color: #7c3aed; }
-:global(.light) .navbar-dropdown-item--active { background: rgba(124, 58, 237, 0.12); color: #7c3aed; }
 
-/* ── Mobile panel ── */
 .navbar-mobile-panel {
-  background: rgba(10, 10, 10, 0.97);
+  background: rgba(var(--bg-primary-rgb), 0.97);
   backdrop-filter: blur(18px);
-  border-top: 1px solid rgba(0, 212, 255, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-:global(.light) .navbar-mobile-panel {
-  background: rgba(238, 242, 255, 0.97);
-  border-top-color: rgba(124, 58, 237, 0.15);
-  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.12);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(var(--accent-rgb), 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .navbar-mobile-link {
@@ -390,10 +366,8 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.navbar-mobile-link:hover { background: rgba(0, 212, 255, 0.08); color: var(--text-primary); }
-.navbar-mobile-link--active { color: var(--accent); font-weight: 600; background: rgba(0, 212, 255, 0.1); }
-:global(.light) .navbar-mobile-link:hover { background: rgba(124, 58, 237, 0.07); color: #1e1b4b; }
-:global(.light) .navbar-mobile-link--active { color: #7c3aed; background: rgba(124, 58, 237, 0.1); }
+.navbar-mobile-link:hover { background: rgba(var(--accent-rgb), 0.08); color: var(--text-primary); }
+.navbar-mobile-link--active { color: var(--accent); font-weight: 600; background: rgba(var(--accent-rgb), 0.1); }
 
 .navbar-lang-pill {
   padding: 5px 12px;
@@ -401,16 +375,13 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(var(--accent-rgb), 0.06);
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
   cursor: pointer;
   transition: all 0.15s;
 }
-.navbar-lang-pill:hover { background: rgba(0, 212, 255, 0.1); border-color: rgba(0, 212, 255, 0.3); color: var(--accent); }
-.navbar-lang-pill--active { background: rgba(0, 212, 255, 0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-:global(.light) .navbar-lang-pill { background: rgba(124, 58, 237, 0.06); border-color: rgba(124, 58, 237, 0.18); color: #64748b; }
-:global(.light) .navbar-lang-pill:hover { background: rgba(124, 58, 237, 0.12); border-color: rgba(124, 58, 237, 0.35); color: #7c3aed; }
-:global(.light) .navbar-lang-pill--active { background: rgba(124, 58, 237, 0.15); border-color: #7c3aed; color: #7c3aed; }
+.navbar-lang-pill:hover { background: rgba(var(--accent-rgb), 0.12); border-color: rgba(var(--accent-rgb), 0.35); color: var(--accent); }
+.navbar-lang-pill--active { background: rgba(var(--accent-rgb), 0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
 /* ── Dropdown transition ── */
 .dropdown-enter-active,
