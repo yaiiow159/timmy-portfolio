@@ -331,7 +331,6 @@ async function confirmDelete(post: BlogPost | null) {
 
 async function fetchPosts() {
   try {
-    // 後台需要看到所有文章，傳高上限確保不被預設的分頁 10 筆截斷
     await blogStore.fetchPosts({ limit: 500 })
     posts.value = blogStore.posts
   } catch (error) {

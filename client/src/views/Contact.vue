@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { contactService } from '../services/contactService'
@@ -17,10 +17,12 @@ const isSubmitting = ref(false)
 const formError = ref('')
 const formSuccess = ref(false)
 
+let entranceTl: gsap.core.Timeline | null = null
+
 onMounted(() => {
-  const tl = gsap.timeline()
+  entranceTl = gsap.timeline()
   
-  tl.from('.contact-header', {
+  entranceTl.from('.contact-header', {
     y: 30,
     opacity: 0,
     duration: 0.6,
@@ -38,6 +40,11 @@ onMounted(() => {
     duration: 0.5,
     ease: 'power3.out'
   }, '-=0.3')
+})
+
+onUnmounted(() => {
+  entranceTl?.kill()
+  entranceTl = null
 })
 
 async function submitForm() {

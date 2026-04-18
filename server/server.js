@@ -100,12 +100,10 @@ app.use('/api/files', filesRouter);
 app.use('/api/activities', activityRoutes);
 
 if (env.nodeEnv === 'production') {
-  // 雜湊命名的靜態資源設 1 年快取 + immutable，避免不必要的重新驗證
   app.use(express.static(path.join(__dirname, '../client/dist'), {
     maxAge: '1y',
     immutable: true,
     setHeaders(res, filePath) {
-      // index.html 不能長期快取，否則部署新版後使用者無法取得最新 HTML
       if (filePath.endsWith('index.html')) {
         res.setHeader('Cache-Control', 'no-cache');
       }

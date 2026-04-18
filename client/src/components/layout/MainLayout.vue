@@ -35,7 +35,6 @@ onMounted(() => {
     <Navbar />
     
     <main class="flex-grow container-custom py-8">
-      <!-- 移除 v-if 翻頁強制 unmount；改用 CSS transition 達到換頁淡入效果 -->
       <router-view v-slot="{ Component }">
         <transition name="page-fade" mode="out-in">
           <component :is="Component" :key="route.path" />
@@ -48,14 +47,4 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.page-fade-enter-active,
-.page-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.page-fade-enter-from,
-.page-fade-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
-}
 </style>

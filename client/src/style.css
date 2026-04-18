@@ -205,6 +205,18 @@ code {
   opacity: 0;
 }
 
+/* 路由頁面切換轉場：必須定義為全域才能正確套用到 router-view 子元件 */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
 .card {
   background-color: #1e1e1e;
   border-radius: 0.5rem;

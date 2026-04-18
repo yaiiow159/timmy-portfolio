@@ -30,6 +30,8 @@ const projectsPerPage = 6
 
 const layoutMode = ref<'grid' | 'masonry' | 'list'>('grid')
 
+let entranceTl: gsap.core.Timeline | null = null
+
 const categories = computed(() => {
   const allTechnologies = projects.value.flatMap(project => project.technologies)
   return [...new Set(allTechnologies)].sort()
@@ -120,9 +122,9 @@ onMounted(async () => {
     if (!isMounted.value) return
     await nextTick()
 
-    const tl = gsap.timeline()
+    entranceTl = gsap.timeline()
     
-    tl.from('.portfolio-header', {
+    entranceTl.from('.portfolio-header', {
       y: 30,
       opacity: 0,
       duration: 0.6,
@@ -146,6 +148,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
   isMounted.value = false
+  // 離頁時強制結束動畫，防止半途的 from() 讓元素殘留 opacity:0
+  entranceTl?.kill()
+  entranceTl = null
   stopDetailsCarousel()
 })
 
