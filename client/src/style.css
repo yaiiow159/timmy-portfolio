@@ -2581,3 +2581,12 @@ section {
 .light .hero-orb-2 {
   background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
 }
+
+/* ===== STATUS RGB VARIABLES FIX =====
+   --tech-green-rgb / --tech-orange-rgb / --tech-red-rgb 用於 .tech-status-* 但原本遺漏定義，
+   在此補齊讓 rgba() 能正確解析，避免背景與邊框呈現為透明 */
+:root {
+  --tech-green-rgb: 16, 185, 129;
+  --tech-orange-rgb: 245, 158, 11;
+  --tech-red-rgb: 239, 68, 68;
+}
