@@ -21,86 +21,69 @@
       <p class="text-text-secondary">{{ t('common.loading') }}</p>
     </div>
     
-    <div v-else-if="projects.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="project in projects" :key="project.id" class="project-card tech-card tech-glow">
-        <div class="project-image tech-data-stream">
-          <div 
-            v-if="project.images && project.images.length > 0" 
-            class="project-image-carousel tech-hologram-overlay"
-            @mouseenter="handleMouseEnter(project.id)"
-            @mouseleave="handleMouseLeave(project.id)"
+    <div v-else-if="projects.length > 0">
+      <!-- 排序工具列 -->
+      <div class="sort-bar">
+        <span class="sort-label">
+          <i class="fas fa-sort-amount-down"></i> {{ t('common.sortBy') }}：
+        </span>
+        <div class="sort-buttons">
+          <button
+            v-for="opt in sortOptions"
+            :key="opt.value"
+            class="sort-btn"
+            :class="{ active: sortKey === opt.value }"
+            @click="setSort(opt.value)"
           >
-            <div class="carousel-images">
-              <transition-group name="fade">
-                <img 
-                  v-for="(image, index) in project.images" 
-                  :key="`${project.id}-img-${index}`"
-                  :src="image" 
-                  :alt="`${project.title} - Image ${index + 1}`"
-                  class="carousel-image"
-                  loading="lazy"
-                  v-show="project.currentImageIndex === index"
-                />
-              </transition-group>
-            </div>
-            
-            <div class="carousel-controls">
-              <button @click.prevent="prevProjectImage(project.id)" class="carousel-control carousel-prev">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button @click.prevent="nextProjectImage(project.id)" class="carousel-control carousel-next">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-              
-              <div class="carousel-indicators">
-                <button 
-                  v-for="(_, index) in project.images" 
-                  :key="`${project.id}-indicator-${index}`"
-                  @click="goToImage(project.id, index)"
-                  class="carousel-indicator"
-                  :class="{ active: project.currentImageIndex === index }"
-                ></button>
-              </div>
-            </div>
-            
-            <div class="carousel-counter" v-if="project.images.length > 1">
-              {{ project.currentImageIndex + 1 }} / {{ project.images.length }}
-            </div>
-          </div>
-          
-          <div 
-            v-else
-            class="no-image-placeholder"
-          >
-            <i class="fas fa-image"></i>
-            <span>{{ t('admin.noImage') }}</span>
-          </div>
+            {{ opt.label }}
+            <i v-if="sortKey === opt.value" :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+          </button>
         </div>
-        
-        <div class="project-content tech-scan-lines">
-          <h3 class="project-title tech-text-glow">{{ project.title }}</h3>
-          <div class="project-description line-clamp-3">{{ getProjectPreviewText(project.description) }}</div>
-          
-          <div class="project-tech">
-            <span 
-              v-for="(tech, index) in project.technologies" 
-              :key="`${project.id}-tech-${index}`"
-              class="tech-tag"
-            >
-              <i class="fas fa-tag"></i> {{ tech }}
-            </span>
+        <span class="sort-count">{{ projects.length }} {{ t('admin.projects') }}</span>
+      </div>
+
+      <!-- 專案卡片列表 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div v-for="project in sortedProjects" :key="project.id" class="project-card tech-card">
+          <!-- 圖片區：手動翻頁，無自動輪播 -->
+          <div class="project-image">
+            <div v-if="project.images && project.images.length > 0" class="image-wrapper">
+              <img
+                :src="project.images[project.currentImageIndex]"
+                :alt="`${project.title} - Image ${project.currentImageIndex + 1}`"
+                class="card-img"
+                loading="lazy"
+              />
+              <template v-if="project.images.length > 1">
+                <button class="img-nav img-prev" @click.prevent="prevProjectImage(project.id)">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="img-nav img-next" @click.prevent="nextProjectImage(project.id)">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <span class="img-counter">{{ project.currentImageIndex + 1 }} / {{ project.images.length }}</span>
+              </template>
+              <span v-if="project.featured" class="featured-badge">
+                <i class="fas fa-star"></i>
+              </span>
+            </div>
+            <div v-else class="no-image-placeholder">
+              <i class="fas fa-image"></i>
+              <span>{{ t('admin.noImage') }}</span>
+            </div>
           </div>
-          
-          <div class="project-links" v-if="project.codeUrl || project.liveUrl">
-            <a v-if="project.codeUrl" :href="project.codeUrl" target="_blank" class="project-link">
-              <i class="fab fa-github"></i> GitHub
-            </a>
-            <a v-if="project.liveUrl" :href="project.liveUrl" target="_blank" class="project-link">
-              <i class="fas fa-external-link-alt"></i> Live Demo
-            </a>
+
+          <!-- 標題 + 類型 -->
+          <div class="card-info">
+            <h3 class="card-title" :title="project.title">{{ project.title }}</h3>
+            <div class="card-meta">
+              <span class="meta-badge">{{ project.projectType }}</span>
+              <span class="meta-badge">{{ project.platformType }}</span>
+            </div>
           </div>
-          
-          <div class="project-actions">
+
+          <!-- 操作按鈕 -->
+          <div class="card-actions">
             <button @click="openEditModal(project)" class="btn btn-edit">
               <i class="fas fa-edit"></i> {{ t('common.edit') }}
             </button>
@@ -108,10 +91,6 @@
               <i class="fas fa-trash"></i> {{ t('common.delete') }}
             </button>
           </div>
-        </div>
-        
-        <div class="project-badge" v-if="project.featured">
-          <i class="fas fa-star"></i> {{ t('admin.featured') }}
         </div>
       </div>
     </div>
@@ -356,7 +335,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/services/api';
 import type { Project, ProjectType, VCSType } from '@/types/project';
@@ -366,7 +345,6 @@ import { handleSuccess, handleError, ErrorContext } from '@/utils/errorHandler';
 
 interface AdminProject extends Project {
   currentImageIndex: number;
-  intervalId?: number;
   images: string[];
   projectType: ProjectType;
   vcsType: VCSType;
@@ -405,11 +383,6 @@ const currentProject = reactive<AdminProject>({ ...emptyProject });
 
 onMounted(async () => {
   await fetchProjects();
-  startAllCarousels();
-});
-
-onUnmounted(() => {
-  stopAllCarousels();
 });
 
 async function fetchProjects() {
@@ -424,78 +397,55 @@ async function fetchProjects() {
       vcsType: project.vcsType || 'github',
       platformType: project.platformType || 'web'
     }));
-    startAllCarousels();
-  } catch (error) {
+    } catch (error) {
     handleError(error, { context: ErrorContext.ADMIN, showNotification: true });
   } finally {
     loading.value = false;
   }
 }
 
-function startAllCarousels() {
-  projects.value.forEach(project => {
-    if (project.images && project.images.length > 1) {
-      startCarousel(project.id);
-    }
-  });
-}
+// 排序狀態：預設依日期新到舊
+type SortKey = 'date' | 'title';
+const sortKey = ref<SortKey>('date');
+const sortOrder = ref<'asc' | 'desc'>('desc');
 
-function stopAllCarousels() {
-  projects.value.forEach(project => {
-    if (project.intervalId) {
-      clearInterval(project.intervalId);
-      project.intervalId = undefined;
-    }
-  });
-}
+const sortOptions = [
+  { value: 'date' as SortKey, label: t('admin.sortByDate') },
+  { value: 'title' as SortKey, label: t('admin.sortByTitle') }
+];
 
-function startCarousel(projectId: string) {
-  const project = projects.value.find(p => p.id === projectId);
-  if (!project || project.intervalId || !project.images || project.images.length <= 1) return;
-  
-  project.intervalId = window.setInterval(() => {
-    nextProjectImage(projectId);
-  }, 5000);
-}
-
-function stopCarousel(projectId: string) {
-  const project = projects.value.find(p => p.id === projectId);
-  if (!project || !project.intervalId) return;
-  
-  clearInterval(project.intervalId);
-  project.intervalId = undefined;
-}
-
-function handleMouseEnter(projectId: string) {
-  stopCarousel(projectId);
-}
-
-function handleMouseLeave(projectId: string) {
-  const project = projects.value.find(p => p.id === projectId);
-  if (project && project.images && project.images.length > 1) {
-    startCarousel(projectId);
+function setSort(key: SortKey) {
+  if (sortKey.value === key) {
+    // 同欄位再點一次則切換升降冪
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortOrder.value = key === 'date' ? 'desc' : 'asc';
   }
 }
+
+const sortedProjects = computed(() => {
+  return [...projects.value].sort((a, b) => {
+    let cmp = 0;
+    if (sortKey.value === 'date') {
+      cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
+    } else {
+      cmp = a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+    }
+    return sortOrder.value === 'asc' ? cmp : -cmp;
+  });
+});
 
 function prevProjectImage(projectId: string) {
   const project = projects.value.find(p => p.id === projectId);
   if (!project || !project.images || !project.images.length) return;
-  
   project.currentImageIndex = (project.currentImageIndex - 1 + project.images.length) % project.images.length;
 }
 
 function nextProjectImage(projectId: string) {
   const project = projects.value.find(p => p.id === projectId);
   if (!project || !project.images || !project.images.length) return;
-  
   project.currentImageIndex = (project.currentImageIndex + 1) % project.images.length;
-}
-
-function goToImage(projectId: string, index: number) {
-  const project = projects.value.find(p => p.id === projectId);
-  if (!project || !project.images || !project.images.length) return;
-  
-  project.currentImageIndex = index;
 }
 
 function openCreateModal() {
@@ -649,16 +599,6 @@ function removeTechnology(index: number) {
   currentProject.technologies.splice(index, 1);
 }
 
-function getProjectPreviewText(rawDescription: string): string {
-  const plainText = (rawDescription || '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  if (plainText.length <= 180) return plainText
-  return `${plainText.slice(0, 180)}...`
-}
-
 async function saveProject() {
   try {
     const projectData = {
@@ -744,321 +684,212 @@ async function deleteProject() {
     }
   }
   
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2rem;
-    
-    .project-card {
-      background: linear-gradient(145deg, var(--surface-card), var(--surface-section));
-      border-radius: 1rem;
-      overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      height: 100%;
+  /* 排序工具列 */
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+
+    .sort-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      white-space: nowrap;
+    }
+
+    .sort-buttons {
       display: flex;
-      flex-direction: column;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      
+      gap: 0.5rem;
+    }
+
+    .sort-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: var(--surface-section);
+      color: var(--text-color-secondary);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
       &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        border-color: var(--accent-color);
+        color: var(--text-color);
       }
-      
-      .project-badge {
+
+      &.active {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+        color: #fff;
+      }
+    }
+
+    .sort-count {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+    }
+  }
+
+  /* 精簡卡片 */
+  .project-card {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--surface-card);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .project-image {
+      position: relative;
+      height: 160px;
+      overflow: hidden;
+      background: var(--surface-section);
+
+      .image-wrapper {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* 手動翻頁箭頭：常駐顯示 */
+      .img-nav {
         position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background-color: var(--accent-color);
-        color: white;
-        padding: 0.5rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: bold;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        z-index: 5;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 4;
+        transition: background 0.2s;
+        font-size: 0.7rem;
+
+        &:hover { background: rgba(0, 0, 0, 0.85); }
+        &.img-prev { left: 6px; }
+        &.img-next { right: 6px; }
       }
-      
-      .project-image {
-        position: relative;
-        height: 220px;
-        overflow: hidden;
-        
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, var(--accent-color), var(--accent-dark));
-        }
-        
-        .project-image-carousel {
-          position: relative;
-          height: 100%;
-          width: 100%;
-          
-          .carousel-images {
-            height: 100%;
-            width: 100%;
-            position: relative;
-            
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              transition: transform 0.5s ease;
-            }
-          }
-          
-          .carousel-counter {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            z-index: 5;
-          }
-          
-          .carousel-controls {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            background: linear-gradient(
-              to right,
-              rgba(0, 0, 0, 0.3) 0%,
-              rgba(0, 0, 0, 0) 15%,
-              rgba(0, 0, 0, 0) 85%,
-              rgba(0, 0, 0, 0.3) 100%
-            );
-            
-            .carousel-control {
-              background: rgba(0, 0, 0, 0.5);
-              color: white;
-              border: none;
-              border-radius: 50%;
-              width: 40px;
-              height: 40px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              margin: 0 1rem;
-              transition: all 0.3s ease;
-              z-index: 10;
-              
-              &:hover {
-                background: rgba(0, 0, 0, 0.8);
-                transform: scale(1.1);
-              }
-            }
-            
-            .carousel-indicators {
-              position: absolute;
-              bottom: 1rem;
-              left: 0;
-              width: 100%;
-              display: flex;
-              justify-content: center;
-              gap: 0.5rem;
-              z-index: 10;
-              
-              .carousel-indicator {
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.5);
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                
-                &.active {
-                  background: white;
-                  transform: scale(1.2);
-                }
-                
-                &:hover {
-                  background: rgba(255, 255, 255, 0.8);
-                }
-              }
-            }
-          }
-          
-          &:hover {
-            .carousel-controls {
-              opacity: 1;
-            }
-            
-            img {
-              transform: scale(1.05);
-            }
-          }
-        }
-        
-        .no-image-placeholder {
-          height: 100%;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
-          color: #999;
-          
-          i {
-            font-size: 2.5rem;
-            margin-bottom: 0.75rem;
-            opacity: 0.7;
-          }
-        }
+
+      .img-counter {
+        position: absolute;
+        bottom: 6px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        font-size: 0.7rem;
+        padding: 2px 7px;
+        border-radius: 10px;
+        z-index: 4;
       }
-      
-      .project-content {
-        padding: 1.75rem;
-        flex: 1;
+
+      .featured-badge {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        background: var(--accent-color);
+        color: #fff;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        z-index: 4;
+      }
+
+      .no-image-placeholder {
+        height: 100%;
         display: flex;
         flex-direction: column;
-        background: var(--surface-card);
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        
-        .project-title {
-          font-size: 1.35rem;
-          font-weight: bold;
-          margin-bottom: 0.75rem;
-          color: var(--text-color);
-          position: relative;
-          padding-bottom: 0.75rem;
-          
-          &::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--accent-color);
-            border-radius: 3px;
-          }
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color-secondary);
+
+        i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
+        span { font-size: 0.8rem; }
+      }
+    }
+
+    .card-info {
+      padding: 0.75rem 0.875rem 0.5rem;
+      flex: 1;
+
+      .card-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0.4rem;
+      }
+
+      .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      .meta-badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: var(--surface-section);
+        color: var(--text-color-secondary);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-transform: capitalize;
+      }
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.625rem 0.875rem 0.75rem;
+
+      .btn {
+        flex: 1;
+        padding: 0.45rem 0.6rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+
+        &.btn-edit {
+          background: var(--accent-color);
+          color: #fff;
+          &:hover { filter: brightness(1.15); }
         }
-        
-        .project-description {
-          color: var(--text-color-secondary);
-          margin-bottom: 1.25rem;
-          line-height: 1.6;
-          flex: 1;
-          white-space: pre-line;
-        }
-        
-        .project-tech {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-          margin-bottom: 1.25rem;
-          
-          .tech-tag {
-            background: linear-gradient(145deg, var(--surface-section), var(--surface-hover));
-            padding: 0.35rem 0.75rem;
-            border-radius: 2rem;
-            font-size: 0.85rem;
-            color: var(--text-color);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all 0.2s ease;
-            
-            i {
-              color: var(--accent-color);
-              font-size: 0.75rem;
-            }
-            
-            &:hover {
-              background: var(--surface-hover);
-              transform: translateY(-2px);
-              box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-            }
-          }
-        }
-        
-        .project-links {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 1.25rem;
-          
-          .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            
-            &:hover {
-              color: var(--accent-dark);
-              transform: translateY(-2px);
-            }
-            
-            i {
-              font-size: 1rem;
-            }
-          }
-        }
-        
-        .project-actions {
-          display: flex;
-          gap: 0.75rem;
-          margin-top: auto;
-          
-          .btn {
-            padding: 0.6rem 1.25rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            
-            &.btn-edit {
-              background-color: var(--accent-color);
-              color: white;
-              
-              &:hover {
-                background-color: var(--accent-dark);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-              }
-            }
-            
-            &.btn-delete {
-              background-color: rgba(220, 53, 69, 0.1);
-              color: #dc3545;
-              
-              &:hover {
-                background-color: #dc3545;
-                color: white;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-              }
-            }
-          }
+
+        &.btn-delete {
+          background: rgba(220, 53, 69, 0.12);
+          color: #dc3545;
+          &:hover { background: #dc3545; color: #fff; }
         }
       }
     }

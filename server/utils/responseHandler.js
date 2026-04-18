@@ -18,7 +18,6 @@ const handleError = (res, error, customMessage = 'Server Error') => {
   console.error(error.message || error);
   const prismaMappedError = error.code ? PRISMA_ERROR_MAP[error.code] : null;
   const statusCode = error.statusCode || prismaMappedError?.status || 500;
-  // 對外固定回傳安全訊息，避免揭露內部堆疊或資料庫細節
   const message = prismaMappedError?.message || customMessage;
   return res.status(statusCode).json({ msg: message });
 };
