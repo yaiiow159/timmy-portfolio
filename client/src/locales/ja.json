@@ -703,6 +703,8 @@
     "confirm": "確認",
     "close": "閉じる",
     "sortBy": "並び順",
+    "update": "更新",
+    "preview": "プレビュー",
     "uploading": "アップロード中..."
   }
 }

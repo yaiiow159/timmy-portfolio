@@ -677,6 +677,8 @@
     "filter": "Filter",
     "sort": "Sort",
     "sortBy": "Sort by",
+    "update": "Update",
+    "preview": "Preview",
     "descending": "Descending",
     "ascending": "Ascending",
     "add": "Add",

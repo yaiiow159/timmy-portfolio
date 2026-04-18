@@ -667,6 +667,8 @@
     "save": "保存",
     "submit": "提交",
     "sortBy": "排序依据",
+    "update": "更新",
+    "preview": "预览",
     "uploading": "上传中..."
   }
 }

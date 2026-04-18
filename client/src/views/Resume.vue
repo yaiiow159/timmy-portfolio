@@ -12,7 +12,6 @@ gsap.registerPlugin(ScrollTrigger)
 const { t, tm } = useI18n()
 const languageBarsAnimated = ref(false)
 const showDialog = ref(false)
-let entranceTl: gsap.core.Timeline | null = null
 
 const getLocalizedList = <T>(path: string): T[] => {
   const value = tm(path)
@@ -27,31 +26,8 @@ const languageSkills = computed<LanguageSkill[]>(() => getLocalizedList<Language
 onMounted(async () => {
   await nextTick()
 
-  entranceTl = gsap.timeline({
-    // 動畫完成後清除 GSAP 內聯樣式，確保元素不因意外中斷而卡在 opacity:0
-    onComplete: () => { gsap.set(['.resume-header', '.resume-section'], { clearProps: 'all' }) }
-  })
-  const tl = entranceTl
-
-  tl.from('.resume-header', {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out',
-    immediateRender: false,
-  }).from(
-    '.resume-section',
-    {
-      y: 30,
-      opacity: 0,
-      duration: 0.5,
-      stagger: 0.2,
-      ease: 'power3.out',
-      immediateRender: false,
-    },
-    '-=0.3'
-  )
-
+  // 入場動畫改由 CSS keyframes 負責，確保頁面內容一定可見
+  // GSAP 僅負責捲動觸發的互動動畫
   animateWorkExperience()
 
   ScrollTrigger.create({
@@ -71,13 +47,8 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  // 離頁時停止進場動畫並清除內聯樣式，防止重新進入時元素卡在 opacity:0
-  if (entranceTl) {
-    entranceTl.kill()
-    entranceTl = null
-  }
-  gsap.set(['.resume-header', '.resume-section'], { clearProps: 'all' })
-  // onUnmounted 時本頁 trigger 元素已從 document 移除；仍在 document 中的屬於其他元件，不應清除
+  // onUnmounted 時本頁 trigger 元素已從 document 移除
+  // 仍在 document 中的屬於其他元件，不應清除
   ScrollTrigger.getAll()
     .filter(st => st.trigger instanceof Element && !document.contains(st.trigger))
     .forEach(st => st.kill())
@@ -85,8 +56,12 @@ onUnmounted(() => {
 
 function animateWorkExperience() {
   gsap.utils.toArray<HTMLElement>('.job-entry').forEach((entry) => {
+    const rect = entry.getBoundingClientRect()
+    // 已在 viewport 內的 entry 直接播動畫，不預先設為不可見，避免閃爍或卡住
+    const isInView = rect.top < window.innerHeight * 0.85 && rect.bottom > 0
+
     const tl = gsap.timeline({
-      scrollTrigger: {
+      scrollTrigger: isInView ? undefined : {
         trigger: entry as gsap.DOMTarget,
         start: 'top 85%',
         once: true,
@@ -95,18 +70,18 @@ function animateWorkExperience() {
 
     tl.fromTo(
       entry as gsap.TweenTarget,
-      { x: -50, opacity: 0 },
+      { x: isInView ? 0 : -50, opacity: isInView ? 1 : 0 },
       { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' },
     )
       .fromTo(
         entry.querySelectorAll('.job-detail'),
-        { y: 20, opacity: 0 },
+        { y: isInView ? 0 : 20, opacity: isInView ? 1 : 0 },
         { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power3.out' },
         '-=0.2',
       )
       .fromTo(
         entry.querySelectorAll('.job-bullet'),
-        { scale: 0.5, opacity: 0 },
+        { scale: isInView ? 1 : 0.5, opacity: isInView ? 1 : 0 },
         { scale: 1, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'back.out(1.7)' },
         '-=0.2',
       )
@@ -269,6 +244,27 @@ function downloadResume(language: 'zh' | 'en') {
 <style scoped>
 .resume-content {
   word-break: break-word;
+}
+
+/* CSS 入場動畫：不依賴 JS，確保內容永遠可見 */
+.resume-header {
+  animation: resumeSlideIn 0.6s ease-out both;
+}
+
+:deep(.resume-section):nth-child(1) { animation: resumeSlideIn 0.5s 0.05s ease-out both; }
+:deep(.resume-section):nth-child(2) { animation: resumeSlideIn 0.5s 0.15s ease-out both; }
+:deep(.resume-section):nth-child(3) { animation: resumeSlideIn 0.5s 0.25s ease-out both; }
+:deep(.resume-section):nth-child(4) { animation: resumeSlideIn 0.5s 0.35s ease-out both; }
+
+@keyframes resumeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .job-entry {
