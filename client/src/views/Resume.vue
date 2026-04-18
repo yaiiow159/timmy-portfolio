@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -12,6 +12,7 @@ gsap.registerPlugin(ScrollTrigger)
 const { t, tm } = useI18n()
 const languageBarsAnimated = ref(false)
 const showDialog = ref(false)
+let entranceTl: gsap.core.Timeline | null = null
 
 const getLocalizedList = <T>(path: string): T[] => {
   const value = tm(path)
@@ -23,8 +24,14 @@ const workExperiences = computed<WorkExperience[]>(() => getLocalizedList<WorkEx
 const educationEntries = computed<EducationEntry[]>(() => getLocalizedList<EducationEntry>('resume.content.education'))
 const languageSkills = computed<LanguageSkill[]>(() => getLocalizedList<LanguageSkill>('resume.content.languages'))
 
-onMounted(() => {
-  const tl = gsap.timeline()
+onMounted(async () => {
+  await nextTick()
+
+  entranceTl = gsap.timeline({
+    // 動畫完成後清除 GSAP 內聯樣式，確保元素不因意外中斷而卡在 opacity:0
+    onComplete: () => { gsap.set(['.resume-header', '.resume-section'], { clearProps: 'all' }) }
+  })
+  const tl = entranceTl
 
   tl.from('.resume-header', {
     y: 30,
@@ -63,6 +70,16 @@ onMounted(() => {
   })
 })
 
+onUnmounted(() => {
+  // 離頁時停止進場動畫並清除內聯樣式，防止重新進入時元素卡在 opacity:0
+  if (entranceTl) {
+    entranceTl.kill()
+    entranceTl = null
+  }
+  gsap.set(['.resume-header', '.resume-section'], { clearProps: 'all' })
+  ScrollTrigger.getAll().forEach(st => st.kill())
+})
+
 function animateWorkExperience() {
   gsap.utils.toArray<HTMLElement>('.job-entry').forEach((entry) => {
     const tl = gsap.timeline({
@@ -89,12 +106,6 @@ function animateWorkExperience() {
         { scale: 0.5, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'back.out(1.7)' },
         '-=0.2',
-      )
-      .fromTo(
-        entry.querySelector('.job-date'),
-        { width: 0, opacity: 0 },
-        { width: 'auto', opacity: 1, duration: 0.5, ease: 'power3.inOut' },
-        '-=0.3',
       )
   })
 }

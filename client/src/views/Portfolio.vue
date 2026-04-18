@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { ref, onMounted, computed, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Project } from '../store/portfolioStore'
 import gsap from 'gsap'
@@ -9,6 +9,8 @@ import ProjectCard from '../components/portfolio/ProjectCard.vue'
 const { t } = useI18n()
 
 const isLoading = ref(true)
+// 防止 async fetch 結束時元件已離開導致 GSAP 對不存在的 DOM 操作
+const isMounted = ref(false)
 const selectedCategory = ref('')
 const selectedProjectType = ref<'all' | 'work' | 'personal'>('all')
 const selectedPlatformType = ref<'all' | 'web' | 'mobile' | 'desktop' | 'script' | 'api'>('all')
@@ -105,6 +107,7 @@ function stopDetailsCarousel() {
 }
 
 onMounted(async () => {
+  isMounted.value = true
   try {
     isLoading.value = true
     projects.value = await projectService.getAllProjects()
@@ -112,7 +115,11 @@ onMounted(async () => {
     console.error('Error fetching projects:', error)
   } finally {
     isLoading.value = false
-    
+
+    // 若使用者在 fetch 期間已離頁，DOM 已不存在，不執行入場動畫
+    if (!isMounted.value) return
+    await nextTick()
+
     const tl = gsap.timeline()
     
     tl.from('.portfolio-header', {
@@ -138,6 +145,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  isMounted.value = false
   stopDetailsCarousel()
 })
 
