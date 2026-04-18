@@ -153,7 +153,7 @@ function getImageUrl(imagePath: string | undefined): string {
                 </div>
               </div>
               
-              <div class="flex items-center gap-2">
+              <div class="hidden sm:flex items-center gap-2">
                 <span class="text-sm tech-text-secondary mr-2">Layout:</span>
                 <div class="flex bg-secondary rounded-xl p-1">
                   <button

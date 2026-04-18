@@ -1262,13 +1262,34 @@ code {
 /* 響應式設計 */
 @media (max-width: 768px) {
   .tech-card {
-    margin: 0 16px;
+    margin: 0 8px;
     border-radius: 12px;
   }
-  
+
   .tech-button {
-    padding: 10px 20px;
-    font-size: 14px;
+    padding: 9px 18px;
+    font-size: 0.875rem;
+  }
+
+  .tech-button-lg {
+    padding: 10px 22px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+
+  .tech-button-xl {
+    padding: 12px 24px;
+    font-size: 1.0625rem;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tech-button-lg {
+    padding: 9px 18px;
+    font-size: 0.9375rem;
+    white-space: normal;
+    text-align: center;
   }
 }
 
@@ -2583,4 +2604,91 @@ section {
   --tech-green-rgb: 16, 185, 129;
   --tech-orange-rgb: 245, 158, 11;
   --tech-red-rgb: 239, 68, 68;
+}
+
+/* ===== 手機版全域響應式補強 =====
+   針對因 scoped CSS 限制無法直接修改的頁面元素，
+   在全域層級套用手機媒體查詢 */
+@media (max-width: 768px) {
+  /* Home - skills grid 縮減間距，避免雙欄圖示過度擠壓 */
+  .skills-grid {
+    gap: 1.25rem !important;
+  }
+
+  /* Home - profile section 底部留白縮短 */
+  .profile-section {
+    margin-bottom: 2rem !important;
+  }
+
+  /* Home - hero CTA 按鈕在小螢幕時允許換行 */
+  .hero-cta {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* Portfolio - filter 按鈕縮減 padding，防止超出螢幕 */
+  .filter-container .tech-button {
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+    padding-top: 0.5625rem !important;
+    padding-bottom: 0.5625rem !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Home - 極小螢幕三欄 skills grid */
+  .skills-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.875rem !important;
+  }
+
+  /* Portfolio - 極小螢幕 filter 按鈕進一步縮減 */
+  .filter-container .tech-button {
+    padding-left: 0.625rem !important;
+    padding-right: 0.625rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* BlogPost heading 手機版縮放
+   使用 !important 是因為 BlogPost.vue <style> 為非 scoped，
+   與全域同 specificity，靠覆寫順序確保此媒體查詢優先生效 */
+@media (max-width: 768px) {
+  .blog-content {
+    font-size: 1rem !important;
+  }
+  .blog-content h1 {
+    font-size: 1.75rem !important;
+  }
+  .blog-content h2 {
+    font-size: 1.5rem !important;
+  }
+  .blog-content h3 {
+    font-size: 1.25rem !important;
+  }
+  .blog-content h4 {
+    font-size: 1.125rem !important;
+  }
+  .blog-content pre {
+    font-size: 0.875rem !important;
+    padding: 1rem !important;
+  }
+  .blog-content table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-content h1 {
+    font-size: 1.5rem !important;
+  }
+  .blog-content h2 {
+    font-size: 1.25rem !important;
+  }
+  .blog-content h3 {
+    font-size: 1.125rem !important;
+  }
 }
