@@ -32,10 +32,6 @@
         >
       </div>
       
-      <div v-if="loginErrorMessage" class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center">
-        {{ loginErrorMessage }}
-      </div>
-      
       <button 
         type="submit"
         class="tech-button w-full py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 tech-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
@@ -65,14 +61,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { reactive } from 'vue'
 import { useAuthStore } from '../store/authStore'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
-
-const loginErrorMessage = computed(() => authStore.error ? t('errors.auth.loginFailed') : null)
 
 const emit = defineEmits(['login-success', 'switch-mode'])
 

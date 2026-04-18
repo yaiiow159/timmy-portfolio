@@ -118,6 +118,11 @@ router.beforeEach(async (to, _from, next) => {
       try {
         await authStore.loadUser()
         if (authStore.isAuthenticated) {
+          // loadUser 後仍需補驗管理員資格，避免一般帳號透過頁面重整繞過 requiresAdmin
+          if (requiresAdmin && !authStore.isAdmin) {
+            next('/')
+            return
+          }
           next()
           return
         }

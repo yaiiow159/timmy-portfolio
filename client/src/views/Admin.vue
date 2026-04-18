@@ -127,30 +127,15 @@
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/authStore'
-import { useNotificationStore } from '../store/notificationStore'
 
 const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
-const notificationStore = useNotificationStore()
 
-async function logout() {
-  try {
-    authStore.logout()
-    notificationStore.addNotification({
-      type: 'success',
-      message: t('auth.logoutSuccess'),
-      duration: 3000
-    })
-    router.push('/auth')
-  } catch (error) {
-    console.error('Logout error:', error)
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('auth.logoutError'),
-      duration: 3000
-    })
-  }
+function logout() {
+  // authStore.logout() 內部已呼叫 handleSuccess 顯示通知，此處不重複新增
+  authStore.logout()
+  router.push('/auth')
 }
 </script>
 
