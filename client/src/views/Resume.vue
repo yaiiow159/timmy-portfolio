@@ -77,7 +77,10 @@ onUnmounted(() => {
     entranceTl = null
   }
   gsap.set(['.resume-header', '.resume-section'], { clearProps: 'all' })
-  ScrollTrigger.getAll().forEach(st => st.kill())
+  // onUnmounted 時本頁 trigger 元素已從 document 移除；仍在 document 中的屬於其他元件，不應清除
+  ScrollTrigger.getAll()
+    .filter(st => st.trigger instanceof Element && !document.contains(st.trigger))
+    .forEach(st => st.kill())
 })
 
 function animateWorkExperience() {
