@@ -30,9 +30,6 @@ export default defineConfig({
         secure: false
       }
     },
-    allowedHosts: [
-      '2437-2407-4b00-2c00-e70-7198-acf9-c943-545b.ngrok-free.app'
-    ]
   },
   
   define: {

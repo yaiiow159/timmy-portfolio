@@ -209,50 +209,16 @@ onUnmounted(stopCarousel)
 }
 
 .project-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 0.75rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
+/* 使用 CSS 變數讓 hover 陰影自動適應深色/亮色主題 */
 .project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(99, 102, 241, 0.3);
-}
-
-.tech-button {
-  transition: all 0.2s ease;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-}
-
-.tech-button:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #a5b4fc;
-}
-
-.tech-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: rgba(99, 102, 241, 0.1);
-  color: #a5b4fc;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-}
-
-.tech-badge:hover {
-  background: rgba(99, 102, 241, 0.2);
-  transform: translateY(-1px);
+  transform: translateY(-6px);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(var(--accent-rgb), 0.28),
+    0 0 18px rgba(var(--accent-rgb), 0.1);
 }
 
 .carousel-controls button {
@@ -272,11 +238,7 @@ onUnmounted(stopCarousel)
 }
 @media (max-width: 768px) {
   .project-card:hover {
-    transform: translateY(-6px) scale(1.01);
-  }
-  
-  .project-card::before {
-    display: none;
+    transform: translateY(-3px);
   }
 }
 </style>

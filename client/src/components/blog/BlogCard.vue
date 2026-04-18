@@ -12,6 +12,7 @@ const props = defineProps<{
 
 function formatDate(dateString: string) {
   const date = new Date(dateString)
+  if (isNaN(date.getTime())) return dateString
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -117,7 +118,7 @@ const displayExcerpt = computed(() => {
         <div class="mt-auto pt-2">
           <router-link 
             :to="`/blog/${post.id}`" 
-            class="tech-button tech-button-sm inline-flex items-center gap-2 group-hover:scale-105 transition-all duration-300"
+            class="tech-button tech-button-sm inline-flex items-center gap-2"
           >
             {{ t('blog.readMore') }}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -132,11 +133,12 @@ const displayExcerpt = computed(() => {
 
 <style scoped>
 .blog-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
+/* shimmer 掃光效果 */
 .blog-card::before {
   content: '';
   position: absolute;
@@ -144,9 +146,10 @@ const displayExcerpt = computed(() => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
-  transition: left 0.6s ease;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.08), transparent);
+  transition: left 0.5s ease;
   z-index: 1;
+  pointer-events: none;
 }
 
 .blog-card:hover::before {
@@ -154,24 +157,17 @@ const displayExcerpt = computed(() => {
 }
 
 .blog-card:hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-6px);
   box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(0, 212, 255, 0.2),
-    0 0 30px rgba(0, 212, 255, 0.1);
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(var(--accent-rgb), 0.28),
+    0 0 18px rgba(var(--accent-rgb), 0.1);
 }
 
+/* 確保 button 在 z-index 堆疊中可點擊 */
 .blog-card .tech-button {
   position: relative;
   z-index: 2;
-}
-
-.blog-card .tag {
-  transition: all 0.3s ease;
-}
-
-.blog-card:hover .tag {
-  transform: translateY(-2px);
 }
 
 .blog-card img {
@@ -179,20 +175,12 @@ const displayExcerpt = computed(() => {
 }
 
 .blog-card:hover img {
-  filter: brightness(1.1) contrast(1.05);
-}
-
-.blog-card h2 {
-  transition: all 0.3s ease;
-}
-
-.blog-card:hover h2 {
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  filter: brightness(1.08) contrast(1.03);
 }
 
 @media (max-width: 768px) {
   .blog-card:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: translateY(-3px);
   }
   
   .blog-card::before {

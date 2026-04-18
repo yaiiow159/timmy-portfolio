@@ -229,8 +229,6 @@ import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
 import gsap from 'gsap'
 import { useNotificationStore } from '../store/notificationStore'
-import { formatDescription } from '../utils/textFormatters'
-
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
@@ -293,10 +291,14 @@ onMounted(async () => {
 const renderedContent = computed(() => {
   if (!post.value) return ''
   try {
-    const formattedContent = formatDescription(post.value.content)
-    return marked(formattedContent)
+    const content = post.value.content
+    if (!content) return ''
+    // 富文字編輯器輸出已是 HTML，直接回傳；僅對純文字（無任何 HTML 標籤）才嘗試 markdown 渲染
+    const isHtml = /<[a-zA-Z][^>]*>/.test(content)
+    if (isHtml) return content
+    return marked(content) as string
   } catch (error) {
-    console.error('Error rendering markdown:', error)
+    console.error('Error rendering content:', error)
     return '<p class="text-red-500">Error rendering content</p>'
   }
 })

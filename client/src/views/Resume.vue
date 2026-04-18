@@ -157,7 +157,7 @@ function downloadResume(language: 'zh' | 'en') {
           {{ t('resume.subtitle') }}
         </p>
         <button
-          class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors"
+          class="tech-button tech-button-primary"
           @click="showDialog = true"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -248,7 +248,7 @@ function downloadResume(language: 'zh' | 'en') {
               <span class="font-medium text-text-primary language-label">{{ language.name }}</span>
             </div>
             <div class="flex-grow">
-              <div class="h-2 w-full bg-gray-700 rounded-full">
+              <div class="language-bar-track h-2 w-full rounded-full">
                 <div
                   class="language-bar h-2 rounded-full bg-accent"
                   :data-percent="`${language.level}%`"
@@ -272,6 +272,11 @@ function downloadResume(language: 'zh' | 'en') {
 
 .job-entry {
   position: relative;
+}
+
+/* 使用 CSS 變數讓進度條軌道自動適應主題 */
+.language-bar-track {
+  background: rgba(var(--accent-rgb), 0.15);
 }
 
 .language-bar {

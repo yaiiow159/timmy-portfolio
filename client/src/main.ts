@@ -4,6 +4,7 @@ import router from './router'
 import pinia from './store'
 import i18n from './i18n'
 import './style.css'
+import './styles/home-interaction-fix.css'
 
 
 const app = createApp(App)

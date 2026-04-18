@@ -1,0 +1,12 @@
+.hero-section.tech-particles,
+.skills-section.tech-particles,
+.blog-section.tech-particles {
+  position: relative;
+  pointer-events: auto;
+}
+
+.hero-section.tech-particles > *,
+.skills-section.tech-particles > *,
+.blog-section.tech-particles > * {
+  pointer-events: auto;
+}
