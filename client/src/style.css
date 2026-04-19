@@ -31,6 +31,7 @@ body {
   color: var(--text-primary);
   margin: 0;
   min-height: 100vh;
+  font-family: 'Inter', 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -495,8 +496,10 @@ code {
   border-color: rgba(124, 58, 237, 0.1);
 }
 
-/* ===== UNIFIED TECH THEME ===== */
-:root {
+/* ===== UNIFIED TECH THEME（僅非淺色）=====
+   若用單一 :root 區塊，會與 html 同一節點，在來源順序上蓋掉 html.light 的 --text-primary，
+   造成淺色主題仍繼承 #fff 字色、按鈕與內文看不見。 */
+html:not(.light) {
   /* 科技感主色調 - 深色主題 */
   --primary: #0a0a0a;
   --primary-dark: #000000;
@@ -546,8 +549,6 @@ code {
   --tech-purple-rgb: 139, 92, 246;
   --tech-cyan-rgb: 6, 182, 212;
   
-  /* 字體設定 - 科技感字體 */
-  font-family: 'Inter', 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 
@@ -599,6 +600,9 @@ code {
   --accent-rgb: 124, 58, 237;
   --tech-purple-rgb: 109, 40, 217;
   --tech-cyan-rgb: 8, 145, 178;
+  --tech-green-rgb: 5, 150, 105;
+  --tech-orange-rgb: 217, 119, 6;
+  --tech-red-rgb: 220, 38, 38;
 }
 
 /* 全局科技感樣式 */
@@ -2496,14 +2500,46 @@ section {
   border-top: 1px solid rgba(124, 58, 237, 0.08);
 }
 
-/* 亮色主題補充樣式：紫 + 青雙色調，避免純紫單調 */
+/* 亮色主題補充樣式：紫 + 青雙色調；務必保留白字以免被上層 text 變數蓋成淺底淺字 */
 .light .tech-button {
   background: linear-gradient(135deg, #6d28d9, #7c3aed 50%, #0891b2);
+  color: #ffffff;
   box-shadow: 0 4px 16px rgba(109, 40, 217, 0.25), 0 1px 4px rgba(6, 182, 212, 0.15);
 }
 .light .tech-button:hover {
   filter: brightness(1.08);
+  color: #ffffff;
   box-shadow: 0 6px 22px rgba(109, 40, 217, 0.35), 0 2px 8px rgba(6, 182, 212, 0.2);
+}
+
+/* 亮色：文章 prose 區塊（Tailwind Typography）確保內文／標題對比 */
+html.light .prose {
+  color: var(--text-secondary);
+}
+html.light .prose :where(h1, h2, h3, h4, h5, h6, strong) {
+  color: var(--text-primary);
+}
+
+/* 亮色：通知內文用深字色，避免綠／藍系字疊在淺底上對比不足 */
+html.light .tech-notification-success {
+  color: #065f46;
+  border-color: rgba(5, 150, 105, 0.45);
+  background: rgba(5, 150, 105, 0.08);
+}
+html.light .tech-notification-error {
+  color: #991b1b;
+  border-color: rgba(220, 38, 38, 0.45);
+  background: rgba(220, 38, 38, 0.08);
+}
+html.light .tech-notification-info {
+  color: #5b21b6;
+  border-color: rgba(124, 58, 237, 0.4);
+  background: rgba(124, 58, 237, 0.08);
+}
+html.light .tech-notification-warning {
+  color: #92400e;
+  border-color: rgba(217, 119, 6, 0.45);
+  background: rgba(245, 158, 11, 0.12);
 }
 
 .light .gradient-text {

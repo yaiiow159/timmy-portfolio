@@ -42,7 +42,10 @@ export const fileService = {
       .map(([key, value]) => `${key}_${value}`)
       .join(',')
 
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME?.trim()
+    if (!cloudName) {
+      return publicId.startsWith('http') ? normalizeCloudinaryDeliveryUrl(publicId) : ''
+    }
     return normalizeCloudinaryDeliveryUrl(
       `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${publicId}`
     )

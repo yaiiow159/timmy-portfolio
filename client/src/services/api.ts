@@ -70,15 +70,20 @@ export function normalizeCloudinaryUrlsInString(text: string): string {
 }
 
 export function getStaticUrl(path: string): string {
+  if (path == null || path === '') return ''
+  const trimmed = typeof path === 'string' ? path.trim() : String(path).trim()
+  if (!trimmed) return ''
+  if (trimmed.startsWith('data:') || trimmed.startsWith('blob:')) return trimmed
+
   let resolved: string
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    resolved = path
-  } else if (path.startsWith('//res.cloudinary.com')) {
-    resolved = `https:${path}`
-  } else if (path.startsWith('/uploads/') || path.startsWith('uploads/')) {
-    resolved = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    resolved = trimmed
+  } else if (trimmed.startsWith('//res.cloudinary.com')) {
+    resolved = `https:${trimmed}`
+  } else if (trimmed.startsWith('/uploads/') || trimmed.startsWith('uploads/')) {
+    resolved = `${API_BASE_URL}${trimmed.startsWith('/') ? trimmed : `/${trimmed}`}`
   } else {
-    resolved = path
+    resolved = trimmed
   }
   return normalizeCloudinaryDeliveryUrl(resolved)
 }
