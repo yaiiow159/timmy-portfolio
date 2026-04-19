@@ -785,4 +785,13 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
     transform: translateY(0);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-header,
+  .filter-container {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 </style>

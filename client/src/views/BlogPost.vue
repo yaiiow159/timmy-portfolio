@@ -49,7 +49,7 @@
           <h1 class="tech-title text-3xl md:text-4xl font-bold mb-4">{{ post.title }}</h1>
           
           <div v-if="post.coverImage" class="mb-8 tech-card overflow-hidden">
-            <img :src="post.coverImage" :alt="post?.title" class="w-full h-auto">
+            <img :src="coverImageUrl" :alt="post?.title" class="w-full h-auto">
           </div>
           <div v-else class="mb-8 tech-card h-64 flex items-center justify-center tech-text-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@
               <div class="w-20 h-20 flex-shrink-0 tech-card overflow-hidden">
                 <img 
                   v-if="relatedPost.coverImage" 
-                  :src="relatedPost.coverImage" 
+                  :src="getRelatedCoverUrl(relatedPost.coverImage)" 
                   :alt="relatedPost.title" 
                   class="w-full h-full object-cover"
                 />
@@ -224,6 +224,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useBlogStore, type BlogPost } from '../store/blogStore'
+import { getStaticUrl, normalizeCloudinaryUrlsInString } from '../services/api'
 import { marked } from 'marked'
 import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
@@ -277,14 +278,22 @@ const relatedPosts = computed(() =>
   blogStore.posts.filter((p: BlogPost) => p.id !== post.value?.id).slice(0, 3)
 )
 
+const coverImageUrl = computed(() =>
+  post.value?.coverImage ? getStaticUrl(post.value.coverImage) : ''
+)
+
+function getRelatedCoverUrl(src: string) {
+  return getStaticUrl(src)
+}
+
 const renderedContent = computed(() => {
   if (!post.value) return ''
   try {
     const content = post.value.content
     if (!content) return ''
     const isHtml = /<[a-zA-Z][^>]*>/.test(content)
-    if (isHtml) return content
-    return marked(content) as string
+    const raw = isHtml ? content : (marked(content) as string)
+    return normalizeCloudinaryUrlsInString(raw)
   } catch (error) {
     console.error('Error rendering content:', error)
     return '<p class="text-red-500">Error rendering content</p>'
@@ -348,6 +357,15 @@ async function submitComment() {
 @keyframes blogSlideIn {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-header,
+  .blog-content {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 .blog-content {

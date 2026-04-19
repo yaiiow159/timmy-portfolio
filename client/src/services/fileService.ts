@@ -1,4 +1,4 @@
-import api from './api'
+import api, { normalizeCloudinaryDeliveryUrl } from './api'
 
 export interface CloudinaryUploadResponse {
   fileName: string;
@@ -43,7 +43,9 @@ export const fileService = {
       .join(',')
 
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${publicId}`
+    return normalizeCloudinaryDeliveryUrl(
+      `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${publicId}`
+    )
   },
 
   getImageThumbnail(publicId: string, width = 200, height = 200): string {

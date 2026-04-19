@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '@/store/blogStore.ts'
+import { getStaticUrl } from '@/services/api'
 
 const { t } = useI18n()
 
@@ -33,6 +34,10 @@ const displayExcerpt = computed(() => {
   }
   return props.post.excerpt.substring(0, 120) + '...'
 })
+
+const coverImageSrc = computed(() =>
+  props.post.coverImage ? getStaticUrl(props.post.coverImage) : ''
+)
 </script>
 
 <template>
@@ -49,7 +54,7 @@ const displayExcerpt = computed(() => {
       <div :class="{ 'md:w-1/3 h-40 md:h-auto': !compact, 'h-36': compact }" class="bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
         <div v-if="post.coverImage" class="h-full w-full relative">
           <img 
-            :src="post.coverImage" 
+            :src="coverImageSrc" 
             :alt="post.title" 
             class="h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
           />

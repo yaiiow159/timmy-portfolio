@@ -126,8 +126,8 @@ function handleTagClick(tag: string) {
 }
 
 function getImageUrl(imagePath: string | undefined): string {
-  if (!imagePath) return '';
-  return imagePath.startsWith('http') ? imagePath : getStaticUrl(imagePath);
+  if (!imagePath) return ''
+  return getStaticUrl(imagePath)
 }
 </script>
 

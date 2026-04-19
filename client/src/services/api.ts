@@ -54,21 +54,33 @@ api.interceptors.response.use(
   }
 )
 
+/** 修正資料庫或上傳流程中誤存的雙重副檔名（例如 *.png.png），否則 Cloudinary 會 404 */
+export function normalizeCloudinaryDeliveryUrl(url: string): string {
+  if (!url.includes('res.cloudinary.com')) return url
+  return url.replace(/\.(png|jpe?g|webp|gif)\.\1(?=$|[?#])/i, '.$1')
+}
+
+/** 文章 HTML / Markdown 內文中的 Cloudinary 連結一併修正 */
+export function normalizeCloudinaryUrlsInString(text: string): string {
+  if (!text.includes('res.cloudinary.com')) return text
+  return text.replace(/(?:https?:)?\/\/res\.cloudinary\.com[^"'\\\s>]*/gi, (match) => {
+    const absolute = match.startsWith('//') ? `https:${match}` : match
+    return normalizeCloudinaryDeliveryUrl(absolute)
+  })
+}
+
 export function getStaticUrl(path: string): string {
+  let resolved: string
   if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path
+    resolved = path
+  } else if (path.startsWith('//res.cloudinary.com')) {
+    resolved = `https:${path}`
+  } else if (path.startsWith('/uploads/') || path.startsWith('uploads/')) {
+    resolved = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+  } else {
+    resolved = path
   }
-  
-  if (path.startsWith('//res.cloudinary.com')) {
-    return `https:${path}`
-  }
-
-  if (path.startsWith('/uploads/') || path.startsWith('uploads/')) {
-    return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
-  }
-
-
-  return path
+  return normalizeCloudinaryDeliveryUrl(resolved)
 }
 
 export default api

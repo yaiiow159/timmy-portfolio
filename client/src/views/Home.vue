@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { usePortfolioStore } from '@/store/portfolioStore'
 import { useBlogStore } from '@/store/blogStore'
+import { getStaticUrl } from '@/services/api'
 import { formatDescription } from '@/utils/textFormatters'
 
 const { t } = useI18n()
@@ -504,7 +505,7 @@ watch(() => activeSkillCategory.value, () => {
             <div class="h-48 relative overflow-hidden rounded-t-2xl">
               <img 
                 v-if="post.coverImage" 
-                :src="post.coverImage" 
+                :src="getStaticUrl(post.coverImage)" 
                 :alt="post.title"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />

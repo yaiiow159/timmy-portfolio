@@ -267,4 +267,14 @@ async function submitForm() {
     transform: translateY(0);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-header,
+  .contact-form,
+  .contact-info {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 </style>

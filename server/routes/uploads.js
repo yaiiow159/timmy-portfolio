@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const upload = require('../middleware/upload');
 const adminAuth = require('../middleware/adminAuth');
@@ -15,11 +16,13 @@ router.post('/', adminAuth, upload.single('file'), async (req, res) => {
     const folder = getFolderName(req.file.mimetype);
 
     const uploadPromise = new Promise((resolve, reject) => {
+      // 不含副檔名的 basename，避免 originalname 已帶 .png 時與 Cloudinary 格式後綴疊成 *.png.png
+      const baseName = path.parse(req.file.originalname).name.replace(/\s+/g, '-');
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: `portfolio/${folder}`,
           resource_type: 'auto',
-          public_id: `${Date.now()}-${req.file.originalname.replace(/\s+/g, '-')}`
+          public_id: `${Date.now()}-${baseName}`
         },
         (error, result) => {
           if (error) return reject(error);

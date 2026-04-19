@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const adminAuth = require('../middleware/adminAuth');
 const upload = require('../middleware/upload');
@@ -44,11 +45,12 @@ router.post('/', adminAuth, upload.single('file'), async (req, res) => {
     const folder = getFolderName(req.file.mimetype);
     
     const uploadPromise = new Promise((resolve, reject) => {
+      const baseName = path.parse(req.file.originalname).name.replace(/\s+/g, '-');
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: `portfolio/${folder}`,
           resource_type: 'auto',
-          public_id: `${Date.now()}-${req.file.originalname.replace(/\s+/g, '-')}`
+          public_id: `${Date.now()}-${baseName}`
         },
         (error, result) => {
           if (error) return reject(error);

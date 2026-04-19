@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ResumeDialog from '../components/common/ResumeDialog.vue'
 import ResumeSectionCard from '../components/resume/ResumeSectionCard.vue'
@@ -23,9 +23,20 @@ const languageSkills = computed<LanguageSkill[]>(() => getLocalizedList<Language
 let jobObserver: IntersectionObserver | null = null
 let langObserver: IntersectionObserver | null = null
 
-onMounted(() => {
+onMounted(async () => {
+  // 等路由 page-fade 掛上 DOM 並完成首幀排版後再掛 IO，避免轉場期間漏判 intersection
+  await nextTick()
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  )
   setupJobEntryAnimations()
   setupLanguageBarAnimation()
+  // 若仍無觸發（極少數轉場／縮排時序），避免工作經歷區塊永遠 opacity:0
+  window.setTimeout(() => {
+    document.querySelectorAll('.job-entry').forEach((el) => {
+      if (!el.classList.contains('is-visible')) el.classList.add('is-visible')
+    })
+  }, 800)
 })
 
 onUnmounted(() => {
@@ -215,6 +226,20 @@ function downloadResume(language: 'zh' | 'en') {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-header,
+  :deep(.resume-section) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .job-entry {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

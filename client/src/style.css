@@ -217,6 +217,45 @@ code {
   transform: translateY(8px);
 }
 
+/* 明確終止狀態，避免部分瀏覽器在轉場結束後仍殘留 enter-from 的 transform／opacity */
+.page-fade-enter-to,
+.page-fade-leave-from {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-fade-enter-active,
+  .page-fade-leave-active {
+    transition-duration: 0.001ms !important;
+    transition-property: opacity;
+  }
+
+  .page-fade-enter-from,
+  .page-fade-leave-to {
+    transform: none;
+  }
+
+  /* 與 GSAP 類似問題：動畫被縮短或略過時 both/backwards 會卡在 opacity:0 */
+  .tech-animate-fade-in,
+  .tech-animate-slide-up,
+  .tech-animate-slide-down,
+  .tech-animate-slide-left,
+  .tech-animate-slide-right,
+  .tech-animate-scale,
+  .tech-animate-rotate {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .tech-slide-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 .card {
   background-color: #1e1e1e;
   border-radius: 0.5rem;
