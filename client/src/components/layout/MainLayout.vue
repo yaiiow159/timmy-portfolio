@@ -36,8 +36,9 @@ onMounted(() => {
     
     <main class="flex-grow container-custom py-8">
       <router-view v-slot="{ Component }">
-        <transition name="page-fade" mode="out-in">
-          <component :is="Component" :key="route.path" />
+        <!-- 不使用 mode="out-in"：先卸載再掛載時，若離場動畫或片段根節點異常，會出現整頁空白 -->
+        <transition name="page-fade">
+          <component :is="Component" :key="route.fullPath" />
         </transition>
       </router-view>
     </main>

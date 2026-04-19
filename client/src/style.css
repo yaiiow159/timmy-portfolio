@@ -208,20 +208,19 @@ code {
 /* 路由頁面切換轉場：必須定義為全域才能正確套用到 router-view 子元件 */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  /* 僅淡出淡入：搭配 transform 時，部分 WebKit／Edge 與子層動畫疊加易出現殘影或卡在最後一幀 */
+  transition: opacity 0.18s ease;
 }
 
 .page-fade-enter-from,
 .page-fade-leave-to {
   opacity: 0;
-  transform: translateY(8px);
 }
 
-/* 明確終止狀態，避免部分瀏覽器在轉場結束後仍殘留 enter-from 的 transform／opacity */
+/* 明確終止狀態，避免轉場結束後仍殘留 enter-from 的 opacity */
 .page-fade-enter-to,
 .page-fade-leave-from {
   opacity: 1;
-  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -233,7 +232,7 @@ code {
 
   .page-fade-enter-from,
   .page-fade-leave-to {
-    transform: none;
+    opacity: 0;
   }
 
   /* 與 GSAP 類似問題：動畫被縮短或略過時 both/backwards 會卡在 opacity:0 */

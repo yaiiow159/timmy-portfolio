@@ -111,11 +111,8 @@
       
       <div class="flex-1 overflow-auto p-8">
         <router-view v-slot="{ Component }">
-          <transition
-            name="page-fade"
-            mode="out-in"
-          >
-            <component :is="Component" />
+          <transition name="page-fade">
+            <component :is="Component" :key="$route.fullPath" />
           </transition>
         </router-view>
       </div>

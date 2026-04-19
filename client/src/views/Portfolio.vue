@@ -211,6 +211,8 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
 </script>
 
 <template>
+  <!-- 單一根節點：Vue Router 的 <Transition> 對多根片段套用 enter/leave 類別不可靠，易造成切頁後內容不顯示 -->
+  <div class="portfolio-view">
   <div class="min-h-screen py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
     <div class="container mx-auto px-4 sm:px-6 md:px-8">
       <div class="portfolio-header mb-12 md:mb-20 text-center">
@@ -707,9 +709,15 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <style scoped>
+.portfolio-view {
+  display: block;
+  width: 100%;
+}
+
 .project-image-carousel {
   position: relative;
   overflow: hidden;
