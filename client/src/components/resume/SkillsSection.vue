@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { ref, onMounted } from 'vue'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const { t } = useI18n()
 
@@ -19,35 +15,30 @@ const { skills } = defineProps<{
 }>()
 
 const skillsRef = ref<HTMLElement | null>(null)
+// 進入 viewport 後才展開技能進度條
+const skillsVisible = ref(false)
+let observer: IntersectionObserver | null = null
 
 onMounted(() => {
-  if (skillsRef.value) {
-    animateSkills()
-  }
+  if (!skillsRef.value) return
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !skillsVisible.value) {
+          skillsVisible.value = true
+          observer?.disconnect()
+        }
+      })
+    },
+    { threshold: 0.15 }
+  )
+  observer.observe(skillsRef.value)
 })
 
-function animateSkills() {
-  const skillBars = document.querySelectorAll('.skill-progress-bar')
-  
-  skillBars.forEach((bar) => {
-    const level = parseFloat(bar.getAttribute('data-level') || '0')
-    
-    gsap.fromTo(
-      bar,
-      { width: '0%' },
-      {
-        width: `${level}%`,
-        duration: 1.5,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: bar,
-          start: 'top 80%',
-          once: true
-        }
-      }
-    )
-  })
-}
+onUnmounted(() => {
+  observer?.disconnect()
+})
 </script>
 
 <template>
@@ -67,8 +58,7 @@ function animateSkills() {
           <div class="h-2 bg-primary rounded-full overflow-hidden">
             <div 
               class="skill-progress-bar h-full bg-accent rounded-full"
-              :data-level="skill.level"
-              :style="{ width: '0%' }"
+              :style="{ width: skillsVisible ? `${skill.level}%` : '0%' }"
             ></div>
           </div>
         </div>
@@ -76,3 +66,9 @@ function animateSkills() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.skill-progress-bar {
+  transition: width 1.5s ease-out;
+}
+</style>

@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ResumeDialog from '../components/common/ResumeDialog.vue'
 import ResumeSectionCard from '../components/resume/ResumeSectionCard.vue'
 import type { EducationEntry, LanguageSkill, SkillGroup, WorkExperience } from '../types/resume'
 
-gsap.registerPlugin(ScrollTrigger)
-
 const { t, tm } = useI18n()
-const languageBarsAnimated = ref(false)
 const showDialog = ref(false)
+// 語言進度條進入 viewport 後才展開寬度
+const languagesVisible = ref(false)
 
 const getLocalizedList = <T>(path: string): T[] => {
   const value = tm(path)
@@ -23,93 +20,48 @@ const workExperiences = computed<WorkExperience[]>(() => getLocalizedList<WorkEx
 const educationEntries = computed<EducationEntry[]>(() => getLocalizedList<EducationEntry>('resume.content.education'))
 const languageSkills = computed<LanguageSkill[]>(() => getLocalizedList<LanguageSkill>('resume.content.languages'))
 
-onMounted(async () => {
-  await nextTick()
+let jobObserver: IntersectionObserver | null = null
+let langObserver: IntersectionObserver | null = null
 
-  // 入場動畫改由 CSS keyframes 負責，確保頁面內容一定可見
-  // GSAP 僅負責捲動觸發的互動動畫
-  animateWorkExperience()
-
-  ScrollTrigger.create({
-    trigger: '.language-section',
-    start: 'top 80%',
-    once: true,
-    onEnter: animateLanguageSkills
-  })
-
-  nextTick(() => {
-    const languageSection = document.querySelector('.language-section')
-    if (languageSection && isLanguageSectionInView(languageSection)) {
-      animateLanguageSkills()
-    }
-    ScrollTrigger.refresh()
-  })
+onMounted(() => {
+  setupJobEntryAnimations()
+  setupLanguageBarAnimation()
 })
 
 onUnmounted(() => {
-  // onUnmounted 時本頁 trigger 元素已從 document 移除
-  // 仍在 document 中的屬於其他元件，不應清除
-  ScrollTrigger.getAll()
-    .filter(st => st.trigger instanceof Element && !document.contains(st.trigger))
-    .forEach(st => st.kill())
+  jobObserver?.disconnect()
+  langObserver?.disconnect()
 })
 
-function animateWorkExperience() {
-  gsap.utils.toArray<HTMLElement>('.job-entry').forEach((entry) => {
-    const rect = entry.getBoundingClientRect()
-    // 已在 viewport 內的 entry 直接播動畫，不預先設為不可見，避免閃爍或卡住
-    const isInView = rect.top < window.innerHeight * 0.85 && rect.bottom > 0
-
-    const tl = gsap.timeline({
-      scrollTrigger: isInView ? undefined : {
-        trigger: entry as gsap.DOMTarget,
-        start: 'top 85%',
-        once: true,
-      },
-    })
-
-    tl.fromTo(
-      entry as gsap.TweenTarget,
-      { x: isInView ? 0 : -50, opacity: isInView ? 1 : 0 },
-      { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' },
-    )
-      .fromTo(
-        entry.querySelectorAll('.job-detail'),
-        { y: isInView ? 0 : 20, opacity: isInView ? 1 : 0 },
-        { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power3.out' },
-        '-=0.2',
-      )
-      .fromTo(
-        entry.querySelectorAll('.job-bullet'),
-        { scale: isInView ? 1 : 0.5, opacity: isInView ? 1 : 0 },
-        { scale: 1, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'back.out(1.7)' },
-        '-=0.2',
-      )
-  })
+function setupJobEntryAnimations() {
+  jobObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible')
+          jobObserver?.unobserve(entry.target)
+        }
+      })
+    },
+    { threshold: 0.1 }
+  )
+  document.querySelectorAll('.job-entry').forEach((el) => jobObserver!.observe(el))
 }
 
-function animateLanguageSkills() {
-  if (languageBarsAnimated.value) return
-  languageBarsAnimated.value = true
-
-  const languageBars = document.querySelectorAll<HTMLElement>('.language-bar')
-  languageBars.forEach((bar) => {
-    const percent = bar.dataset.percent || bar.style.width || '0%'
-    gsap.from(bar, {
-      width: '0%',
-      duration: 1.2,
-      ease: 'power3.out',
-      onStart: () => {
-        bar.style.width = percent
-      }
-    })
-  })
-}
-
-function isLanguageSectionInView(section: Element) {
-  const rect = section.getBoundingClientRect()
-  const startOffset = window.innerHeight * 0.8
-  return rect.top <= startOffset && rect.bottom >= 0
+function setupLanguageBarAnimation() {
+  langObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !languagesVisible.value) {
+          languagesVisible.value = true
+          langObserver?.disconnect()
+        }
+      })
+    },
+    { threshold: 0.2 }
+  )
+  const langSection = document.querySelector('.language-section')
+  if (langSection) langObserver.observe(langSection)
 }
 
 function downloadResume(language: 'zh' | 'en') {
@@ -227,8 +179,7 @@ function downloadResume(language: 'zh' | 'en') {
               <div class="language-bar-track h-2 w-full rounded-full">
                 <div
                   class="language-bar h-2 rounded-full bg-accent"
-                  :data-percent="`${language.level}%`"
-                  :style="{ width: `${language.level}%` }"
+                  :style="{ width: languagesVisible ? `${language.level}%` : '0%' }"
                 ></div>
               </div>
               <span class="text-sm text-text-secondary language-label">{{ language.proficiency }}</span>
@@ -267,8 +218,17 @@ function downloadResume(language: 'zh' | 'en') {
   }
 }
 
+/* 捲動進入 viewport 後才套用動畫（JS 先隱藏，Observer 再顯示） */
 .job-entry {
   position: relative;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.job-entry.is-visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* 使用 CSS 變數讓進度條軌道自動適應主題 */
@@ -278,6 +238,6 @@ function downloadResume(language: 'zh' | 'en') {
 
 .language-bar {
   transform-origin: left;
-  transition: width 1s ease-in-out;
+  transition: width 1.2s ease-out;
 }
 </style>

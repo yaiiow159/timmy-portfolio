@@ -227,7 +227,6 @@ import { useBlogStore, type BlogPost } from '../store/blogStore'
 import { marked } from 'marked'
 import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
-import gsap from 'gsap'
 import { useNotificationStore } from '../store/notificationStore'
 const route = useRoute()
 const router = useRouter()
@@ -270,21 +269,6 @@ onMounted(async () => {
     router.push('/blog')
   } finally {
     isLoading.value = false
-    
-    const tl = gsap.timeline()
-    
-    tl.from('.blog-header', {
-      y: 30,
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power3.out'
-    })
-    .from('.blog-content', {
-      y: 20,
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power3.out'
-    }, '-=0.3')
   }
 })
 
@@ -351,6 +335,20 @@ async function submitComment() {
 
 <style>
 @import '../assets/atom-one-dark.css';
+
+/* 入場動畫改由 CSS keyframes 負責，確保頁面內容在轉場後一定可見 */
+.blog-header {
+  animation: blogSlideIn 0.6s ease-out both;
+}
+
+.blog-content {
+  animation: blogSlideIn 0.5s 0.15s ease-out both;
+}
+
+@keyframes blogSlideIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .blog-content {
   font-size: 1.125rem;
@@ -460,7 +458,6 @@ async function submitComment() {
   background-color: rgba(var(--text-primary-rgb), 0.03);
 }
 
-/* Animation */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
