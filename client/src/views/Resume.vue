@@ -31,7 +31,6 @@ onMounted(async () => {
   )
   setupJobEntryAnimations()
   setupLanguageBarAnimation()
-  // 若仍無觸發（極少數轉場／縮排時序），避免工作經歷區塊永遠 opacity:0
   window.setTimeout(() => {
     document.querySelectorAll('.job-entry').forEach((el) => {
       if (!el.classList.contains('is-visible')) el.classList.add('is-visible')
@@ -88,36 +87,51 @@ function downloadResume(language: 'zh' | 'en') {
 </script>
 
 <template>
-  <div class="min-h-screen py-8 md:py-12 resume-content tech-grid-bg">
-    <div class="container mx-auto px-4 sm:px-6 md:px-8">
-      <div class="resume-header mb-8 md:mb-12 text-center">
-        <h1 class="text-3xl md:text-4xl font-bold mb-3 md:mb-4 text-text-primary">{{ t('resume.title') }}</h1>
-        <p class="text-base md:text-lg text-text-secondary mb-4 md:mb-6">
-          {{ t('resume.subtitle') }}
-        </p>
-        <button
-          class="tech-button tech-button-primary"
-          @click="showDialog = true"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          {{ t('resume.downloadPdf') }}
-        </button>
+  <div class="min-h-screen py-8 md:py-14 resume-content tech-grid-bg">
+    <div class="container mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
+      <div class="resume-header mb-10 text-center md:mb-14">
+        <div class="page-hero-panel mx-auto max-w-2xl">
+          <h1 class="tech-title mb-3 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+            {{ t('resume.title') }}
+          </h1>
+          <p class="mx-auto max-w-xl text-base leading-relaxed text-text-secondary md:text-lg">
+            {{ t('resume.subtitle') }}
+          </p>
+          <div class="page-hero-divider" />
+          <button
+            type="button"
+            class="tech-button tech-button-primary mt-8 inline-flex shadow-lg shadow-accent/25 ring-2 ring-accent/20 transition-transform hover:-translate-y-0.5"
+            @click="showDialog = true"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {{ t('resume.downloadPdf') }}
+          </button>
+        </div>
       </div>
 
       <ResumeDialog v-model="showDialog" @download="downloadResume" />
 
       <ResumeSectionCard :title="t('resume.skills')">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div v-for="group in skillGroups" :key="group.title">
-            <h3 class="text-xl font-semibold mb-3 text-text-primary">{{ group.title }}</h3>
-            <ul class="space-y-2 text-text-secondary">
-              <li v-for="item in group.items" :key="item.label" class="flex items-start">
-                <span class="text-accent mr-2">•</span>
-                <div>
-                  <span class="font-medium">{{ item.label }}</span>
-                  <span class="text-text-secondary"> {{ item.description }}</span>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+          <div
+            v-for="group in skillGroups"
+            :key="group.title"
+            class="rounded-xl border border-accent/10 bg-primary/15 p-5 transition-colors hover:border-accent/25 md:p-6"
+          >
+            <h3 class="mb-4 border-b border-accent/10 pb-2 text-lg font-semibold text-text-primary">
+              {{ group.title }}
+            </h3>
+            <ul class="space-y-3 text-text-secondary">
+              <li v-for="item in group.items" :key="item.label" class="flex items-start gap-3">
+                <span
+                  class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-br from-accent to-tech-purple shadow-[0_0_8px_rgba(var(--accent-rgb),0.6)]"
+                  aria-hidden="true"
+                />
+                <div class="leading-relaxed">
+                  <span class="font-medium text-text-primary">{{ item.label }}</span>
+                  <span class="text-text-secondary/90"> {{ item.description }}</span>
                 </div>
               </li>
             </ul>
@@ -129,34 +143,43 @@ function downloadResume(language: 'zh' | 'en') {
         <div
           v-for="experience in workExperiences"
           :key="`${experience.role}-${experience.company}`"
-          class="job-entry mb-8 relative pl-6 border-l-2 border-accent"
+          class="job-entry relative mb-8 pl-0 last:mb-0 md:pl-2"
         >
-          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent job-bullet"></div>
-          <div class="mb-2 job-detail">
-            <h3 class="text-xl font-semibold text-text-primary">{{ experience.role }}</h3>
-            <p class="text-accent">{{ experience.company }}</p>
-            <p class="text-sm text-text-secondary job-date">{{ experience.date }}</p>
-          </div>
+          <div
+            class="absolute left-0 top-2 z-[1] h-4 w-4 rounded-full border-2 border-accent bg-[var(--secondary)] shadow-[0_0_14px_rgba(var(--accent-rgb),0.55)] md:top-2.5 md:h-5 md:w-5 md:left-1"
+            aria-hidden="true"
+          />
+          <div
+            class="relative ml-6 rounded-xl border border-white/5 bg-secondary/30 p-5 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:bg-secondary/45 md:ml-8 md:p-6"
+          >
+            <div class="job-detail mb-1">
+              <h3 class="text-lg font-semibold text-text-primary md:text-xl">{{ experience.role }}</h3>
+              <p class="bg-gradient-to-r from-accent to-tech-cyan bg-clip-text font-medium text-transparent">
+                {{ experience.company }}
+              </p>
+              <p class="job-date mt-1 text-sm text-text-secondary/90">{{ experience.date }}</p>
+            </div>
 
-          <template v-if="experience.projects?.length">
-            <div v-for="project in experience.projects" :key="project.title" class="job-detail">
-              <h4 class="font-semibold mt-4 mb-2 text-text-primary">{{ project.title }}</h4>
-              <ul class="space-y-2 text-text-secondary">
-                <li v-for="bullet in project.bullets" :key="bullet" class="flex items-start job-detail">
-                  <span class="text-accent mr-2">•</span>
-                  <span>{{ bullet }}</span>
+            <template v-if="experience.projects?.length">
+              <div v-for="project in experience.projects" :key="project.title" class="job-detail mt-4 border-t border-accent/10 pt-4 first:mt-0 first:border-t-0 first:pt-0">
+                <h4 class="mb-2 font-semibold text-text-primary">{{ project.title }}</h4>
+                <ul class="space-y-2.5 text-text-secondary">
+                  <li v-for="bullet in project.bullets" :key="bullet" class="job-detail flex items-start gap-2.5">
+                    <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent/80" />
+                    <span class="leading-relaxed">{{ bullet }}</span>
+                  </li>
+                </ul>
+              </div>
+            </template>
+            <template v-else>
+              <ul class="mt-3 space-y-2.5 text-text-secondary">
+                <li v-for="bullet in experience.bullets" :key="bullet" class="job-detail flex items-start gap-2.5">
+                  <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent/80" />
+                  <span class="leading-relaxed">{{ bullet }}</span>
                 </li>
               </ul>
-            </div>
-          </template>
-          <template v-else>
-            <ul class="space-y-2 text-text-secondary">
-              <li v-for="bullet in experience.bullets" :key="bullet" class="flex items-start job-detail">
-                <span class="text-accent mr-2">•</span>
-                <span>{{ bullet }}</span>
-              </li>
-            </ul>
-          </template>
+            </template>
+          </div>
         </div>
       </ResumeSectionCard>
 
@@ -164,36 +187,48 @@ function downloadResume(language: 'zh' | 'en') {
         <div
           v-for="education in educationEntries"
           :key="education.school"
-          class="relative pl-6 border-l-2 border-accent mb-6"
+          class="relative mb-8 pl-0 last:mb-0 md:pl-2"
         >
-          <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent"></div>
-          <div class="mb-2">
-            <h3 class="text-xl font-semibold text-text-primary">{{ education.school }}</h3>
-            <p class="text-accent">{{ education.degree }}</p>
-            <p class="text-sm text-text-secondary">{{ education.period }}</p>
+          <div
+            class="absolute left-0 top-2 z-[1] h-4 w-4 rounded-full border-2 border-accent bg-[var(--secondary)] shadow-[0_0_12px_rgba(var(--accent-rgb),0.45)] md:left-1 md:h-5 md:w-5"
+            aria-hidden="true"
+          />
+          <div
+            class="relative ml-6 rounded-xl border border-white/5 bg-secondary/30 p-5 backdrop-blur-sm md:ml-8 md:p-6"
+          >
+            <div class="mb-2">
+              <h3 class="text-lg font-semibold text-text-primary md:text-xl">{{ education.school }}</h3>
+              <p class="font-medium text-accent">{{ education.degree }}</p>
+              <p class="mt-1 text-sm text-text-secondary">{{ education.period }}</p>
+            </div>
+            <ul class="mt-4 list-none space-y-2 border-t border-accent/10 pt-4 text-text-secondary">
+              <li v-for="detail in education.description" :key="detail" class="flex items-start gap-2.5 pl-0">
+                <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-tech-purple/90" />
+                <span class="leading-relaxed">{{ detail }}</span>
+              </li>
+            </ul>
           </div>
-          <ul class="list-disc list-inside text-text-secondary space-y-2 mt-4">
-            <li v-for="detail in education.description" :key="detail">
-              {{ detail }}
-            </li>
-          </ul>
         </div>
       </ResumeSectionCard>
 
       <ResumeSectionCard :title="t('resume.languages')" customClass="language-section">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div v-for="language in languageSkills" :key="language.name" class="flex items-center gap-4">
-            <div class="w-24">
-              <span class="font-medium text-text-primary language-label">{{ language.name }}</span>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+          <div
+            v-for="language in languageSkills"
+            :key="language.name"
+            class="flex flex-col gap-2 rounded-lg border border-accent/8 bg-primary/10 p-4 sm:flex-row sm:items-center sm:gap-5"
+          >
+            <div class="w-full shrink-0 sm:w-28">
+              <span class="language-label font-medium text-text-primary">{{ language.name }}</span>
             </div>
-            <div class="flex-grow">
-              <div class="language-bar-track h-2 w-full rounded-full">
+            <div class="min-w-0 flex-1">
+              <div class="language-bar-track h-2.5 w-full overflow-hidden rounded-full">
                 <div
-                  class="language-bar h-2 rounded-full bg-accent"
+                  class="language-bar h-2.5 rounded-full"
                   :style="{ width: languagesVisible ? `${language.level}%` : '0%' }"
-                ></div>
+                />
               </div>
-              <span class="text-sm text-text-secondary language-label">{{ language.proficiency }}</span>
+              <span class="language-label mt-1.5 block text-sm text-text-secondary">{{ language.proficiency }}</span>
             </div>
           </div>
         </div>
@@ -264,5 +299,11 @@ function downloadResume(language: 'zh' | 'en') {
 .language-bar {
   transform-origin: left;
   transition: width 1.2s ease-out;
+  background: linear-gradient(90deg, var(--accent), var(--tech-purple));
+  box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.35);
+}
+
+.light .language-bar {
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.25);
 }
 </style>

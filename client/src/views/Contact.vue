@@ -60,19 +60,21 @@ async function submitForm() {
 <template>
   <div class="min-h-screen py-12 md:py-16 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
     <div class="container mx-auto px-4 sm:px-6 md:px-8">
-      <div class="contact-header mb-10 md:mb-16 text-center">
-        <h1 class="tech-title text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
-          {{ t('contact.title') }}
-        </h1>
-        <p class="text-base sm:text-lg md:text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
-          {{ t('contact.subtitle') }}
-        </p>
-        <div class="w-24 md:w-32 h-1 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-4 md:mt-6 rounded-full"></div>
+      <div class="contact-header mb-10 text-center md:mb-16">
+        <div class="page-hero-panel mx-auto max-w-3xl">
+          <h1 class="tech-title mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl md:mb-5">
+            {{ t('contact.title') }}
+          </h1>
+          <p class="mx-auto max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg md:text-xl">
+            {{ t('contact.subtitle') }}
+          </p>
+          <div class="page-hero-divider" />
+        </div>
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         <div class="lg:col-span-2 contact-form">
-          <div class="tech-card p-5 sm:p-6 md:p-8">
+          <div class="tech-card rounded-2xl border border-accent/10 p-5 shadow-xl sm:p-6 md:p-8">
             <form @submit.prevent="submitForm" class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

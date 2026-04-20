@@ -215,14 +215,16 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
   <div class="portfolio-view">
   <div class="min-h-screen py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
     <div class="container mx-auto px-4 sm:px-6 md:px-8">
-      <div class="portfolio-header mb-12 md:mb-20 text-center">
-        <h1 class="tech-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8">
-          {{ t('portfolio.title') }}
-        </h1>
-        <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
-          {{ t('portfolio.subtitle') }}
-        </p>
-        <div class="w-24 md:w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-6 md:mt-8 rounded-full shadow-lg shadow-accent/30"></div>
+      <div class="portfolio-header mb-12 text-center md:mb-20">
+        <div class="page-hero-panel mx-auto max-w-4xl">
+          <h1 class="tech-title mb-5 text-3xl font-bold tracking-tight sm:text-4xl md:mb-7 md:text-5xl lg:text-6xl">
+            {{ t('portfolio.title') }}
+          </h1>
+          <p class="mx-auto max-w-3xl text-base leading-relaxed text-text-secondary sm:text-lg md:text-xl lg:text-2xl">
+            {{ t('portfolio.subtitle') }}
+          </p>
+          <div class="page-hero-divider mt-6 md:mt-7" />
+        </div>
       </div>
       
       <div class="filter-container mb-16">
@@ -484,7 +486,7 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
                     </div>
                   </div>
                   
-                  <div class="flex gap-3">
+                  <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <a 
                       v-if="project.liveUrl"
                       :href="project.liveUrl" 
@@ -539,12 +541,12 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
         </button>
       </div>
       
-      <div v-if="totalPages > 1" class="flex justify-center mt-20">
-        <div class="flex items-center space-x-4 bg-secondary p-5 rounded-2xl shadow-2xl border border-accent/20">
+      <div v-if="totalPages > 1" class="mt-12 flex justify-center px-1 md:mt-20">
+        <div class="flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-accent/20 bg-secondary p-3 shadow-2xl sm:gap-4 sm:p-5">
           <button 
             @click="prevPage" 
             :disabled="currentPage === 1"
-            class="tech-button px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+            class="tech-button flex-shrink-0 rounded-xl px-3 py-2 transition-all duration-300 hover:scale-105 sm:px-4"
             :class="{'opacity-50 cursor-not-allowed': currentPage === 1, 'hover:bg-accent hover:text-white hover:shadow-lg': currentPage !== 1}"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -552,12 +554,13 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
             </svg>
           </button>
           
-          <div class="flex space-x-2">
+          <div class="-mx-1 flex max-w-[min(100vw-8rem,28rem)] flex-1 flex-wrap justify-center gap-1 overflow-x-auto py-1 sm:max-w-none sm:flex-none sm:gap-2">
             <button 
               v-for="page in totalPages" 
               :key="page"
+              type="button"
               @click="goToPage(page)"
-              class="tech-button w-12 h-12 flex items-center justify-center rounded-xl font-semibold transition-all duration-300 transform hover:scale-110"
+              class="tech-button flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-110 sm:h-12 sm:w-12 sm:text-base"
               :class="currentPage === page ? 'bg-gradient-to-r from-accent to-tech-purple text-white shadow-2xl' : 'bg-primary text-text-primary hover:bg-accent/20'"
             >
               {{ page }}
@@ -567,7 +570,7 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
           <button 
             @click="nextPage" 
             :disabled="currentPage === totalPages"
-            class="tech-button px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+            class="tech-button flex-shrink-0 rounded-xl px-3 py-2 transition-all duration-300 hover:scale-105 sm:px-4"
             :class="{'opacity-50 cursor-not-allowed': currentPage === totalPages, 'hover:bg-accent hover:text-white hover:shadow-lg': currentPage !== totalPages}"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -587,7 +590,7 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent"></div>
         <button 
           @click="closeDetailsModal" 
-          class="absolute top-6 right-6 text-text-secondary hover:text-accent z-20 tech-button p-3 transition-all duration-300 hover:scale-110"
+          class="absolute right-3 top-3 z-20 p-2 text-text-secondary transition-all duration-300 hover:scale-110 hover:text-accent sm:right-6 sm:top-6 sm:p-3 tech-button"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -640,8 +643,8 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
           </div>
         </div>
         
-        <div class="p-10">
-          <h2 class="tech-title text-4xl font-bold mb-6">{{ selectedProject.title }}</h2>
+        <div class="p-4 sm:p-8 md:p-10">
+          <h2 class="tech-title mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl md:text-4xl">{{ selectedProject.title }}</h2>
           
           <div class="mb-10">
             <p class="text-text-secondary text-lg leading-relaxed">{{ getProjectPlainDescription(selectedProject.description) }}</p>
@@ -681,12 +684,12 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
             </div>
           </div>
           
-          <div class="flex gap-4 mt-8">
+          <div class="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:gap-4">
             <a 
               v-if="selectedProject.liveUrl"
               :href="selectedProject.liveUrl" 
               target="_blank"
-              class="flex-1 tech-button inline-flex justify-center items-center px-6 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 tech-glow"
+              class="tech-button inline-flex flex-1 items-center justify-center px-4 py-3 text-base font-semibold transition-all duration-300 transform hover:scale-105 tech-glow sm:px-6 sm:py-4 sm:text-lg"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -697,7 +700,7 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
               v-if="selectedProject.codeUrl"
               :href="selectedProject.codeUrl" 
               target="_blank"
-              class="flex-1 inline-flex justify-center items-center px-6 py-4 border-2 border-accent text-accent hover:bg-accent hover:text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 text-lg"
+              class="inline-flex flex-1 items-center justify-center rounded-xl border-2 border-accent px-4 py-3 text-base font-semibold text-accent transition-all duration-300 transform hover:scale-105 hover:bg-accent hover:text-white sm:px-6 sm:py-4 sm:text-lg"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />

@@ -11,10 +11,10 @@ function goHome() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center py-12 px-4">
-    <div class="text-center">
-      <h1 class="text-9xl font-bold text-accent mb-4">{{ t('notFound.title') }}</h1>
-      <h2 class="text-3xl font-semibold text-text-primary mb-6">{{ t('notFound.heading') }}</h2>
+  <div class="min-h-screen flex items-center justify-center py-10 sm:py-12 px-4 sm:px-6">
+    <div class="text-center max-w-lg mx-auto w-full">
+      <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-accent mb-3 sm:mb-4 leading-none">{{ t('notFound.title') }}</h1>
+      <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-text-primary mb-4 sm:mb-6">{{ t('notFound.heading') }}</h2>
       <p class="text-text-secondary mb-8 max-w-md mx-auto">
         {{ t('notFound.description') }}
       </p>

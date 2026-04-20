@@ -29,7 +29,7 @@ const socialLinks = [
     <div class="tech-decoration circle-1 opacity-30"></div>
     <div class="tech-decoration circle-2 opacity-30"></div>
     
-    <div class="container relative z-10 mx-auto px-6 md:px-8">
+    <div class="container relative z-10 mx-auto px-4 sm:px-6 md:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
         <div class="lg:col-span-1">
           <div class="flex items-center mb-6">

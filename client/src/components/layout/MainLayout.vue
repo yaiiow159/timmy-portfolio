@@ -34,7 +34,7 @@ onMounted(() => {
     
     <Navbar />
     
-    <main class="flex-grow container-custom py-8">
+    <main class="flex-grow container-custom min-w-0 py-6 sm:py-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <router-view v-slot="{ Component }">
         <transition name="page-fade">
           <component :is="Component" :key="route.fullPath" />

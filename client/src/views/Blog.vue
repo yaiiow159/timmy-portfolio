@@ -132,18 +132,22 @@ function getImageUrl(imagePath: string | undefined): string {
 </script>
 
 <template>
-  <div class="min-h-screen py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
+  <div class="min-h-screen py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
     <div class="container mx-auto px-4 sm:px-6 md:px-8">
-      <div class="blog-header mb-12 md:mb-20 text-center">
-        <h1 class="tech-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8">{{ t('blog.title') }}</h1>
-        <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
-          {{ t('blog.subtitle') }}
-        </p>
-        <div class="w-24 md:w-32 h-1.5 bg-gradient-to-r from-accent to-tech-purple mx-auto mt-6 md:mt-8 rounded-full shadow-lg shadow-accent/30"></div>
+      <div class="blog-header mb-12 text-center md:mb-20">
+        <div class="page-hero-panel mx-auto max-w-4xl">
+          <h1 class="tech-title mb-5 text-3xl font-bold tracking-tight sm:text-4xl md:mb-7 md:text-5xl lg:text-6xl">
+            {{ t('blog.title') }}
+          </h1>
+          <p class="mx-auto max-w-3xl text-base leading-relaxed text-text-secondary sm:text-lg md:text-xl lg:text-2xl">
+            {{ t('blog.subtitle') }}
+          </p>
+          <div class="page-hero-divider mt-6 md:mt-7" />
+        </div>
       </div>
       
       <div class="flex flex-col lg:flex-row gap-8">
-        <div class="lg:w-2/3">
+        <div class="min-w-0 lg:w-2/3">
           <div class="mb-8">
             <div class="flex flex-col md:flex-row gap-4 md:items-center justify-between">
               <div class="flex-1">
@@ -163,8 +167,8 @@ function getImageUrl(imagePath: string | undefined): string {
                 </div>
               </div>
               
-              <div class="hidden sm:flex items-center gap-2">
-                <span class="text-sm tech-text-secondary mr-2">Layout:</span>
+              <div class="flex w-full flex-wrap items-center justify-start gap-2 sm:w-auto sm:justify-end">
+                <span class="mr-1 text-sm tech-text-secondary sm:mr-2">{{ t('portfolio.layout') }}:</span>
                 <div class="flex bg-secondary rounded-xl p-1">
                   <button
                     @click="layoutMode = 'grid'"
@@ -332,12 +336,12 @@ function getImageUrl(imagePath: string | undefined): string {
             <p class="text-text-secondary">{{ t('blog.tryDifferent') }}</p>
           </div>
           
-          <div v-if="totalPages > 1 && !isLoading" class="flex justify-center mt-20">
-            <div class="flex items-center space-x-4 bg-secondary p-5 rounded-2xl shadow-2xl border border-accent/20">
+          <div v-if="totalPages > 1 && !isLoading" class="mt-12 flex justify-center px-1 md:mt-20">
+            <div class="flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-accent/20 bg-secondary p-3 shadow-2xl sm:gap-4 sm:p-5">
               <button 
                 @click="prevPage" 
                 :disabled="currentPage === 1"
-                class="tech-button px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+                class="tech-button flex-shrink-0 rounded-xl px-3 py-2 transition-all duration-300 hover:scale-105 sm:px-4"
                 :class="{'opacity-50 cursor-not-allowed': currentPage === 1, 'hover:bg-accent hover:text-white hover:shadow-lg': currentPage !== 1}"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -345,12 +349,13 @@ function getImageUrl(imagePath: string | undefined): string {
                 </svg>
               </button>
               
-              <div class="flex space-x-2">
+              <div class="-mx-1 flex max-w-[min(100vw-8rem,28rem)] flex-1 flex-wrap justify-center gap-1 overflow-x-auto py-1 sm:max-w-none sm:flex-none sm:gap-2">
                 <button 
                   v-for="page in pageNumbers" 
                   :key="page"
+                  type="button"
                   @click="changePage(page)"
-                  class="tech-button w-12 h-12 flex items-center justify-center rounded-xl font-semibold transition-all duration-300 transform hover:scale-110"
+                  class="tech-button flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-110 sm:h-12 sm:w-12 sm:text-base"
                   :class="currentPage === page ? 'bg-gradient-to-r from-accent to-tech-purple text-white shadow-2xl' : 'bg-primary text-text-primary hover:bg-accent/20'"
                 >
                   {{ page }}
@@ -360,7 +365,7 @@ function getImageUrl(imagePath: string | undefined): string {
               <button 
                 @click="nextPage" 
                 :disabled="currentPage === totalPages"
-                class="tech-button px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+                class="tech-button flex-shrink-0 rounded-xl px-3 py-2 transition-all duration-300 hover:scale-105 sm:px-4"
                 :class="{'opacity-50 cursor-not-allowed': currentPage === totalPages, 'hover:bg-accent hover:text-white hover:shadow-lg': currentPage !== totalPages}"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -371,9 +376,9 @@ function getImageUrl(imagePath: string | undefined): string {
           </div>
         </div>
         
-        <div class="lg:w-1/3 blog-sidebar">
-          <div class="tech-card p-8 mb-8">
-            <h3 class="tech-title text-2xl font-bold mb-6 flex items-center gap-2">
+        <div class="lg:w-1/3 blog-sidebar min-w-0">
+          <div class="tech-card mb-8 p-5 sm:p-6 md:p-8">
+            <h3 class="tech-title text-xl sm:text-2xl font-bold mb-6 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
@@ -403,8 +408,8 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
           </div>
           
-          <div class="tech-card p-8">
-            <h3 class="tech-title text-2xl font-bold mb-6 flex items-center gap-2">
+          <div class="tech-card p-5 sm:p-6 md:p-8">
+            <h3 class="tech-title text-xl sm:text-2xl font-bold mb-6 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

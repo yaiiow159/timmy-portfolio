@@ -1,9 +1,20 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-primary to-secondary tech-grid-bg">
-    <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50 z-50"></div>
-    
-    <div class="flex">
-      <div class="w-72 min-h-screen bg-gradient-to-b from-secondary/95 to-primary/95 backdrop-blur-xl border-r border-accent/20 shadow-2xl relative overflow-hidden">
+    <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50 z-50 pointer-events-none"></div>
+
+    <div
+      v-show="sidebarOpen"
+      class="fixed inset-0 z-30 bg-black/50 backdrop-blur-[2px] lg:hidden"
+      aria-hidden="true"
+      @click="closeSidebar"
+    />
+
+    <div class="flex min-h-screen">
+      <aside
+        id="admin-sidebar"
+        class="fixed lg:static inset-y-0 left-0 z-40 flex h-screen min-h-0 w-72 max-w-[min(100vw-2rem,20rem)] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-secondary/95 to-primary/95 backdrop-blur-xl border-r border-accent/20 shadow-2xl transition-transform duration-300 ease-out lg:translate-x-0"
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+      >
         <div class="absolute inset-0 bg-gradient-to-b from-accent/5 to-transparent pointer-events-none"></div>
         
         <div class="relative p-8 border-b border-accent/10">
@@ -26,6 +37,7 @@
             to="/admin" 
             exact-active-class="admin-nav-active"
             class="admin-nav-item group"
+            @click="closeSidebar"
           >
             <div class="admin-nav-icon">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,6 +52,7 @@
             to="/admin/posts" 
             active-class="admin-nav-active"
             class="admin-nav-item group"
+            @click="closeSidebar"
           >
             <div class="admin-nav-icon">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,6 +67,7 @@
             to="/admin/projects" 
             active-class="admin-nav-active"
             class="admin-nav-item group"
+            @click="closeSidebar"
           >
             <div class="admin-nav-icon">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,6 +82,7 @@
             to="/admin/files" 
             active-class="admin-nav-active"
             class="admin-nav-item group"
+            @click="closeSidebar"
           >
             <div class="admin-nav-icon">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,6 +98,7 @@
           <router-link 
             to="/" 
             class="admin-nav-item group"
+            @click="closeSidebar"
           >
             <div class="admin-nav-icon">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,27 +123,66 @@
             <div class="admin-nav-indicator"></div>
           </button>
         </nav>
-      </div>
-      
-      <div class="flex-1 overflow-auto p-8">
+      </aside>
+
+      <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:min-h-0">
+        <header
+          class="sticky top-0 z-20 flex items-center gap-3 border-b border-accent/10 bg-gradient-to-b from-secondary/95 to-primary/95 px-4 py-3 backdrop-blur-xl lg:hidden"
+        >
+          <button
+            type="button"
+            class="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-accent/20 text-accent transition-colors hover:bg-accent/10"
+            :aria-expanded="sidebarOpen"
+            aria-controls="admin-sidebar"
+            aria-label="Toggle navigation menu"
+            @click="toggleSidebar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span class="truncate font-semibold text-text-primary">{{ t('admin.dashboard') }}</span>
+        </header>
+
+        <div class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
         <router-view v-slot="{ Component }">
           <transition name="page-fade">
             <component :is="Component" :key="$route.fullPath" />
           </transition>
         </router-view>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store/authStore'
 
 const { t } = useI18n()
+const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+
+const sidebarOpen = ref(false)
+
+watch(
+  () => route.fullPath,
+  () => {
+    sidebarOpen.value = false
+  }
+)
+
+function toggleSidebar() {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+function closeSidebar() {
+  sidebarOpen.value = false
+}
 
 function logout() {
   // authStore.logout() 內部已呼叫 handleSuccess 顯示通知，此處不重複新增
