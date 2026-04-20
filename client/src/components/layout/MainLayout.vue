@@ -29,12 +29,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col" :class="themeClasses">
+  <div class="min-h-screen flex w-full max-w-full min-w-0 flex-col" :class="themeClasses">
     <div class="fixed inset-0 opacity-50 z-[-1]" :class="bgGradientClass"></div>
     
     <Navbar />
     
-    <main class="flex-grow container-custom min-w-0 py-6 sm:py-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <main class="flex-grow w-full max-w-full min-w-0 container-custom py-6 sm:py-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <router-view v-slot="{ Component }">
         <transition name="page-fade">
           <component :is="Component" :key="route.fullPath" />

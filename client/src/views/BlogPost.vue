@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
-    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+  <div class="min-h-screen w-full max-w-full min-w-0 overflow-x-hidden py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
+    <div class="container mx-auto w-full max-w-full min-w-0 px-4 sm:px-6 md:px-8">
       <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
         <div class="tech-loading">
           <svg class="w-16 h-16 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,7 +129,7 @@
                   <div 
                     v-for="comment in post.comments" 
                     :key="comment.id" 
-                    class="flex-shrink-0 w-80 tech-card p-4"
+                    class="flex-shrink-0 w-[min(20rem,calc(100vw-3rem))] max-w-[85vw] tech-card p-4"
                   >
                     <div class="flex items-center mb-3">
                       <div class="bg-gradient-to-br from-accent/20 to-tech-purple/20 rounded-full w-10 h-10 flex items-center justify-center text-accent font-medium">
@@ -425,6 +425,10 @@ async function submitComment() {
 .blog-content {
   font-size: 1.125rem;
   line-height: 1.75;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .blog-content pre {
@@ -451,12 +455,19 @@ async function submitComment() {
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
-.blog-content img {
+.blog-content img,
+.blog-content video,
+.blog-content iframe {
   border-radius: 0.5rem;
   max-width: 100%;
   height: auto;
   margin: 1.5rem 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-content iframe {
+  aspect-ratio: 16 / 9;
+  width: 100%;
 }
 
 .blog-content h1,
@@ -472,21 +483,21 @@ async function submitComment() {
 }
 
 .blog-content h1 {
-  font-size: 2.25rem;
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
 }
 
 .blog-content h2 {
-  font-size: 1.875rem;
+  font-size: clamp(1.35rem, 4vw, 1.875rem);
   border-bottom: 1px solid rgba(var(--text-primary-rgb), 0.1);
   padding-bottom: 0.5rem;
 }
 
 .blog-content h3 {
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
 }
 
 .blog-content h4 {
-  font-size: 1.25rem;
+  font-size: clamp(1.05rem, 3vw, 1.25rem);
 }
 
 .blog-content ul,
@@ -509,6 +520,7 @@ async function submitComment() {
 
 .blog-content table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
   overflow: hidden;

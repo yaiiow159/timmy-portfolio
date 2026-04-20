@@ -28,6 +28,7 @@ html.light {
 
 body {
   overflow-x: hidden;
+  width: 100%;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   margin: 0;
@@ -41,7 +42,9 @@ body {
 
 #app {
   width: 100%;
+  max-width: 100%;
   min-height: 100vh;
+  min-width: 0;
   position: relative;
   z-index: 1;
 }
@@ -301,11 +304,13 @@ code {
 }
 
 .container-custom {
+  width: 100%;
   max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
@@ -501,6 +506,7 @@ code {
    若用單一 :root 區塊，會與 html 同一節點，在來源順序上蓋掉 html.light 的 --text-primary，
    造成淺色主題仍繼承 #fff 字色、按鈕與內文看不見。 */
 html:not(.light) {
+  --text-primary-rgb: 255, 255, 255;
   /* 科技感主色調 - 深色主題 */
   --primary: #0a0a0a;
   --primary-dark: #000000;
@@ -568,6 +574,7 @@ html:not(.light) {
 
 /* 淺色主題變數 */
 .light {
+  --text-primary-rgb: 30, 27, 75;
   --primary: #eef2ff;
   --primary-dark: #e0e7ff;
   --secondary: #e8eeff;

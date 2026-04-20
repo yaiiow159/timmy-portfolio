@@ -233,7 +233,7 @@ watch(() => activeSkillCategory.value, () => {
 </script>
 
 <template>
-  <div class="min-h-screen tech-grid-bg" v-if="isLoaded">
+  <div class="min-h-screen w-full max-w-full min-w-0 overflow-x-hidden tech-grid-bg" v-if="isLoaded">
     <section class="relative py-28 md:py-40 overflow-hidden hero-section tech-particles">
       <div class="tech-decoration circle-1"></div>
       <div class="tech-decoration circle-2"></div>
@@ -579,15 +579,20 @@ watch(() => activeSkillCategory.value, () => {
 .hero-section {
   position: relative;
   overflow: hidden;
-  padding: 8rem 0;
+  /* 不寫死 padding／min-height，交由模板 py-* / md:* 與下方 media 控制，避免蓋掉 Tailwind 斷點 */
   background: linear-gradient(135deg, rgba(var(--bg-primary-rgb), 0.95), rgba(var(--bg-primary-rgb), 1)),
               radial-gradient(circle at 20% 80%, rgba(var(--accent-rgb), 0.08), transparent 30%),
               radial-gradient(circle at 80% 20%, rgba(var(--accent-rgb), 0.08), transparent 30%);
   backdrop-filter: blur(10px);
-  min-height: 100vh;
   display: flex;
   align-items: center;
   z-index: 1;
+}
+
+@media (min-width: 769px) {
+  .hero-section {
+    min-height: 100vh;
+  }
 }
 
 .light .hero-section {
@@ -662,14 +667,15 @@ watch(() => activeSkillCategory.value, () => {
 
 .profile-picture-container {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: min(280px, calc(100vw - 2rem));
+  height: min(280px, calc(100vw - 2rem));
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .profile-picture-inner {
-  width: 240px;
-  height: 240px;
+  width: min(240px, calc(100vw - 3.5rem));
+  height: min(240px, calc(100vw - 3.5rem));
   position: absolute;
   top: 50%;
   left: 50%;
@@ -782,7 +788,6 @@ watch(() => activeSkillCategory.value, () => {
 .hero-description {
   color: var(--text-secondary) !important;
   line-height: 1.8;
-  font-size: 1.125rem;
   letter-spacing: 0.01em;
   position: relative;
   z-index: 10;
@@ -1233,26 +1238,12 @@ watch(() => activeSkillCategory.value, () => {
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 4rem 0;
     min-height: auto;
   }
-  
-  .profile-picture-container {
-    width: 200px;
-    height: 200px;
-  }
-  
+
   .profile-picture-inner {
-    width: 180px;
-    height: 180px;
-  }
-  
-  .tech-title {
-    font-size: 2rem !important;
-  }
-  
-  .hero-description {
-    font-size: 1rem !important;
+    width: min(200px, calc(100vw - 4rem));
+    height: min(200px, calc(100vw - 4rem));
   }
 }
 </style>
