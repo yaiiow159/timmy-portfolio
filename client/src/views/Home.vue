@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {ref, onMounted, watch, onUnmounted} from 'vue'
+import { ref, onMounted, watch, onUnmounted, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { usePortfolioStore } from '@/store/portfolioStore'
 import { useBlogStore } from '@/store/blogStore'
-import { getStaticUrl } from '@/services/api'
+import type { BlogPost } from '@/store/blogStore'
+import { getStaticUrl, hasUsableBlogCoverImage } from '@/services/api'
 import { formatDescription } from '@/utils/textFormatters'
 
 const { t } = useI18n()
@@ -16,6 +17,30 @@ const projectCarouselIndices = ref<Record<string, number>>({})
 const activeSkillCategory = ref('all')
 const carouselIntervals = ref<Record<string, number>>({})
 const animationComplete = ref(false)
+
+/** 首頁部落格卡片：封面 404 或無效路徑時改顯無封面區塊 */
+const homeBlogCoverFailed = reactive<Record<string, boolean>>({})
+
+watch(
+  () => blogStore.posts.map((p) => `${p.id}:${p.coverImage ?? ''}`).join('|'),
+  () => {
+    for (const k of Object.keys(homeBlogCoverFailed)) {
+      delete homeBlogCoverFailed[k]
+    }
+  }
+)
+
+function homeBlogCoverShows(post: BlogPost) {
+  return hasUsableBlogCoverImage(post.coverImage) && !homeBlogCoverFailed[post.id]
+}
+
+function homeBlogCoverSrc(post: BlogPost) {
+  return getStaticUrl(post.coverImage as string)
+}
+
+function onHomeBlogCoverError(postId: string) {
+  homeBlogCoverFailed[postId] = true
+}
 
 function getProjectCarouselIndex(projectId: string): number {
   return projectCarouselIndices.value[projectId] || 0
@@ -503,16 +528,23 @@ watch(() => activeSkillCategory.value, () => {
           
           <div v-else-if="blogStore.posts.length > 0" v-for="post in blogStore.posts.slice(0, 3)" :key="post.id" class="tech-card group cursor-pointer relative z-10" @click="router.push(`/blog/${post.id}`)">
             <div class="h-48 relative overflow-hidden rounded-t-2xl">
-              <img 
-                v-if="post.coverImage" 
-                :src="getStaticUrl(post.coverImage)" 
+              <img
+                v-if="homeBlogCoverShows(post)"
+                :src="homeBlogCoverSrc(post)"
                 :alt="post.title"
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+                decoding="async"
+                @error="onHomeBlogCoverError(post.id)"
               />
-              <div v-else class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M5 14h5m5-4h5M5 8h5" />
+              <div
+                v-else
+                class="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-secondary via-primary/80 to-primary px-4 text-center tech-text-secondary"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-12 w-12 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
+                <p class="text-xs font-medium tracking-wide opacity-80">{{ t('blog.noCover') }}</p>
               </div>
               <div class="absolute top-4 right-4 bg-gradient-to-r from-accent to-tech-purple text-white text-xs px-3 py-1 rounded-full font-semibold">
                 {{ new Date(post.date).toLocaleDateString() }}

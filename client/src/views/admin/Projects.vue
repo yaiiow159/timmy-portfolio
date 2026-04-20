@@ -1,13 +1,13 @@
 <template>
   <div class="admin-projects min-h-screen">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="tech-title text-3xl font-bold mb-2">{{ t('admin.projectsManagement') }}</h1>
-        <p class="text-text-secondary">{{ t('admin.manageProjectsDescription') }}</p>
+    <div class="page-toolbar flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6 sm:mb-8">
+      <div class="min-w-0">
+        <h1 class="tech-title text-2xl sm:text-3xl font-bold mb-2">{{ t('admin.projectsManagement') }}</h1>
+        <p class="text-text-secondary text-sm sm:text-base">{{ t('admin.manageProjectsDescription') }}</p>
       </div>
       <button
         @click="openCreateModal()"
-        class="tech-button inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 tech-glow"
+        class="tech-button inline-flex shrink-0 items-center justify-center px-5 py-3 sm:px-6 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 tech-glow w-full sm:w-auto"
       >
         <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -647,6 +647,18 @@ async function deleteProject() {
 <style scoped lang="scss">
 .admin-projects {
   padding: 2rem;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
+
+  .sort-bar .sort-count {
+    @media (max-width: 480px) {
+      margin-left: 0;
+      width: 100%;
+      flex-basis: 100%;
+    }
+  }
   
   .header-container {
     display: flex;
@@ -694,7 +706,7 @@ async function deleteProject() {
 
     .sort-label {
       font-size: 0.875rem;
-      color: var(--text-color-secondary);
+      color: var(--text-secondary);
       white-space: nowrap;
     }
 
@@ -710,28 +722,28 @@ async function deleteProject() {
       padding: 0.4rem 0.85rem;
       border-radius: 0.5rem;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      background: var(--surface-section);
-      color: var(--text-color-secondary);
+      background: rgba(var(--bg-secondary-rgb), 0.45);
+      color: var(--text-secondary);
       font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.2s ease;
 
       &:hover {
-        border-color: var(--accent-color);
-        color: var(--text-color);
+        border-color: var(--accent);
+        color: var(--text-primary);
       }
 
       &.active {
-        background: var(--accent-color);
-        border-color: var(--accent-color);
-        color: #fff;
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-text-color);
       }
     }
 
     .sort-count {
       margin-left: auto;
       font-size: 0.8rem;
-      color: var(--text-color-secondary);
+      color: var(--text-secondary);
     }
   }
 
@@ -742,7 +754,7 @@ async function deleteProject() {
     display: flex;
     flex-direction: column;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: var(--surface-card);
+    background: var(--secondary);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 
     &:hover {
@@ -754,7 +766,7 @@ async function deleteProject() {
       position: relative;
       height: 160px;
       overflow: hidden;
-      background: var(--surface-section);
+      background: rgba(var(--bg-secondary-rgb), 0.45);
 
       .image-wrapper {
         width: 100%;
@@ -809,8 +821,8 @@ async function deleteProject() {
         position: absolute;
         top: 6px;
         left: 8px;
-        background: var(--accent-color);
-        color: #fff;
+        background: var(--accent);
+        color: var(--accent-text-color);
         font-size: 0.7rem;
         padding: 2px 8px;
         border-radius: 10px;
@@ -823,7 +835,7 @@ async function deleteProject() {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: var(--text-color-secondary);
+        color: var(--text-secondary);
 
         i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
         span { font-size: 0.8rem; }
@@ -837,7 +849,7 @@ async function deleteProject() {
       .card-title {
         font-size: 0.95rem;
         font-weight: 600;
-        color: var(--text-color);
+        color: var(--text-primary);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -854,8 +866,8 @@ async function deleteProject() {
         font-size: 0.7rem;
         padding: 2px 8px;
         border-radius: 10px;
-        background: var(--surface-section);
-        color: var(--text-color-secondary);
+        background: rgba(var(--bg-secondary-rgb), 0.45);
+        color: var(--text-secondary);
         border: 1px solid rgba(255, 255, 255, 0.08);
         text-transform: capitalize;
       }
@@ -881,8 +893,8 @@ async function deleteProject() {
         transition: all 0.2s ease;
 
         &.btn-edit {
-          background: var(--accent-color);
-          color: #fff;
+          background: var(--accent);
+          color: var(--accent-text-color);
           &:hover { filter: brightness(1.15); }
         }
 
@@ -896,20 +908,20 @@ async function deleteProject() {
   }
   
   .no-projects {
-    background-color: var(--surface-card);
+    background-color: var(--secondary);
     border-radius: 0.5rem;
     padding: 2rem;
     text-align: center;
     
     i {
       font-size: 3rem;
-      color: var(--text-color-secondary);
+      color: var(--text-secondary);
       margin-bottom: 1rem;
     }
     
     p {
       font-size: 1.25rem;
-      color: var(--text-color-secondary);
+      color: var(--text-secondary);
       margin-bottom: 1.5rem;
     }
   }
@@ -930,9 +942,9 @@ async function deleteProject() {
       background: linear-gradient(145deg, #2d2d2d, #3a3a3a) !important;
       color: #ffffff;
       border-radius: 16px;
-      width: 90%;
+      width: min(100% - 1.5rem, 90vw);
       max-width: 800px;
-      max-height: 90vh;
+      max-height: min(90vh, 100dvh - 2rem);
       overflow-y: auto;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       position: relative;
@@ -955,7 +967,7 @@ async function deleteProject() {
           margin: 0;
           font-size: 1.5rem;
           font-weight: 600;
-          color: var(--accent-color);
+          color: var(--accent);
         }
         
         .close-button {
@@ -1012,7 +1024,7 @@ async function deleteProject() {
             display: block;
             margin-bottom: 0.75rem;
             font-weight: 500;
-            color: var(--accent-color);
+            color: var(--accent);
           }
           
           .form-control {
@@ -1026,8 +1038,8 @@ async function deleteProject() {
             
             &:focus {
               outline: none;
-              border-color: var(--accent-color);
-              box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.25);
+              border-color: var(--accent);
+              box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
             }
             
             &::placeholder {
@@ -1048,7 +1060,7 @@ async function deleteProject() {
               margin-right: 0.5rem;
               width: 18px;
               height: 18px;
-              accent-color: var(--accent-color);
+              accent-color: var(--accent);
             }
             
             label {
@@ -1079,8 +1091,8 @@ async function deleteProject() {
               .technology-tag {
                 display: flex;
                 align-items: center;
-                background-color: rgba(var(--accent-color-rgb), 0.2);
-                color: var(--accent-color);
+                background-color: rgba(var(--accent-rgb), 0.2);
+                color: var(--accent);
                 padding: 0.5rem 0.75rem;
                 border-radius: 50px;
                 font-size: 0.875rem;
@@ -1137,7 +1149,7 @@ async function deleteProject() {
               align-items: center;
               justify-content: center;
               padding: 0.75rem 1.25rem;
-              background-color: var(--accent-color);
+              background-color: var(--accent);
               color: #ffffff;
               border: none;
               border-radius: 8px;
@@ -1310,8 +1322,8 @@ async function deleteProject() {
           }
           
           &.btn-primary {
-            background-color: var(--accent-color);
-            color: white;
+            background-color: var(--accent);
+            color: var(--accent-text-color);
             
             &:hover:not(:disabled) {
               background-color: var(--accent-dark);
@@ -1382,13 +1394,13 @@ async function deleteProject() {
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, transparent, rgba(var(--accent-color-rgb), 0.1));
+      background: linear-gradient(135deg, transparent, rgba(var(--accent-rgb), 0.1));
       opacity: 0;
       transition: opacity 0.3s ease;
     }
     
     &:hover {
-      border-color: var(--accent-color);
+      border-color: var(--accent);
       background-color: rgba(255, 255, 255, 0.05);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -1402,20 +1414,20 @@ async function deleteProject() {
       cursor: pointer;
       width: 18px;
       height: 18px;
-      accent-color: var(--accent-color);
+      accent-color: var(--accent);
       flex-shrink: 0;
       
       &:checked ~ span,
       &:checked ~ i {
-        color: var(--accent-color);
+        color: var(--accent);
         font-weight: 600;
       }
     }
     
     &:has(input[type="radio"]:checked) {
-      border-color: var(--accent-color);
-      background-color: rgba(var(--accent-color-rgb), 0.15);
-      box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2);
+      border-color: var(--accent);
+      background-color: rgba(var(--accent-rgb), 0.15);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
     }
     
     i {

@@ -196,6 +196,9 @@ function insertLink() {
 
 <style scoped lang="scss">
 .rich-text-editor {
+  --accent-color: var(--accent);
+  --border-color: rgba(var(--accent-rgb), 0.22);
+  --bg-hover: rgba(var(--accent-rgb), 0.1);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -229,8 +232,8 @@ function insertLink() {
       }
       
       &.active {
-        background: var(--accent-color);
-        color: white;
+        background: var(--accent);
+        color: var(--accent-text-color, #fff);
       }
     }
   }
@@ -249,8 +252,8 @@ function insertLink() {
     
     &:focus {
       outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
     }
   }
   
