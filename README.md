@@ -1,468 +1,162 @@
-# 🌟 Timmy's Portfolio - Modern Full-Stack Web Application
+# Timmy Portfolio
 
-<div align="center">
+全端個人作品集與部落格：**Vue 3 + Vite** 前端、**Express + Prisma + PostgreSQL** 後端，可選 **Docker** 一鍵開發環境。正式環境下由 **同一支 Node 服務** 提供 REST API 並代管前端建置產物（`client/dist`）。
 
-![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-
-</div>
-
-<p align="center">
-A modern, responsive portfolio website with blog functionality, built using Vue.js, Node.js, and PostgreSQL. Containerized with Docker for easy deployment and scalability. Uses Cloudinary for optimized image storage and delivery.
-</p>
-
-<p align="center">
-<i>Last updated: May 10, 2025</i>
-</p>
+**技術摘要：** Vue 3、TypeScript、Vue Router、Pinia、Tailwind CSS、vue-i18n | Express、Prisma、PostgreSQL、JWT、Nodemailer、Cloudinary、Multer、Helmet、compression、express-rate-limit
 
 ---
 
-## 📋 Table of Contents
+## 目錄
 
-- [💻 System Requirements](#-system-requirements)
-- [🏗️ Project Structure](#️-project-structure)
-- [✨ Key Features](#-key-features)
-- [🚀 Development Setup](#-development-setup)
-  - [🖥️ Frontend Development](#️-frontend-development)
-  - [⚙️ Backend Development](#️-backend-development)
-  - [🐳 Docker Development](#-docker-development)
-- [🌐 Production Deployment](#-production-deployment)
-  - [📜 Using Deployment Scripts](#-using-deployment-scripts)
-  - [🛠️ Manual Deployment](#️-manual-deployment)
-  - [⚙️ Environment Configuration](#️-environment-configuration)
-- [🔄 CI/CD Integration](#-cicd-integration)
-- [🧪 Testing](#-testing)
-- [📝 License](#-license)
-- [❓ FAQ](#-faq)
+- [專案結構](#專案結構)
+- [環境需求](#環境需求)
+- [本機開發（前後端分開跑）](#本機開發前後端分開跑)
+- [根目錄 npm 指令](#根目錄-npm-指令)
+- [Docker 開發](#docker-開發)
+- [正式環境建置](#正式環境建置)
+- [環境變數總覽](#環境變數總覽)
+- [說明文件](#說明文件)
 
 ---
 
-## 💻 System Requirements
-
-<table>
-  <tr>
-    <td>✅ Node.js 18.x or higher</td>
-    <td>✅ npm 9.x or higher</td>
-  </tr>
-  <tr>
-    <td>✅ PostgreSQL 16.x (if not using Docker)</td>
-    <td>✅ Docker and Docker Compose (recommended)</td>
-  </tr>
-</table>
-
----
-
-## 🏗️ Project Structure
+## 專案結構
 
 ```
 timmy-portfolio/
-├── client/                 # Vue.js Frontend Application
-│   ├── public/             # Static Assets
-│   ├── src/                # Source Code
-│   │   ├── assets/         # Images, fonts, etc.
-│   │   ├── components/     # Reusable components
-│   │   ├── composables/    # Vue composables
-│   │   ├── views/          # Page components
-│   │   ├── router/         # Vue Router configuration
-│   │   ├── stores/         # Pinia stores
-│   │   └── utils/          # Utility functions
-│   └── package.json        # Frontend Dependencies
-├── server/                 # Node.js Backend Application
-│   ├── prisma/             # Database Models & Migrations
-│   ├── routes/             # API Routes
-│   ├── middleware/         # Express middleware
-│   ├── scripts/            # Script Files
-│   └── package.json        # Backend Dependencies
-├── docker-compose.yml      # Docker Compose Configuration
-├── docker-compose.dev.yml  # Development Docker Configuration
-├── Dockerfile.frontend     # Frontend Production Docker Configuration
-├── Dockerfile.backend      # Backend Production Docker Configuration
-├── Dockerfile.frontend.dev # Frontend Development Docker Configuration
-├── Dockerfile.backend.dev  # Backend Development Docker Configuration
-├── start-dev.ps1           # Windows Development Script
-├── deploy.sh               # Linux/macOS Deployment Script
-└── deploy.ps1              # Windows Deployment Script
+├── client/                    # 前端（Vite + Vue 3）
+│   ├── public/
+│   ├── src/
+│   │   ├── components/        # layout, blog, portfolio, common …
+│   │   ├── views/             # 公開頁 + views/admin 後台
+│   │   ├── router/
+│   │   ├── store/             # Pinia（auth, blog, portfolio, theme …）
+│   │   ├── services/          # Axios 呼叫 API
+│   │   ├── locales/           # i18n JSON
+│   │   ├── config/            # 例如 API_BASE_URL（VITE_API_URL）
+│   │   └── style.css          # 全域樣式 + Tailwind
+│   ├── package.json
+│   └── README.md
+├── server/                    # 後端（Express）
+│   ├── routes/                # auth, posts, projects, contact, uploads, admin, files, activity
+│   ├── middleware/            # auth, adminAuth, upload
+│   ├── config/                # env, logger, cloudinary, admin
+│   ├── lib/prisma.js
+│   ├── prisma/schema.prisma
+│   ├── scripts/init-db.js     # 建立／更新管理員帳號（需 ADMIN_* 環境變數）
+│   ├── uploads/               # 本機上傳目錄（亦掛載於 Docker）
+│   ├── server.js
+│   ├── package.json
+│   └── README.md
+├── docker-compose.yml         # 正式取向組態
+├── docker-compose.dev.yml     # 開發組態
+├── Dockerfile.frontend / .backend / *.dev
+└── package.json               # 根層便捷指令（聚合 client/server）
 ```
-
-## ✨ Key Features
-
-- 📱 **Responsive Design** - Optimized for all device sizes
-- 🎨 **Modern UI** - Built with TailwindCSS for a clean, modern look
-- 📝 **Blog System** - Create, edit, and publish blog posts with rich text editing
-- 🔐 **Authentication** - Secure user authentication and authorization
-- 🎯 **Project Showcase** - Display your projects with detailed information
-- 📧 **Contact Form** - Allow visitors to reach out via a contact form
-- 📊 **Admin Dashboard** - Manage content through an intuitive admin interface
-- 🌐 **SEO Optimized** - Structured for better search engine visibility
-- 🔄 **Real-time Updates** - Dynamic content updates without page reloads
-- 🌙 **Dark Mode** - Toggle between light and dark themes
-- 🖼️ **Cloud Image Management** - Optimized image storage and delivery with Cloudinary
-- 🔍 **Full-text Search** - Search functionality for blog posts and projects
-- 🌍 **Multilingual Support** - i18n integration with English and Chinese (Traditional and Simplified)
 
 ---
 
-## 🚀 Development Setup
+## 環境需求
 
-### 🖥️ Frontend Development
-
-<details>
-<summary><b>Click to expand detailed steps</b></summary>
-
-1. Navigate to frontend directory:
-
-```bash
-cd client
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create `.env` file and set API URL:
-
-```
-VITE_API_URL=http://localhost:5000
-```
-
-4. Start development server:
-
-```bash
-npm run dev
-```
-
-The frontend application will run at http://localhost:3000.
-
-</details>
-
-### ⚙️ Backend Development
-
-<details>
-<summary><b>Click to expand detailed steps</b></summary>
-
-1. Navigate to backend directory:
-
-```bash
-cd server
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create `.env` file and set environment variables:
-
-```
-PORT=5000
-NODE_ENV=development
-DATABASE_URL=postgresql://username:password@localhost:5432/timmy_portfolio?schema=public
-CORS_ORIGIN=http://localhost:3000
-JWT_SECRET=your_jwt_secret_here
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_SECURE=false
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
-EMAIL_RECIPIENT=your-email@gmail.com
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
-4. Set up database:
-
-```bash
-npx prisma db push
-```
-
-5. Initialize database:
-
-```bash
-node scripts/init-db.js
-```
-
-6. Start development server:
-
-```bash
-npm run dev
-```
-
-The backend API will run at http://localhost:5000.
-
-</details>
-
-### 🐳 Docker Development
-
-<details>
-<summary><b>Click to expand detailed steps</b></summary>
-
-Using Docker is the simplest way to develop, avoiding environment configuration issues.
-
-1. Make sure you have Docker and Docker Compose installed on your system.
-
-2. Run the development script in the project root directory:
-
-```bash
-# Windows
-.\start-dev.ps1
-```
-
-Or manually run Docker Compose:
-
-```bash
-# Development environment
-docker-compose -f docker-compose.dev.yml up -d
-
-# Production-like environment
-docker-compose up -d
-```
-
-3. The services will be available at:
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - PostgreSQL: localhost:5432
-
-4. If you encounter database schema issues, you can run:
-
-```bash
-docker-compose exec backend npx prisma db push
-```
-
-This will synchronize the Prisma schema with the database without creating migration files.
-
-</details>
+| 項目 | 說明 |
+|------|------|
+| Node.js | **>= 18**（與根 `package.json` engines 一致） |
+| npm | 與 Node 搭配的版本即可 |
+| PostgreSQL | 本機或 Docker 內資料庫；連線字串 `DATABASE_URL` |
+| Docker（選用） | 使用 `docker-compose.dev.yml` 時需要 |
 
 ---
 
-## 🌐 Production Deployment
+## 本機開發（前後端分開跑）
 
-### 📜 Using Deployment Scripts
-
-<details>
-<summary><b>Click to expand detailed steps</b></summary>
-
-1. Ensure Docker and Docker Compose are installed.
-
-2. Modify environment files for production:
-   - `server/.env`: Set production database connection, email configuration, etc.
-   - `client/.env`: Set production API URL
-
-3. Run the deployment script:
+### 1. 後端 `server/`
 
 ```bash
-# Linux/macOS
-./deploy.sh --production
-
-# Windows
-.\deploy.ps1 -Production
+cd server
+npm install
 ```
 
-This will build and deploy the application in production mode.
+在 `server/.env` 設定至少：`DATABASE_URL`、`JWT_SECRET`、`CORS_ORIGIN`（可逗號分隔多個來源）、`ADMIN_EMAIL`、`ADMIN_PASSWORD`，以及聯絡表單／Cloudinary 等（詳見 [server/README.md](./server/README.md)）。
 
-</details>
+```bash
+npx prisma generate
+npx prisma db push          # 開發同步 schema；正式遷移請用 migrate
+npm run db:init             # 寫入管理員（依 ADMIN_*）
+npm run dev                 # nodemon，預設埠見 env PORT（預設 5000）
+```
 
-### 🛠️ Manual Deployment
-
-<details>
-<summary><b>Click to expand detailed steps</b></summary>
-
-#### Frontend Deployment
-
-1. Navigate to frontend directory:
+### 2. 前端 `client/`
 
 ```bash
 cd client
+npm install
 ```
 
-2. Build for production:
+在 `client/.env` 設定後端 API 基底（**需含 `/api` 前綴**，與 Axios `baseURL` 一致）：
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
 ```bash
-npm run build
+npm run dev                 # Vite 開發伺服器（預設常為 http://localhost:5173，依終端機為準）
 ```
 
-3. Serve the built files using Nginx or another web server.
+本機若前後埠不同，請將 `CORS_ORIGIN` 設為實際前端 origin（例如 `http://localhost:5173`）。
 
-#### Backend Deployment
+---
 
-1. Navigate to backend directory:
+## 根目錄 npm 指令
+
+於 **專案根目錄** 執行：
+
+| 指令 | 說明 |
+|------|------|
+| `npm run install:server` | 安裝 `server` 依賴 |
+| `npm run install:client` | 安裝 `client` 依賴 |
+| `npm run dev:server` | 在 `server` 跑 `npm run dev` |
+| `npm run dev:client` | 在 `client` 跑 `npm run dev` |
+| `npm run build:client` | 建置前端至 `client/dist` |
+| `npm run build` | 安裝 server + client 依賴並建置前端 |
+| `npm start` | 以 `node server/server.js` 啟動（正式模式請搭配 `NODE_ENV=production` 與已建置之 `client/dist`） |
+
+---
+
+## Docker 開發
 
 ```bash
-cd server
+docker compose -f docker-compose.dev.yml up -d
 ```
 
-2. Install production dependencies:
+組態內已帶入資料庫、後端、前端與常見環境變數；修改 `server/prisma` 後可在容器內執行 `npx prisma db push` 等指令同步 schema。細節以 `docker-compose.dev.yml` 為準。
 
-```bash
-npm install --production
-```
+---
 
-3. Start the server:
+## 正式環境建置
 
-```bash
-npm start
-```
+1. 建置前端：`cd client && npm ci && npm run build`  
+2. 確認 `client/dist` 與 `server` 的相對位置符合 `server.js`（`../client/dist`）。  
+3. 設定 `NODE_ENV=production`、`DATABASE_URL`、`JWT_SECRET`、`CORS_ORIGIN` 等。  
+4. `cd server && npm ci && npx prisma migrate deploy`（若採用 migrations）。  
+5. 啟動：`cd .. && npm start` 或於 `server` 執行 `npm start`。
 
-Or use a process manager like PM2:
+---
 
-```bash
-pm2 start server.js --name timmy-portfolio-backend
-```
+## 環境變數總覽
 
-</details>
+| 位置 | 重點變數 |
+|------|-----------|
+| `client/.env` | `VITE_API_URL`（建議 `http(s)://主機:埠/api`） |
+| `server/.env` | `PORT`、`NODE_ENV`、`DATABASE_URL`、`JWT_SECRET`、`CORS_ORIGIN`、`ADMIN_EMAIL`、`ADMIN_PASSWORD`、`ADMIN_NAME`、SMTP、Cloudinary 等 |
 
-### ⚙️ Environment Configuration
+完整表格與預設值見 **[server/README.md](./server/README.md)**。
 
-<details>
-<summary><b>Click to expand configuration details</b></summary>
+---
 
-#### Frontend Environment Variables
+## 說明文件
 
-| Variable | Description | Default |
-|:---------|:------------|:--------|
-| `VITE_API_URL` | Backend API URL | http://localhost:5000 |
+- [client/README.md](./client/README.md) — 前端架構、腳本、目錄說明  
+- [server/README.md](./server/README.md) — 後端 API 前綴、Prisma、路由與環境變數  
 
-#### Backend Environment Variables
+---
 
-| Variable | Description | Required |
-|:---------|:------------|:---------|
-| `PORT` | Server port | Yes |
-| `NODE_ENV` | Environment | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `CORS_ORIGIN` | Allowed CORS origin | Yes |
-| `JWT_SECRET` | JWT secret key | Yes |
-| `EMAIL_HOST` | SMTP host | For email |
-| `EMAIL_PORT` | SMTP port | For email |
-| `EMAIL_SECURE` | Use TLS | For email |
-| `EMAIL_USER` | SMTP username | For email |
-| `EMAIL_PASS` | SMTP password | For email |
-| `EMAIL_RECIPIENT` | Contact form recipient | For email |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes |
-| `CLOUDINARY_API_KEY` | Cloudinary API key | Yes |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
-
-</details>
-
-## 🔄 CI/CD Integration
-
-This project is configured for continuous integration and deployment using GitHub Actions. Each push to the main branch triggers automated tests and deployment to the staging environment.
-
-## 🧪 Testing
-
-<details>
-<summary><b>Click to expand testing information</b></summary>
-
-### Frontend Tests
-
-```bash
-cd client
-npm run test
-```
-
-### Backend Tests
-
-```bash
-cd server
-npm run test
-```
-
-</details>
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## ❓ FAQ
-
-<details>
-<summary><b>How do I reset the admin password?</b></summary>
-
-Run the password reset script:
-
-```bash
-cd server
-node scripts/reset-password.js
-```
-
-</details>
-
-<details>
-<summary><b>How do I backup the database?</b></summary>
-
-If using Docker:
-
-```bash
-docker exec -t timmy-portfolio-db pg_dump -U postgres timmy_portfolio > backup.sql
-```
-
-If using local PostgreSQL:
-
-```bash
-pg_dump -U postgres timmy_portfolio > backup.sql
-```
-
-</details>
-
-<details>
-<summary><b>How do I restore the database?</b></summary>
-
-If using Docker:
-
-```bash
-docker exec -i timmy-portfolio-db psql -U postgres timmy_portfolio < backup.sql
-```
-
-If using local PostgreSQL:
-
-```bash
-psql -U postgres timmy_portfolio < backup.sql
-```
-
-</details>
-
-<details>
-<summary><b>How do I handle database schema changes?</b></summary>
-
-For development environments, you can use Prisma's db push to synchronize schema changes:
-
-```bash
-npx prisma db push
-```
-
-For production environments, it's recommended to use migrations:
-
-```bash
-npx prisma migrate dev --name describe_your_changes
-npx prisma migrate deploy
-```
-
-If you encounter migration issues, you can reset the database (development only):
-
-```bash
-npx prisma migrate reset
-```
-
-</details>
-
-<details>
-<summary><b>How do I update the Docker containers?</b></summary>
-
-Pull the latest code changes, then rebuild and restart the containers:
-
-```bash
-git pull
-docker-compose down
-docker-compose build
-docker-compose up -d
-```
-
-</details>
+*最後更新：2026 年 4 月*

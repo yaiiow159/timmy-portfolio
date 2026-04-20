@@ -69,6 +69,16 @@ export function normalizeCloudinaryUrlsInString(text: string): string {
   })
 }
 
+/** 文章封面欄位是否有可用字串（排除空值、空白、字面上的 "null"/"undefined"） */
+export function hasUsableBlogCoverImage(path: unknown): boolean {
+  if (path == null) return false
+  const trimmed = typeof path === 'string' ? path.trim() : String(path).trim()
+  if (!trimmed) return false
+  const lower = trimmed.toLowerCase()
+  if (lower === 'null' || lower === 'undefined') return false
+  return true
+}
+
 export function getStaticUrl(path: string): string {
   if (path == null || path === '') return ''
   const trimmed = typeof path === 'string' ? path.trim() : String(path).trim()

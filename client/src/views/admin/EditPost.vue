@@ -93,13 +93,22 @@ onMounted(async () => {
   }
 })
 
+function buildExcerpt(data: Partial<BlogPost>): string {
+  const explicit = data.excerpt?.trim()
+  if (explicit) {
+    return explicit.substring(0, 200)
+  }
+  const plain = (data.content ?? '').replace(/<[^>]*>/g, '').trim()
+  return plain.substring(0, 200)
+}
+
 async function handleSave(postData: Partial<BlogPost>) {
   try {
     isLoading.value = true
     const completePostData = {
       title: postData.title || '',
       content: postData.content || '',
-      excerpt: postData.content?.substring(0, 200).replace(/<[^>]*>/g, '') || '',
+      excerpt: buildExcerpt(postData),
       coverImage: postData.coverImage || '',
       tags: postData.tags || [],
       date: currentPost.value.date || new Date().toISOString(),

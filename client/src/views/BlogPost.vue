@@ -48,13 +48,15 @@
           
           <h1 class="tech-title text-3xl md:text-4xl font-bold mb-4">{{ post.title }}</h1>
           
-          <div v-if="post.coverImage" class="mb-8 tech-card overflow-hidden">
-            <img :src="coverImageUrl" :alt="post?.title" class="w-full h-auto">
-          </div>
-          <div v-else class="mb-8 tech-card h-64 flex items-center justify-center tech-text-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zm-9 9h7v7H4v-7zm9 0h7v7h-7v-7z" />
-            </svg>
+          <div v-if="showPostCoverHero" class="mb-8 tech-card overflow-hidden rounded-xl">
+            <img
+              :src="coverImageUrl"
+              :alt="post.title"
+              class="h-auto w-full object-cover"
+              loading="eager"
+              decoding="async"
+              @error="onCoverHeroError"
+            />
           </div>
         </div>
         
@@ -187,17 +189,24 @@
               :key="relatedPost.id"
               class="flex gap-4 tech-card p-4 hover:scale-[1.02] transition-all duration-300"
             >
-              <div class="w-20 h-20 flex-shrink-0 tech-card overflow-hidden">
-                <img 
-                  v-if="relatedPost.coverImage" 
-                  :src="getRelatedCoverUrl(relatedPost.coverImage)" 
-                  :alt="relatedPost.title" 
-                  class="w-full h-full object-cover"
+              <div class="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-accent/15 bg-gradient-to-br from-secondary/80 to-primary/60 tech-card">
+                <img
+                  v-if="relatedCoverShows(relatedPost)"
+                  :src="getRelatedCoverUrl(relatedPost.coverImage!)"
+                  :alt="relatedPost.title"
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  @error="onRelatedCoverError(relatedPost.id)"
                 />
-                <div v-else class="w-full h-full flex items-center justify-center tech-text-secondary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zm-9 9h7v7H4v-7zm9 0h7v7h-7v-7z" />
+                <div
+                  v-else
+                  class="flex h-full w-full flex-col items-center justify-center gap-0.5 px-1 text-center text-[10px] font-medium leading-tight text-text-secondary"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                   </svg>
+                  <span class="line-clamp-2">{{ t('blog.noCover') }}</span>
                 </div>
               </div>
               <div class="flex-1">
@@ -220,11 +229,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useBlogStore, type BlogPost } from '../store/blogStore'
-import { getStaticUrl, normalizeCloudinaryUrlsInString } from '../services/api'
+import { getStaticUrl, normalizeCloudinaryUrlsInString, hasUsableBlogCoverImage } from '../services/api'
 import { marked } from 'marked'
 import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
@@ -278,9 +287,54 @@ const relatedPosts = computed(() =>
   blogStore.posts.filter((p: BlogPost) => p.id !== post.value?.id).slice(0, 3)
 )
 
-const coverImageUrl = computed(() =>
-  post.value?.coverImage ? getStaticUrl(post.value.coverImage) : ''
+const coverHeroLoadFailed = ref(false)
+
+watch(
+  () => post.value?.id,
+  () => {
+    coverHeroLoadFailed.value = false
+  }
 )
+
+const coverImageUrl = computed(() =>
+  post.value && hasUsableBlogCoverImage(post.value.coverImage)
+    ? getStaticUrl(post.value.coverImage as string)
+    : ''
+)
+
+const showPostCoverHero = computed(
+  () =>
+    !!post.value &&
+    coverImageUrl.value.length > 0 &&
+    !coverHeroLoadFailed.value
+)
+
+function onCoverHeroError() {
+  coverHeroLoadFailed.value = true
+}
+
+/** 相關文章縮圖：載入失敗或無路徑時改顯示佔位 */
+const relatedCoverFailed = reactive<Record<string, boolean>>({})
+
+watch(
+  () => post.value?.id,
+  () => {
+    for (const k of Object.keys(relatedCoverFailed)) {
+      delete relatedCoverFailed[k]
+    }
+  }
+)
+
+function relatedCoverShows(p: BlogPost) {
+  return (
+    hasUsableBlogCoverImage(p.coverImage) &&
+    !relatedCoverFailed[p.id]
+  )
+}
+
+function onRelatedCoverError(id: string) {
+  relatedCoverFailed[id] = true
+}
 
 function getRelatedCoverUrl(src: string) {
   return getStaticUrl(src)

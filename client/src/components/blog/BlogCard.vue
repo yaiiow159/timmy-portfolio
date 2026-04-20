@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '@/store/blogStore.ts'
-import { getStaticUrl } from '@/services/api'
+import { getStaticUrl, hasUsableBlogCoverImage } from '@/services/api'
 
 const { t } = useI18n()
 
@@ -36,8 +36,24 @@ const displayExcerpt = computed(() => {
 })
 
 const coverImageSrc = computed(() =>
-  props.post.coverImage ? getStaticUrl(props.post.coverImage) : ''
+  hasUsableBlogCoverImage(props.post.coverImage) ? getStaticUrl(props.post.coverImage as string) : ''
 )
+
+const coverLoadFailed = ref(false)
+watch(
+  () => [props.post.id, props.post.coverImage] as const,
+  () => {
+    coverLoadFailed.value = false
+  }
+)
+
+const showCoverPhoto = computed(
+  () => hasUsableBlogCoverImage(props.post.coverImage) && coverImageSrc.value.length > 0 && !coverLoadFailed.value
+)
+
+function onCoverError() {
+  coverLoadFailed.value = true
+}
 </script>
 
 <template>
@@ -52,21 +68,22 @@ const coverImageSrc = computed(() =>
     
     <div :class="{ 'md:flex': !compact }">
       <div :class="{ 'md:w-1/3 h-40 md:h-auto': !compact, 'h-36': compact }" class="bg-gradient-to-br from-secondary to-primary relative overflow-hidden">
-        <div v-if="post.coverImage" class="h-full w-full relative">
+        <div v-if="showCoverPhoto" class="relative h-full w-full">
           <img 
             :src="coverImageSrc" 
             :alt="post.title" 
             class="h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+            loading="lazy"
+            decoding="async"
+            @error="onCoverError"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
         </div>
-        <div v-else class="h-full w-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center tech-text-secondary">
-          <div class="text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <div v-else class="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-secondary via-primary/80 to-primary text-center tech-text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-12 w-12 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
             </svg>
-            <p class="text-xs">No Image</p>
-          </div>
+            <p class="text-xs font-medium tracking-wide opacity-80">{{ t('blog.noCover') }}</p>
         </div>
         
         <div class="absolute top-3 left-3">
