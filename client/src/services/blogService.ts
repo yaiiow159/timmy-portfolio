@@ -8,6 +8,8 @@ export interface PaginationParams {
   tag?: string
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
+  /** Server-side slim list without full content/comments arrays */
+  mode?: 'full' | 'list' | 'summary'
 }
 
 export interface PaginatedResponse<T> {
@@ -23,8 +25,10 @@ export interface PaginatedResponse<T> {
 export const blogService = {
   getPosts: async (params: PaginationParams = {}): Promise<PaginatedResponse<BlogPost>> => {
     try {
-      const { page = 1, limit = 10, search, tag, sortBy, sortOrder } = params
-      const response = await api.get('/posts', { params: { page, limit, search, tag, sortBy, sortOrder } })
+      const { page = 1, limit = 10, search, tag, sortBy, sortOrder, mode } = params
+      const response = await api.get('/posts', {
+        params: { page, limit, search, tag, sortBy, sortOrder, mode }
+      })
       return {
         data: response.data.posts,
         pagination: response.data.pagination
@@ -98,6 +102,15 @@ export const blogService = {
   getTags: async (): Promise<string[]> => {
     try {
       const response = await api.get('/posts/tags')
+      return response.data
+    } catch (err) {
+      throw err
+    }
+  },
+
+  getRelatedPosts: async (id: string, limit = 3): Promise<BlogPost[]> => {
+    try {
+      const response = await api.get(`/posts/${id}/related`, { params: { limit } })
       return response.data
     } catch (err) {
       throw err

@@ -185,7 +185,6 @@ function closeSidebar() {
 }
 
 function logout() {
-  // authStore.logout() 內部已呼叫 handleSuccess 顯示通知，此處不重複新增
   authStore.logout()
   router.push('/auth')
 }

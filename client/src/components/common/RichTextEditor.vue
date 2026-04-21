@@ -32,6 +32,7 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatDescription } from '@/utils/textFormatters'
+import { sanitizeBlogHtml } from '@/utils/sanitizeHtml'
 
 interface Props {
   modelValue: string
@@ -63,7 +64,7 @@ watch(() => props.modelValue, (newValue) => {
 })
 
 const formattedPreview = computed(() => {
-  return formatDescription(localValue.value)
+  return sanitizeBlogHtml(formatDescription(localValue.value))
 })
 
 const tools = [

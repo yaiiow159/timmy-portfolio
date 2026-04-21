@@ -335,7 +335,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/services/api';
 import type { Project, ProjectType, VCSType } from '@/types/project';
@@ -362,6 +362,23 @@ const selectedFiles = ref<File[]>([]);
 const uploadingImage = ref(false);
 const newTechnology = ref('');
 const fileInputRef = ref<HTMLInputElement | null>(null);
+
+/** One stable object URL per selected File (WeakMap so GC cleans entries when File is dropped). */
+const filePreviewUrls = new WeakMap<File, string>();
+
+function revokeFilePreview(file: File) {
+  const url = filePreviewUrls.get(file);
+  if (url) {
+    URL.revokeObjectURL(url);
+    filePreviewUrls.delete(file);
+  }
+}
+
+function revokeAllSelectedFilePreviews() {
+  for (const file of selectedFiles.value) {
+    revokeFilePreview(file);
+  }
+}
 
 const emptyProject: AdminProject = {
   id: '',
@@ -477,7 +494,7 @@ function openEditModal(project: AdminProject) {
 
 function closeModal() {
   // 關閉彈窗時主動釋放預覽資源，避免反覆開關造成記憶體累積
-  selectedFiles.value.forEach(file => URL.revokeObjectURL(getPreviewUrl(file)));
+  revokeAllSelectedFilePreviews();
   selectedFiles.value = [];
   showModal.value = false;
   if (fileInputRef.value) {
@@ -501,13 +518,17 @@ function handleFileChange(event: Event) {
 }
 
 function getPreviewUrl(file: File): string {
-  return URL.createObjectURL(file);
+  let url = filePreviewUrls.get(file);
+  if (!url) {
+    url = URL.createObjectURL(file);
+    filePreviewUrls.set(file, url);
+  }
+  return url;
 }
 
 function removeSelectedFile(index: number) {
-  // 單筆移除時同步釋放預覽資源，避免殘留無主記憶體引用
-  URL.revokeObjectURL(getPreviewUrl(selectedFiles.value[index]));
-
+  const file = selectedFiles.value[index];
+  if (file) revokeFilePreview(file);
   selectedFiles.value.splice(index, 1);
   if (fileInputRef.value && selectedFiles.value.length === 0) {
     fileInputRef.value.value = '';
@@ -552,6 +573,7 @@ async function uploadImages() {
       );
     }
     
+    revokeAllSelectedFilePreviews();
     selectedFiles.value = [];
     if (fileInputRef.value) {
       fileInputRef.value.value = '';
@@ -642,6 +664,10 @@ async function deleteProject() {
     handleError(error, { context: ErrorContext.ADMIN, showNotification: true });
   }
 }
+
+onUnmounted(() => {
+  revokeAllSelectedFilePreviews();
+});
 </script>
 
 <style scoped lang="scss">

@@ -16,6 +16,8 @@ export interface BlogPost {
   coverImage?: string
   coverImagePublicId?: string
   comments: Comment[]
+  /** Present when using GET /posts?mode=list */
+  commentsCount?: number
 }
 
 export interface Comment {
@@ -61,6 +63,7 @@ export const useBlogStore = defineStore('blog', () => {
     } catch (err) {
       console.error('Error fetching blog posts:', err)
       error.value = t('errors.general.message')
+      throw err
     } finally {
       isLoading.value = false
     }
@@ -137,14 +140,18 @@ export const useBlogStore = defineStore('blog', () => {
     }
   }
 
-  async function deletePost(id: string) {
+  async function deletePost(id: string, refetchParams?: PaginationParams) {
     if (!authStore.isAuthenticated) {
       throw new Error(t('errors.auth.unauthorized'))
     }
 
     try {
       await blogService.deletePost(id)
-      await fetchPosts({ page: pagination.value.page, limit: pagination.value.limit })
+      if (refetchParams) {
+        await fetchPosts(refetchParams)
+      } else {
+        await fetchPosts({ page: pagination.value.page, limit: pagination.value.limit })
+      }
     } catch (err) {
       console.error('Error deleting post:', err)
       throw new Error(t('errors.blog.deleteFailed'))

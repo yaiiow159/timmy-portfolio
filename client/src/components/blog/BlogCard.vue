@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '@/store/blogStore.ts'
 import { getStaticUrl, hasUsableBlogCoverImage } from '@/services/api'
+import { estimateReadMinutes } from '@/utils/blogReadTime'
 
 const { t } = useI18n()
 
@@ -34,6 +35,8 @@ const displayExcerpt = computed(() => {
   }
   return props.post.excerpt.substring(0, 120) + '...'
 })
+
+const readMinutes = computed(() => estimateReadMinutes(props.post))
 
 const coverImageSrc = computed(() =>
   hasUsableBlogCoverImage(props.post.coverImage) ? getStaticUrl(props.post.coverImage as string) : ''
@@ -91,7 +94,7 @@ function onCoverError() {
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {{ Math.ceil(post.content.length / 1000) }} min read
+            {{ readMinutes }} min read
           </div>
         </div>
       </div>

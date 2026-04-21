@@ -238,6 +238,8 @@ import { marked } from 'marked'
 import type { MarkedOptions } from 'marked'
 import hljs from 'highlight.js'
 import { useNotificationStore } from '../store/notificationStore'
+import { blogService } from '../services/blogService'
+import { sanitizeBlogHtml } from '../utils/sanitizeHtml'
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
@@ -263,17 +265,26 @@ marked.setOptions({
   breaks: true,
   gfm: true,
   pedantic: false,
-  sanitize: false,  
   smartLists: true,
   smartypants: false
 } as MarkedOptions)
 
+const relatedPosts = ref<BlogPost[]>([])
+
 onMounted(async () => {
   const postId = route.params.id as string
-  
+
   try {
     const fetchedPost = await blogStore.fetchPostById(postId)
     post.value = fetchedPost
+    if (fetchedPost) {
+      try {
+        relatedPosts.value = await blogService.getRelatedPosts(postId, 3)
+      } catch (e) {
+        console.error('Error loading related posts:', e)
+        relatedPosts.value = []
+      }
+    }
   } catch (error) {
     console.error('Error fetching post:', error)
     router.push('/blog')
@@ -281,11 +292,6 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
-
-// 避免在 template 中每次 render 都執行 filter + slice，改以 computed 快取
-const relatedPosts = computed(() =>
-  blogStore.posts.filter((p: BlogPost) => p.id !== post.value?.id).slice(0, 3)
-)
 
 const coverHeroLoadFailed = ref(false)
 
@@ -347,7 +353,8 @@ const renderedContent = computed(() => {
     if (!content) return ''
     const isHtml = /<[a-zA-Z][^>]*>/.test(content)
     const raw = isHtml ? content : (marked(content) as string)
-    return normalizeCloudinaryUrlsInString(raw)
+    const normalized = normalizeCloudinaryUrlsInString(raw)
+    return sanitizeBlogHtml(normalized)
   } catch (error) {
     console.error('Error rendering content:', error)
     return '<p class="text-red-500">Error rendering content</p>'

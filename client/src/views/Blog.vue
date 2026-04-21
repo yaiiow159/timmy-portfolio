@@ -1,30 +1,33 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { BlogPost } from '../store/blogStore'
+import { storeToRefs } from 'pinia'
+import { useBlogPostList } from '../composables/useBlogPostList'
 import { blogService } from '../services/blogService'
 import { getStaticUrl } from '../services/api'
 import { handleError, ErrorContext } from '../utils/errorHandler'
 import { formatDescription } from '../utils/textFormatters'
+import { estimateReadMinutes } from '../utils/blogReadTime'
+import { useDebouncedWatch } from '../composables/useDebouncedWatch'
 import BlogCard from '../components/blog/BlogCard.vue'
 
 const { t, locale } = useI18n()
+const { blogStore, loadList } = useBlogPostList()
+const { posts, pagination, isLoading } = storeToRefs(blogStore)
 
 const searchQuery = ref('')
 const selectedCategory = ref('')
-const isLoading = ref(true)
 const currentPage = ref(1)
 const postsPerPage = 6
-const posts = ref<BlogPost[]>([])
-const totalPostsCount = ref(0)
 const allTags = ref<string[]>([])
 
 const layoutMode = ref<'grid' | 'masonry' | 'list'>('grid')
 
+const totalPostsCount = computed(() => pagination.value.total)
+
 async function fetchPosts() {
   try {
-    isLoading.value = true
-    const response = await blogService.getPosts({
+    await loadList({
       page: currentPage.value,
       limit: postsPerPage,
       search: searchQuery.value || undefined,
@@ -32,18 +35,13 @@ async function fetchPosts() {
       sortBy: 'date',
       sortOrder: 'desc'
     })
-    posts.value = response.data
-    totalPostsCount.value = response.pagination.total
   } catch (error) {
     handleError(error, { context: ErrorContext.PUBLIC, showNotification: true })
-  } finally {
-    isLoading.value = false
   }
 }
 
 async function fetchAllTags() {
   try {
-    // 呼叫專用 /tags endpoint，僅回傳去重標籤陣列，避免載入完整文章內容
     allTags.value = await blogService.getTags()
   } catch (error) {
     handleError(error, { context: ErrorContext.PUBLIC, showNotification: false })
@@ -55,22 +53,14 @@ onMounted(async () => {
   await Promise.all([fetchPosts(), fetchAllTags()])
 })
 
-// 搜尋框使用 debounce 避免每次按鍵都觸發 API，分類切換則立即生效
-let searchTimer: ReturnType<typeof setTimeout> | null = null
-
-watch(searchQuery, () => {
+useDebouncedWatch(searchQuery, () => {
   currentPage.value = 1
-  if (searchTimer) clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => fetchPosts(), 300)
-})
+  void fetchPosts()
+}, 300)
 
 watch(selectedCategory, () => {
   currentPage.value = 1
-  fetchPosts()
-})
-
-onUnmounted(() => {
-  if (searchTimer) clearTimeout(searchTimer)
+  void fetchPosts()
 })
 
 const categories = computed(() => allTags.value)
@@ -265,7 +255,7 @@ function getImageUrl(imagePath: string | undefined): string {
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        {{ Math.ceil(post.content.length / 1000) }} min read
+                        {{ estimateReadMinutes(post) }} min read
                       </div>
                     </div>
                   </div>
@@ -397,7 +387,7 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
             <div v-if="selectedCategory" class="mt-4 pt-4 border-t border-accent/10">
               <button 
-                @click="selectedCategory = ''; currentPage = 1"
+                @click="() => { selectedCategory = ''; currentPage = 1; void fetchPosts() }"
                 class="tech-button tech-button-ghost text-sm w-full"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -437,7 +427,7 @@ function getImageUrl(imagePath: string | undefined): string {
                   <div class="flex items-center gap-2 text-xs tech-text-secondary mt-1">
                     <span>{{ formatDate(post.date) }}</span>
                     <span>•</span>
-                    <span>{{ Math.ceil(post.content.length / 1000) }} min read</span>
+                    <span>{{ estimateReadMinutes(post) }} min read</span>
                   </div>
                 </div>
               </div>

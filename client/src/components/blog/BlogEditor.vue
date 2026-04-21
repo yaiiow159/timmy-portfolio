@@ -24,6 +24,8 @@ const newTag = ref('')
 const editorContent = ref(props.post?.content || '')
 const coverImage = ref<File | null>(null)
 const coverImagePreview = ref(props.post?.coverImage || '')
+/** Tracks blob: URLs so we can revoke on replace/unmount */
+const coverBlobUrl = ref<string | null>(null)
 const isDragging = ref(false)
 
 const editorOptions = {
@@ -94,8 +96,13 @@ function handleImageDrop(event: DragEvent) {
 }
 
 function handleImageSelect(file: File) {
+  if (coverBlobUrl.value) {
+    URL.revokeObjectURL(coverBlobUrl.value)
+    coverBlobUrl.value = null
+  }
   coverImage.value = file
-  coverImagePreview.value = URL.createObjectURL(file)
+  coverBlobUrl.value = URL.createObjectURL(file)
+  coverImagePreview.value = coverBlobUrl.value
 }
 
 async function savePost() {
@@ -210,6 +217,13 @@ function onEditorReady(editor: any) {
   
   onUnmounted(cleanup)
 }
+
+onUnmounted(() => {
+  if (coverBlobUrl.value) {
+    URL.revokeObjectURL(coverBlobUrl.value)
+    coverBlobUrl.value = null
+  }
+})
 </script>
 
 <template>

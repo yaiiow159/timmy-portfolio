@@ -5,58 +5,118 @@ const { handleSuccess, handleError } = require('../utils/responseHandler');
 
 const router = express.Router();
 
+const MAX_LIMIT = 100;
+
+function mapListPost(post) {
+  return {
+    id: post.id,
+    title: post.title,
+    excerpt: post.excerpt,
+    author: post.author,
+    date: post.date,
+    tags: post.tags,
+    coverImage: post.coverImage,
+    content: '',
+    comments: [],
+    commentsCount: post._count.comments
+  };
+}
+
 router.get('/', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const mode = req.query.mode || 'full';
+    const listMode = mode === 'list' || mode === 'summary';
+
+    let page = parseInt(req.query.page, 10) || 1;
+    let limit = parseInt(req.query.limit, 10) || 10;
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+    if (limit > MAX_LIMIT) limit = MAX_LIMIT;
+
     const search = req.query.search || '';
     const tag = req.query.tag || '';
-    const ALLOWED_SORT_FIELDS = ['date', 'title', 'author'];
+    const ALLOWED_SORT_FIELDS = ['date', 'title', 'author', 'comments'];
     const rawSortBy = req.query.sortBy || 'date';
     const sortBy = ALLOWED_SORT_FIELDS.includes(rawSortBy) ? rawSortBy : 'date';
     const sortOrder = req.query.sortOrder === 'asc' ? 'asc' : 'desc';
-    
+
     const skip = (page - 1) * limit;
-    
+
     const conditions = [];
     if (search) {
       conditions.push({
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
           { content: { contains: search, mode: 'insensitive' } },
-          { excerpt: { contains: search, mode: 'insensitive' } }
+          { excerpt: { contains: search, mode: 'insensitive' } },
+          { author: { contains: search, mode: 'insensitive' } }
         ]
       });
     }
     if (tag) {
-      // 使用陣列包含查詢可避免模糊比對誤命中相似標籤
       conditions.push({ tags: { has: tag } });
     }
     const where = conditions.length > 0 ? { AND: conditions } : {};
-    
-    const posts = await prisma.post.findMany({
-      where,
-      orderBy: {
-        [sortBy]: sortOrder
-      },
-      skip,
-      take: limit,
-      include: {
-        comments: true
-      }
-    });
-    
-    const total = await prisma.post.count({ where });
-    
-    handleSuccess(res, {
-      posts,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit)
-      }
-    });
+
+    let orderBy;
+    if (sortBy === 'comments') {
+      orderBy = { comments: { _count: sortOrder } };
+    } else {
+      orderBy = { [sortBy]: sortOrder };
+    }
+
+    if (listMode) {
+      const posts = await prisma.post.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          title: true,
+          excerpt: true,
+          author: true,
+          date: true,
+          tags: true,
+          coverImage: true,
+          _count: { select: { comments: true } }
+        }
+      });
+
+      const total = await prisma.post.count({ where });
+
+      handleSuccess(res, {
+        posts: posts.map(mapListPost),
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit)
+        }
+      });
+    } else {
+      const posts = await prisma.post.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          comments: true
+        }
+      });
+
+      const total = await prisma.post.count({ where });
+
+      handleSuccess(res, {
+        posts,
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit)
+        }
+      });
+    }
   } catch (err) {
     handleError(res, err);
   }
@@ -64,7 +124,6 @@ router.get('/', async (req, res) => {
 
 router.get('/tags', async (req, res) => {
   try {
-    // 只撈 tags 欄位而非整篇文章，大幅降低資料庫傳輸量
     const posts = await prisma.post.findMany({
       select: { tags: true }
     });
@@ -92,7 +151,7 @@ router.get('/latest', async (req, res) => {
         tags: true
       }
     });
-    
+
     handleSuccess(res, posts);
   } catch (err) {
     handleError(res, err, 'Failed to fetch latest posts');
@@ -109,7 +168,7 @@ router.get('/list', async (req, res) => {
         comments: true
       }
     });
-    
+
     const formattedPosts = posts.map(post => ({
       id: post.id,
       title: post.title,
@@ -117,8 +176,61 @@ router.get('/list', async (req, res) => {
       date: post.date,
       commentsCount: post.comments.length
     }));
-    
+
     handleSuccess(res, formattedPosts);
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
+router.get('/:id/related', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let limit = parseInt(req.query.limit, 10) || 3;
+    if (limit < 1) limit = 3;
+    if (limit > 10) limit = 10;
+
+    const current = await prisma.post.findUnique({
+      where: { id },
+      select: { tags: true }
+    });
+
+    if (!current) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+
+    const selectList = {
+      id: true,
+      title: true,
+      excerpt: true,
+      author: true,
+      date: true,
+      tags: true,
+      coverImage: true,
+      _count: { select: { comments: true } }
+    };
+
+    let posts;
+    if (current.tags.length > 0) {
+      posts = await prisma.post.findMany({
+        where: {
+          id: { not: id },
+          tags: { hasSome: current.tags }
+        },
+        orderBy: { date: 'desc' },
+        take: limit,
+        select: selectList
+      });
+    } else {
+      posts = await prisma.post.findMany({
+        where: { id: { not: id } },
+        orderBy: { date: 'desc' },
+        take: limit,
+        select: selectList
+      });
+    }
+
+    handleSuccess(res, posts.map(mapListPost));
   } catch (err) {
     handleError(res, err);
   }
@@ -134,7 +246,7 @@ router.get('/:id', async (req, res) => {
         comments: true
       }
     });
-    
+
     if (!post) return res.status(404).json({ msg: 'Post not found' });
     handleSuccess(res, post);
   } catch (err) {
@@ -154,7 +266,7 @@ router.post('/', adminAuth, async (req, res) => {
         coverImage: req.body.coverImage || null
       }
     });
-    
+
     handleSuccess(res, post, 201);
   } catch (err) {
     handleError(res, err, 'Error creating post');
@@ -179,7 +291,7 @@ router.put('/:id', adminAuth, async (req, res) => {
         comments: true
       }
     });
-    
+
     handleSuccess(res, post);
   } catch (err) {
     if (err.code === 'P2025') return res.status(404).json({ msg: 'Post not found' });
@@ -194,7 +306,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
         id: req.params.id
       }
     });
-    
+
     handleSuccess(res, { msg: 'Post removed' });
   } catch (err) {
     if (err.code === 'P2025') return res.status(404).json({ msg: 'Post not found' });
@@ -209,10 +321,10 @@ router.post('/:id/comments', async (req, res) => {
         id: req.params.id
       }
     });
-    
+
     if (!post) return res.status(404).json({ msg: 'Post not found' });
-    
-    const comment = await prisma.comment.create({
+
+    await prisma.comment.create({
       data: {
         name: req.body.name,
         email: req.body.email,
@@ -220,7 +332,7 @@ router.post('/:id/comments', async (req, res) => {
         postId: req.params.id
       }
     });
-    
+
     const comments = await prisma.comment.findMany({
       where: {
         postId: req.params.id
@@ -229,12 +341,11 @@ router.post('/:id/comments', async (req, res) => {
         date: 'desc'
       }
     });
-    
+
     handleSuccess(res, comments, 201);
   } catch (err) {
     handleError(res, err);
   }
 });
-
 
 module.exports = router;

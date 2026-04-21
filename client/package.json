@@ -13,6 +13,7 @@
     "@heroicons/vue": "^2.2.0",
     "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.8.4",
+    "dompurify": "^3.4.0",
     "highlight.js": "^11.11.1",
     "marked": "^15.0.8",
     "pinia": "^3.0.2",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
+    "@types/dompurify": "^3.0.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.21",

@@ -77,7 +77,11 @@
     </div>
 
     <div class="tech-card overflow-hidden">
-      <div v-if="!posts.length" class="p-12 text-center tech-hologram-overlay">
+      <div v-if="isLoading" class="p-12 text-center tech-hologram-overlay">
+        <div class="inline-block h-10 w-10 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <p class="mt-4 text-text-secondary">{{ t('common.loading') }}</p>
+      </div>
+      <div v-else-if="!posts.length" class="p-12 text-center tech-hologram-overlay">
         <svg class="mx-auto h-16 w-16 text-text-secondary dark:text-text-secondary-dark tech-glow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0015.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2z" />
         </svg>
@@ -104,7 +108,7 @@
               </tr>
             </thead>
             <tbody class="bg-secondary dark:bg-secondary-dark divide-y divide-gray-200 dark:divide-gray-700">
-              <tr v-for="post in paginatedPosts" :key="post.id" class="hover:bg-primary dark:hover:bg-primary-light transition-colors duration-150 tech-card tech-glow">
+              <tr v-for="post in posts" :key="post.id" class="hover:bg-primary dark:hover:bg-primary-light transition-colors duration-150 tech-card tech-glow">
                 <td class="px-6 py-4">
                   <div class="flex flex-col">
                     <div class="text-sm font-medium text-text-primary dark:text-text-primary-dark mb-1">{{ post.title }}</div>
@@ -116,7 +120,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-accent/10 dark:bg-accent-light/10 text-accent dark:text-accent-light">
-                    {{ post.comments.length }}
+                    {{ commentCount(post) }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -128,7 +132,8 @@
                       {{ t('admin.edit') }}
                     </router-link>
                     <button
-                      @click="() => { showDeleteDialog = true; postToDelete = post }"
+                      type="button"
+                      @click="openDeleteDialog(post)"
                       class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200"
                     >
                       {{ t('admin.delete') }}
@@ -155,14 +160,16 @@
             <div class="flex space-x-2">
               <button
                 :disabled="currentPage === 1"
-                @click="currentPage--"
+                type="button"
+                @click="goPrev"
                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-md text-text-primary dark:text-text-primary-dark bg-secondary dark:bg-secondary-dark hover:bg-primary dark:hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 tech-button tech-pulse"
               >
                 {{ t('admin.previous') }}
               </button>
               <button
                 :disabled="currentPage === totalPages"
-                @click="currentPage++"
+                type="button"
+                @click="goNext"
                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-md text-text-primary dark:text-text-primary-dark bg-secondary dark:bg-secondary-dark hover:bg-primary dark:hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 tech-button tech-pulse"
               >
                 {{ t('admin.next') }}
@@ -220,82 +227,93 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
 import { useNotificationStore } from '@/store/notificationStore'
 import { useBlogStore } from '@/store/blogStore'
 import type { BlogPost } from '@/store/blogStore'
+import { useDebouncedWatch } from '@/composables/useDebouncedWatch'
 
 const { t } = useI18n()
 const notificationStore = useNotificationStore()
 const blogStore = useBlogStore()
+const { posts, pagination, isLoading } = storeToRefs(blogStore)
 
-const posts = ref<BlogPost[]>([])
 const searchQuery = ref('')
-const sortBy = ref('date')
-const sortOrder = ref('desc')
+const sortBy = ref<'title' | 'date' | 'comments'>('date')
+const sortOrder = ref<'asc' | 'desc'>('desc')
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const showDeleteDialog = ref(false)
 const postToDelete = ref<BlogPost | null>(null)
 
-const filteredPosts = computed(() => {
-  if (!posts.value.length) return []
-  
-  return posts.value.filter(post => {
-    const query = searchQuery.value.toLowerCase()
-    return (
-      post.title.toLowerCase().includes(query) ||
-      post.excerpt.toLowerCase().includes(query) ||
-      post.author.toLowerCase().includes(query)
-    )
-  })
+function listQueryParams() {
+  return {
+    page: currentPage.value,
+    limit: itemsPerPage.value,
+    search: searchQuery.value.trim() || undefined,
+    sortBy: sortBy.value,
+    sortOrder: sortOrder.value,
+    mode: 'list' as const
+  }
+}
+
+async function loadPosts() {
+  try {
+    await blogStore.fetchPosts(listQueryParams())
+  } catch (error) {
+    console.error('fetch posts error:', error)
+    notificationStore.addNotification({
+      type: 'error',
+      message: t('admin.fetchError'),
+      duration: 3000
+    })
+  }
+}
+
+useDebouncedWatch(searchQuery, () => {
+  currentPage.value = 1
+  void loadPosts()
+}, 300)
+
+watch([sortBy, sortOrder], () => {
+  currentPage.value = 1
+  void loadPosts()
 })
 
-const sortedPosts = computed(() => {
-  if (!filteredPosts.value.length) return []
-  
-  return [...filteredPosts.value].sort((a, b) => {
-    let valueA, valueB
-    
-    if (sortBy.value === 'title') {
-      valueA = a.title.toLowerCase()
-      valueB = b.title.toLowerCase()
-    } else if (sortBy.value === 'date') {
-      valueA = new Date(a.date).getTime()
-      valueB = new Date(b.date).getTime()
-    } else if (sortBy.value === 'comments') {
-      valueA = a.comments.length
-      valueB = b.comments.length
-    } else {
-      return 0
-    }
-    
-    if (sortOrder.value === 'asc') {
-      return valueA > valueB ? 1 : -1
-    } else {
-      return valueA < valueB ? 1 : -1
-    }
-  })
-})
+function goPrev() {
+  if (currentPage.value <= 1) return
+  currentPage.value--
+  void loadPosts()
+}
 
-const totalItems = computed(() => sortedPosts.value.length)
+function goNext() {
+  if (currentPage.value >= totalPages.value) return
+  currentPage.value++
+  void loadPosts()
+}
 
-const totalPages = computed(() => {
-  return Math.ceil(sortedPosts.value.length / itemsPerPage.value)
+const totalItems = computed(() => pagination.value.total)
+
+const totalPages = computed(() => Math.max(1, pagination.value.pages || 1))
+
+onMounted(() => {
+  void loadPosts()
 })
 
 const startIndex = computed(() => {
+  if (totalItems.value === 0) return 0
   return (currentPage.value - 1) * itemsPerPage.value
 })
 
 const endIndex = computed(() => {
-  return Math.min(startIndex.value + itemsPerPage.value, sortedPosts.value.length)
+  return Math.min(currentPage.value * itemsPerPage.value, totalItems.value)
 })
 
-const paginatedPosts = computed(() => {
-  return sortedPosts.value.slice(startIndex.value, endIndex.value)
-})
+function commentCount(post: BlogPost) {
+  return post.commentsCount ?? post.comments.length
+}
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString(undefined, {
@@ -305,12 +323,16 @@ function formatDate(date: string) {
   })
 }
 
+function openDeleteDialog(post: BlogPost) {
+  showDeleteDialog.value = true
+  postToDelete.value = post
+}
+
 async function confirmDelete(post: BlogPost | null) {
   if (!post) return
-  
+
   try {
-    await blogStore.deletePost(post.id)
-    posts.value = posts.value.filter(p => p.id !== post.id)
+    await blogStore.deletePost(post.id, listQueryParams())
     notificationStore.addNotification({
       type: 'success',
       message: t('admin.deleteSuccess'),
@@ -328,25 +350,6 @@ async function confirmDelete(post: BlogPost | null) {
     postToDelete.value = null
   }
 }
-
-async function fetchPosts() {
-  try {
-    await blogStore.fetchPosts({ limit: 500 })
-    posts.value = blogStore.posts
-  } catch (error) {
-    console.error('fetch posts error:', error)
-    notificationStore.addNotification({
-      type: 'error',
-      message: t('admin.fetchError'),
-      duration: 3000
-    })
-  }
-}
-
-onMounted(() => {
-  fetchPosts()
-})
- 
 </script>
 
 <style scoped>
