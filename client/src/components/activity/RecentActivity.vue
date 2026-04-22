@@ -22,7 +22,7 @@
         <div class="flex items-start">
           <div class="flex-shrink-0">
             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <icon-component :type="getActivityIcon(activity.type)" />
+              <icon-component :type="activityIconType(activity.type)" class="h-5 w-5 text-primary" />
             </div>
           </div>
           
@@ -41,8 +41,8 @@
             </p>
             
             <router-link 
-              v-if="activity.targetId && activity.targetType"
-              :to="getActivityLink(activity)"
+              v-if="getActivityLink(activity)"
+              :to="getActivityLink(activity)!"
               class="mt-2 inline-flex items-center text-sm text-primary hover:text-primary-dark"
             >
               {{ t('activity.viewDetails') }}
@@ -69,10 +69,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useActivityStore } from '@/store/activityStore.ts'
-import type { Activity } from '@/types/activity.ts'
+import { useActivityStore } from '@/store/activityStore'
+import type { Activity } from '@/types/activity'
 import IconComponent from '../common/IconComponent.vue'
 import { formatDate } from '@/utils/dateUtils'
+import { getActivityLink, activityIconType } from '@/utils/activityLinks'
 
 const { t } = useI18n()
 const activityStore = useActivityStore()
@@ -84,38 +85,6 @@ const error = ref(false)
 const page = ref(1)
 const limit = 5
 const hasMore = ref(false)
-
-const getActivityIcon = (type: string) => {
-  switch (type) {
-    case 'post_create':
-      return 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
-    case 'post_update':
-      return 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
-    case 'post_comment':
-      return 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z'
-    case 'project_create':
-      return 'M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z'
-    case 'project_update':
-      return 'M9 13h6m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-    case 'user_register':
-      return 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z'
-    case 'user_login':
-      return 'M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1'
-    default:
-      return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-  }
-}
-
-const getActivityLink = (activity: Activity) => {
-  switch (activity.targetType) {
-    case 'post':
-      return `/blog/${activity.targetId}`
-    case 'project':
-      return `/projects/${activity.targetId}`
-    default:
-      return '#'
-  }
-}
 
 const loadActivities = async (isLoadMore = false) => {
   try {

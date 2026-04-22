@@ -104,6 +104,8 @@
     "totalPosts": "文章总数",
     "totalProjects": "项目总数",
     "totalComments": "评论总数",
+    "statsTotalsHint": "数据库当前总计",
+    "recentActivityLastDays": "最近 7 天",
     "recentActivity": "最近活动",
     "noRecentActivity": "暂无最近活动",
     "viewAll": "查看全部",

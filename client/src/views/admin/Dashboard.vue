@@ -30,10 +30,10 @@
                 {{ t('admin.totalPosts') }}
               </p>
               <h2 class="text-5xl font-bold text-text-primary mb-2">
-                {{ stats.posts }}
+                {{ statsLoading ? '—' : stats.posts }}
               </h2>
               <p class="text-sm text-text-secondary">
-                +12% 較上月
+                {{ t('admin.statsTotalsHint') }}
               </p>
             </div>
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center tech-glow">
@@ -51,10 +51,10 @@
                 {{ t('admin.totalProjects') }}
               </p>
               <h2 class="text-5xl font-bold text-text-primary mb-2">
-                {{ stats.projects }}
+                {{ statsLoading ? '—' : stats.projects }}
               </h2>
               <p class="text-sm text-text-secondary">
-                +8% 較上月
+                {{ t('admin.statsTotalsHint') }}
               </p>
             </div>
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 flex items-center justify-center tech-glow">
@@ -72,10 +72,10 @@
                 {{ t('admin.totalComments') }}
               </p>
               <h2 class="text-5xl font-bold text-text-primary mb-2">
-                {{ stats.comments }}
+                {{ statsLoading ? '—' : stats.comments }}
               </h2>
               <p class="text-sm text-text-secondary">
-                +25% 較上月
+                {{ t('admin.statsTotalsHint') }}
               </p>
             </div>
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-600/20 flex items-center justify-center tech-glow">
@@ -92,10 +92,20 @@
           <h2 class="tech-title text-2xl font-bold">
             {{ t('admin.recentActivity') }}
           </h2>
-          <span class="text-sm text-accent font-medium px-3 py-1 rounded-full bg-accent/10">最近 7 天</span>
+          <span class="text-sm text-accent font-medium px-3 py-1 rounded-full bg-accent/10">
+            {{ t('admin.recentActivityLastDays') }}
+          </span>
         </div>
 
-        <div v-if="recentActivity.length === 0" class="text-center py-12">
+        <div v-if="activitiesLoading" class="flex justify-center py-12">
+          <div class="animate-spin rounded-full h-10 w-10 border-2 border-accent border-t-transparent" aria-hidden="true" />
+        </div>
+
+        <div v-else-if="activitiesError" class="text-center py-12 text-text-secondary">
+          {{ t('activity.errorLoading') }}
+        </div>
+
+        <div v-else-if="recentForDashboard.length === 0" class="text-center py-12">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-text-secondary mb-4 tech-glow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -104,8 +114,40 @@
           </p>
         </div>
 
-        <div v-else class="space-y-4">
-        </div>
+        <ul v-else class="space-y-4">
+          <li
+            v-for="activity in recentForDashboard"
+            :key="activity.id"
+            class="flex gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10"
+          >
+            <div class="flex-shrink-0">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-accent/15 text-accent">
+                <icon-component :type="activityIconType(activity.type)" class="h-5 w-5" />
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <p class="font-medium text-text-primary">
+                  {{ activity.title }}
+                </p>
+                <span class="shrink-0 text-sm text-text-secondary">
+                  {{ formatActivityDate(activity.date) }}
+                </span>
+              </div>
+              <p v-if="activity.description" class="mt-1 text-sm text-text-secondary">
+                {{ activity.description }}
+              </p>
+              <router-link
+                v-if="getActivityLink(activity)"
+                :to="getActivityLink(activity)!"
+                class="mt-2 inline-flex items-center text-sm font-medium text-accent hover:text-accent-light"
+              >
+                {{ t('activity.viewDetails') }}
+                <icon-component name="arrow-right" class="ml-1 h-4 w-4" />
+              </router-link>
+            </div>
+          </li>
+        </ul>
       </div>
 
       <div class="tech-card p-8">
@@ -177,15 +219,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
 import { useActivityStore } from '@/store/activityStore'
-import type { Activity } from '@/types/activity'
 import api from '@/services/api'
 import { handleError, ErrorContext } from '@/utils/errorHandler'
+import { getActivityLink, activityIconType } from '@/utils/activityLinks'
+import IconComponent from '@/components/common/IconComponent.vue'
 
-const { t } = useI18n()
+const MS_PER_DAY = 24 * 60 * 60 * 1000
+const RECENT_WINDOW_DAYS = 7
+const ACTIVITY_FETCH_LIMIT = 40
+const DASHBOARD_ACTIVITY_CAP = 5
+
+const { t, locale } = useI18n()
 const activityStore = useActivityStore()
+const { loading: activitiesLoading } = storeToRefs(activityStore)
 
 const stats = ref({
   posts: 0,
@@ -193,34 +243,55 @@ const stats = ref({
   comments: 0
 })
 
-const recentActivity = ref<Activity[]>([])
+const statsLoading = ref(true)
+const activitiesError = ref(false)
+
+const recentForDashboard = computed(() => {
+  const cutoff = Date.now() - RECENT_WINDOW_DAYS * MS_PER_DAY
+  return activityStore.activities
+    .filter((a) => new Date(a.date).getTime() >= cutoff)
+    .slice(0, DASHBOARD_ACTIVITY_CAP)
+})
+
+function formatActivityDate(dateString: string) {
+  return new Intl.DateTimeFormat(locale.value, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(new Date(dateString))
+}
 
 onMounted(async () => {
-  try {
-    const response = await api.get('/admin/stats')
-    stats.value = {
-      posts: response.data.postsCount,
-      projects: response.data.projectsCount,
-      comments: response.data.commentsCount
-    }
+  statsLoading.value = true
+  activitiesError.value = false
 
-    try {
-      await activityStore.fetchActivities()
-      recentActivity.value = activityStore.activities.slice(0, 5)
-    } catch (activityError) {
-      console.error('Error fetching activities:', activityError)
-      handleError(activityError, {
-        context: ErrorContext.ADMIN,
-        showNotification: true,
-        customMessage: t('errors.activities.fetch') || '無法獲取最近活動'
-      })
+  const [statsResult, activitiesResult] = await Promise.allSettled([
+    api.get<{ postsCount: number; projectsCount: number; commentsCount: number }>('/admin/stats'),
+    activityStore.fetchActivities({ limit: ACTIVITY_FETCH_LIMIT, page: 1 })
+  ])
+
+  statsLoading.value = false
+
+  if (statsResult.status === 'fulfilled') {
+    const { data } = statsResult.value
+    stats.value = {
+      posts: data.postsCount,
+      projects: data.projectsCount,
+      comments: data.commentsCount
     }
-  } catch (error: any) {
-    console.error('Error fetching dashboard data:', error)
-    handleError(error, {
+  } else {
+    handleError(statsResult.reason, {
       context: ErrorContext.ADMIN,
       showNotification: true,
-      customMessage: t('errors.general.message') || '發生錯誤，請稍後再試'
+      customMessage: t('errors.general.message')
+    })
+  }
+
+  if (activitiesResult.status === 'rejected') {
+    activitiesError.value = true
+    handleError(activitiesResult.reason, {
+      context: ErrorContext.ADMIN,
+      showNotification: true,
+      customMessage: t('errors.activities.fetch')
     })
   }
 })

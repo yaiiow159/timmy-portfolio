@@ -108,6 +108,8 @@
     "totalPosts": "Total Posts",
     "totalProjects": "Total Projects",
     "totalComments": "Total Comments",
+    "statsTotalsHint": "Current totals in the database",
+    "recentActivityLastDays": "Last 7 days",
     "recentActivity": "Recent Activity",
     "noRecentActivity": "No recent activity",
     "viewAll": "View All",

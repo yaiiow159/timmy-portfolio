@@ -105,6 +105,8 @@
     "totalPosts": "記事総数",
     "totalProjects": "プロジェクト総数",
     "totalComments": "コメント総数",
+    "statsTotalsHint": "データベース上の現在の合計",
+    "recentActivityLastDays": "過去7日間",
     "recentActivity": "最近のアクティビティ",
     "noRecentActivity": "最近のアクティビティはありません",
     "viewAll": "すべて表示",
