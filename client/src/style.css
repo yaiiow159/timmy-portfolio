@@ -337,33 +337,30 @@ code {
 }
 
 .btn-primary {
-  background-color: #60a5fa;
+  background-color: var(--accent);
   color: var(--accent-text-color);
 }
 
 .btn-primary:hover {
-  background-color: #3b82f6;
+  background-color: var(--accent-dark);
 }
 
 .light .btn-primary {
-  background-color: #8b5cf6;
-  color: var(--accent-text-color);
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 2px 4px rgba(var(--accent-rgb), 0.2);
 }
 
 .light .btn-primary:hover {
-  background-color: #7c3aed;
-  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 6px rgba(var(--accent-rgb), 0.3);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background-color: #4b5563;
-  color: #ffffff;
+  background-color: var(--secondary);
+  color: var(--text-primary);
 }
 
 .btn-secondary:hover {
-  background-color: #374151;
+  background-color: var(--secondary-dark);
 }
 
 .light .btn-secondary {
@@ -378,36 +375,29 @@ code {
 }
 
 .btn-outline {
-  border: 1px solid #60a5fa;
-  color: #60a5fa;
+  border: 1px solid var(--accent);
+  color: var(--accent);
 }
 
 .btn-outline:hover {
-  background-color: #60a5fa;
+  background-color: var(--accent);
   color: var(--accent-text-color);
-}
-
-.light .btn-outline {
-  border: 1px solid #8b5cf6;
-  color: #8b5cf6;
 }
 
 .light .btn-outline:hover {
-  background-color: #8b5cf6;
-  color: var(--accent-text-color);
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 2px 4px rgba(var(--accent-rgb), 0.2);
 }
 
 .gradient-text {
   color: transparent;
   background-clip: text;
-  background-image: linear-gradient(to right, #60a5fa, #a78bfa);
+  background-image: linear-gradient(to right, var(--accent), var(--tech-purple));
 }
 
 .light .gradient-text {
   color: transparent;
   background-clip: text;
-  background-image: linear-gradient(to right, #8b5cf6, #4f46e5);
+  background-image: linear-gradient(to right, var(--accent), var(--tech-purple-dark));
 }
 
 .glass {

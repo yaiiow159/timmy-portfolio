@@ -571,32 +571,19 @@ onUnmounted(() => {
   opacity: 1;
 }
 
+/* Quill：對齊全站主題（style.css 的 html:not(.light) / .light） */
 :root {
-  --color-primary: #ffffff;
-  --color-primary-dark: #1a1a1a;
-  --color-secondary: #f8f9fa;
-  --color-secondary-dark: #2a2a2a;
-  --color-accent: #3b82f6;
-  --color-accent-light: #60a5fa;
-  --color-border: #e2e8f0;
-  --color-text-primary: #1a1a1a;
-  --color-text-primary-dark: #f8f9fa;
-  --color-text-secondary: #4b5563;
-  --color-text-secondary-dark: #9ca3af;
-}
-
-.dark {
-  --color-primary: #1a1a1a;
-  --color-primary-dark: #0f0f0f;
-  --color-secondary: #2a2a2a;
-  --color-secondary-dark: #333333;
-  --color-accent: #3b82f6;
-  --color-accent-light: #60a5fa;
-  --color-border: #4b5563;
-  --color-text-primary: #f8f9fa;
-  --color-text-primary-dark: #ffffff;
-  --color-text-secondary: #9ca3af;
-  --color-text-secondary-dark: #d1d5db;
+  --color-primary: rgba(var(--bg-primary-rgb), 1);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: rgba(var(--bg-secondary-rgb), 0.96);
+  --color-secondary-dark: var(--secondary-dark);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-border: rgba(var(--accent-rgb), 0.22);
+  --color-text-primary: var(--text-primary);
+  --color-text-primary-dark: var(--text-primary-dark);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-secondary-dark: var(--text-secondary-dark);
 }
 
 .editor-container {

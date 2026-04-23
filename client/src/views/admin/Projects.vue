@@ -965,16 +965,16 @@ onUnmounted(() => {
     z-index: 1000;
     
     .modal-container {
-      background: linear-gradient(145deg, #2d2d2d, #3a3a3a) !important;
-      color: #ffffff;
+      background: linear-gradient(145deg, var(--primary), var(--secondary)) !important;
+      color: var(--text-primary);
       border-radius: 16px;
       width: min(100% - 1.5rem, 90vw);
       max-width: 800px;
       max-height: min(90vh, 100dvh - 2rem);
       overflow-y: auto;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28);
       position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(var(--accent-rgb), 0.2);
       
       &.modal-sm {
         max-width: 500px;
@@ -985,8 +985,8 @@ onUnmounted(() => {
         justify-content: space-between;
         align-items: center;
         padding: 1.5rem 2rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        background: linear-gradient(to right, #333333, #444444);
+        border-bottom: 1px solid rgba(var(--accent-rgb), 0.15);
+        background: linear-gradient(to right, var(--secondary-dark), var(--secondary));
         border-radius: 16px 16px 0 0;
         
         h2 {
@@ -999,7 +999,7 @@ onUnmounted(() => {
         .close-button {
           background: none;
           border: none;
-          color: #ffffff;
+          color: var(--text-secondary);
           font-size: 1.5rem;
           cursor: pointer;
           width: 36px;
@@ -1008,10 +1008,11 @@ onUnmounted(() => {
           align-items: center;
           justify-content: center;
           border-radius: 50%;
-          transition: background-color 0.2s, transform 0.2s;
+          transition: background-color 0.2s, transform 0.2s, color 0.2s;
           
           &:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(var(--accent-rgb), 0.12);
+            color: var(--accent);
             transform: rotate(90deg);
           }
         }
@@ -1019,7 +1020,7 @@ onUnmounted(() => {
       
       .modal-body {
         padding: 2rem;
-        background: linear-gradient(145deg, #2d2d2d, #3a3a3a) !important;
+        background: linear-gradient(145deg, var(--primary), var(--secondary)) !important;
         position: relative;
         z-index: 1;
         max-height: calc(90vh - 180px);
@@ -1030,16 +1031,16 @@ onUnmounted(() => {
         }
         
         &::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(var(--accent-rgb), 0.06);
           border-radius: 4px;
         }
         
         &::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2);
+          background: rgba(var(--accent-rgb), 0.35);
           border-radius: 4px;
           
           &:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(var(--accent-rgb), 0.5);
           }
         }
         
@@ -1057,9 +1058,9 @@ onUnmounted(() => {
             width: 100%;
             padding: 0.75rem 1rem;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
+            border: 1px solid rgba(var(--accent-rgb), 0.22);
+            background-color: rgba(var(--bg-secondary-rgb), 0.45);
+            color: var(--text-primary);
             transition: border-color 0.3s, box-shadow 0.3s;
             
             &:focus {
@@ -1069,7 +1070,8 @@ onUnmounted(() => {
             }
             
             &::placeholder {
-              color: rgba(255, 255, 255, 0.5);
+              color: var(--text-secondary);
+              opacity: 0.7;
             }
           }
           
@@ -1137,7 +1139,7 @@ onUnmounted(() => {
                   padding: 0;
                   
                   &:hover {
-                    color: #ffffff;
+                    color: var(--text-primary);
                   }
                 }
               }
@@ -1158,15 +1160,15 @@ onUnmounted(() => {
               align-items: center;
               justify-content: center;
               padding: 0.75rem 1.25rem;
-              background-color: rgba(255, 255, 255, 0.1);
-              color: #ffffff;
+              background-color: rgba(var(--accent-rgb), 0.1);
+              color: var(--text-primary);
               border-radius: 8px;
               cursor: pointer;
               transition: background-color 0.3s;
-              border: 1px dashed rgba(255, 255, 255, 0.3);
+              border: 1px dashed rgba(var(--accent-rgb), 0.35);
               
               &:hover {
-                background-color: rgba(255, 255, 255, 0.15);
+                background-color: rgba(var(--accent-rgb), 0.16);
               }
             }
             
@@ -1176,7 +1178,7 @@ onUnmounted(() => {
               justify-content: center;
               padding: 0.75rem 1.25rem;
               background-color: var(--accent);
-              color: #ffffff;
+              color: var(--accent-text-color, #fff);
               border: none;
               border-radius: 8px;
               cursor: pointer;
@@ -1205,8 +1207,8 @@ onUnmounted(() => {
               width: 100px;
               border-radius: 8px;
               overflow: hidden;
-              background-color: rgba(255, 255, 255, 0.05);
-              border: 1px solid rgba(255, 255, 255, 0.1);
+              background-color: rgba(var(--accent-rgb), 0.06);
+              border: 1px solid rgba(var(--accent-rgb), 0.15);
               
               .preview-thumbnail {
                 width: 100%;
@@ -1303,12 +1305,12 @@ onUnmounted(() => {
                   transition: background-color 0.2s, transform 0.2s;
                   
                   &:hover {
-                    background-color: rgba(255, 255, 255, 0.2);
+                    background-color: rgba(var(--accent-rgb), 0.25);
                     transform: scale(1.1);
                   }
                   
                   &.btn-remove:hover {
-                    background-color: rgba(255, 0, 0, 0.7);
+                    background-color: rgba(var(--tech-red-rgb), 0.85);
                   }
                 }
               }
@@ -1322,8 +1324,8 @@ onUnmounted(() => {
         justify-content: flex-end;
         gap: 1rem;
         padding: 1.5rem 2rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        background: linear-gradient(to right, #333333, #444444);
+        border-top: 1px solid rgba(var(--accent-rgb), 0.15);
+        background: linear-gradient(to right, var(--secondary), var(--secondary-dark));
         border-radius: 0 0 16px 16px;
         
         .btn {
@@ -1357,11 +1359,11 @@ onUnmounted(() => {
           }
           
           &.btn-secondary {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
+            background-color: rgba(var(--accent-rgb), 0.12);
+            color: var(--text-primary);
             
             &:hover {
-              background-color: rgba(255, 255, 255, 0.2);
+              background-color: rgba(var(--accent-rgb), 0.22);
             }
           }
           
@@ -1406,10 +1408,10 @@ onUnmounted(() => {
     gap: 0.5rem;
     cursor: pointer;
     padding: 0.875rem 1rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(var(--accent-rgb), 0.2);
     border-radius: 10px;
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(var(--accent-rgb), 0.04);
     position: relative;
     overflow: hidden;
     
@@ -1427,9 +1429,9 @@ onUnmounted(() => {
     
     &:hover {
       border-color: var(--accent);
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(var(--accent-rgb), 0.08);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.12);
       
       &::before {
         opacity: 1;

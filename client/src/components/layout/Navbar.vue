@@ -68,14 +68,12 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
 <template>
   <header class="navbar-root fixed w-full top-0 z-50">
     <nav class="container mx-auto px-5 py-0 flex justify-between items-stretch min-h-[60px]">
-      <!-- Logo -->
       <div class="flex items-center">
         <router-link to="/" class="navbar-logo">
           Timmy
         </router-link>
       </div>
 
-      <!-- Desktop nav -->
       <div class="hidden md:flex items-stretch space-x-1">
         <router-link
           v-for="item in navItems"
@@ -88,9 +86,7 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
         </router-link>
       </div>
 
-      <!-- Desktop controls -->
       <div class="hidden md:flex items-center space-x-3">
-        <!-- Language dropdown -->
         <div class="relative navbar-lang-wrapper" @keydown.escape="closeLanguageMenu">
           <button
             @click="toggleLanguageMenu"
@@ -121,7 +117,6 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
           </Transition>
         </div>
 
-        <!-- Theme toggle -->
         <button @click="themeStore.toggleDarkMode" class="navbar-icon-btn" aria-label="Toggle dark mode">
           <svg v-if="themeStore.isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -132,7 +127,6 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
         </button>
       </div>
 
-      <!-- Mobile controls -->
       <div class="md:hidden flex items-center space-x-3">
         <button @click="themeStore.toggleDarkMode" class="navbar-icon-btn" aria-label="Toggle dark mode">
           <svg v-if="themeStore.isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,7 +148,6 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
       </div>
     </nav>
 
-    <!-- Mobile menu -->
     <Transition name="mobile-menu">
       <div v-if="isMenuOpen" class="md:hidden navbar-mobile-panel">
         <div class="px-4 py-3 space-y-1">
@@ -303,9 +296,6 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick))
   color: var(--accent);
 }
 
-/* ── Language dropdown ──
-   使用 CSS 變數取代 hardcoded 深色值，--bg-secondary-rgb 與 --accent-rgb
-   已在 :root（dark）及 html.light 分別定義，主題切換自動生效 */
 .navbar-dropdown {
   position: absolute;
   right: 0;
