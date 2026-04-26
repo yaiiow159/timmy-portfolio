@@ -164,7 +164,7 @@ watch(() => activeSkillCategory.value, () => {
           
           <div class="hero-text w-full text-center">
             <div class="profession-container flex flex-col md:flex-row items-center justify-center gap-4 mb-8">
-              <h2 class="tech-title text-4xl md:text-5xl font-bold profession-highlight">
+              <h2 class="tech-title tech-title-hero text-4xl md:text-5xl font-bold profession-highlight">
                 {{ t('home.title') }}
               </h2>
               <div class="experience-badge tech-button">
@@ -204,7 +204,7 @@ watch(() => activeSkillCategory.value, () => {
     
     <section class="py-16 md:py-24 bg-secondary skills-section tech-particles">
       <div class="container mx-auto px-4 sm:px-6 md:px-8">
-        <div class="text-center mb-20">
+        <div class="text-center mb-12 md:mb-16">
           <div class="inline-flex items-center gap-3 mb-6">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -219,7 +219,7 @@ watch(() => activeSkillCategory.value, () => {
           <div class="w-32 h-1 bg-gradient-to-r from-accent to-tech-purple mx-auto rounded-full"></div>
         </div>
         
-        <div class="skills-filter flex flex-wrap justify-center gap-4 mb-16">
+        <div class="skills-filter flex flex-wrap justify-center gap-4 mb-10 md:mb-14">
           <button 
             v-for="category in ['all', 'frontend', 'backend', 'database', 'devops', 'monitoring', 'systems']" 
             :key="category"
@@ -269,7 +269,7 @@ watch(() => activeSkillCategory.value, () => {
     
     <section class="py-16 md:py-24 bg-primary project-section">
       <div class="container mx-auto px-4 sm:px-6 md:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-12 md:mb-20 gap-4 md:gap-6">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 md:mb-16 gap-4 md:gap-6">
           <div class="flex items-center gap-3 md:gap-4">
             <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-accent/20 to-tech-purple/20 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -440,7 +440,7 @@ watch(() => activeSkillCategory.value, () => {
 }
 
 
-.dark .profession-highlight {
+.dark .profession-highlight:not(.tech-title-hero) {
   color: transparent !important;
   background-image: linear-gradient(135deg, var(--accent), var(--accent-light)) !important;
   background-clip: text !important;
@@ -449,7 +449,7 @@ watch(() => activeSkillCategory.value, () => {
   text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3) !important;
 }
 
-.light .profession-highlight {
+.light .profession-highlight:not(.tech-title-hero) {
   color: var(--accent-dark) !important;
   text-shadow: 0 0 3px rgba(var(--accent-rgb), 0.2) !important;
 }

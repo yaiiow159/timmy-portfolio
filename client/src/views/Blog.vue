@@ -124,7 +124,7 @@ function getImageUrl(imagePath: string | undefined): string {
 <template>
   <div class="min-h-screen w-full max-w-full min-w-0 overflow-x-hidden py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
     <div class="container mx-auto w-full max-w-full min-w-0 px-4 sm:px-6 md:px-8">
-      <div class="blog-header mb-12 text-center md:mb-20">
+      <div class="blog-header mb-10 text-center md:mb-16">
         <div class="page-hero-panel mx-auto max-w-4xl">
           <h1 class="tech-title mb-5 text-3xl font-bold tracking-tight sm:text-4xl md:mb-7 md:text-5xl lg:text-6xl">
             {{ t('blog.title') }}
