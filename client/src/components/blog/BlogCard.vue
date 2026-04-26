@@ -4,8 +4,10 @@ import { useI18n } from 'vue-i18n'
 import type { BlogPost } from '@/store/blogStore.ts'
 import { getStaticUrl, hasUsableBlogCoverImage } from '@/services/api'
 import { estimateReadMinutes } from '@/utils/blogReadTime'
+import { useReadLater } from '@/composables/useReadLater'
 
 const { t } = useI18n()
+const { toggle, has } = useReadLater()
 
 const props = defineProps<{
   post: BlogPost
@@ -140,7 +142,19 @@ function onCoverError() {
           {{ displayExcerpt }}
         </p>
         
-        <div class="mt-auto pt-2">
+        <div class="mt-auto flex flex-wrap items-center gap-2 pt-2">
+          <button
+            type="button"
+            class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border transition-colors"
+            :class="has(post.id) ? 'border-accent bg-accent/20 text-accent' : 'border-accent/20 text-text-secondary hover:border-accent/50 hover:text-accent'"
+            :title="has(post.id) ? t('blog.readLaterRemove') : t('blog.readLaterAdd')"
+            :aria-pressed="has(post.id)"
+            @click.stop="toggle(post.id)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M5 3a2 2 0 00-2 2v16a1 1 0 001.2.98L12 19.2l7.8 3.78a1 1 0 001.2-.98V5a2 2 0 00-2-2H5z" />
+            </svg>
+          </button>
           <router-link 
             :to="`/blog/${post.id}`" 
             class="tech-button tech-button-sm inline-flex items-center gap-2"

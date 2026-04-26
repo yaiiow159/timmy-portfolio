@@ -8,6 +8,6 @@ export function sanitizeBlogHtml(dirty: string): string {
   if (!dirty) return ''
   return DOMPurify.sanitize(dirty, {
     ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ['target', 'rel']
+    ADD_ATTR: ['target', 'rel', 'id'],
   })
 }

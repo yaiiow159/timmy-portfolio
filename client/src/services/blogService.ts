@@ -115,5 +115,13 @@ export const blogService = {
     } catch (err) {
       throw err
     }
-  }
+  },
+
+  getPrevNext: async (id: string): Promise<{
+    newer: { id: string; title: string } | null
+    older: { id: string; title: string } | null
+  }> => {
+    const response = await api.get(`/posts/${id}/prev-next`)
+    return response.data
+  },
 }

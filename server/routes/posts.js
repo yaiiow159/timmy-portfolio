@@ -183,6 +183,47 @@ router.get('/list', async (req, res) => {
   }
 });
 
+/**
+ * 相鄰文章：依 date 大至小、同時刻以 id 次序穩定；newer=較新、older=較舊
+ */
+router.get('/:id/prev-next', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const current = await prisma.post.findUnique({
+      where: { id },
+      select: { id: true, date: true },
+    });
+    if (!current) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+    const [newer, older] = await Promise.all([
+      prisma.post.findFirst({
+        where: {
+          OR: [
+            { date: { gt: current.date } },
+            { AND: [{ date: current.date }, { id: { gt: current.id } }] },
+          ],
+        },
+        orderBy: [{ date: 'asc' }, { id: 'asc' }],
+        select: { id: true, title: true },
+      }),
+      prisma.post.findFirst({
+        where: {
+          OR: [
+            { date: { lt: current.date } },
+            { AND: [{ date: current.date }, { id: { lt: current.id } }] },
+          ],
+        },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
+        select: { id: true, title: true },
+      }),
+    ]);
+    handleSuccess(res, { newer, older });
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
 router.get('/:id/related', async (req, res) => {
   try {
     const { id } = req.params;

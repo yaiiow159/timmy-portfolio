@@ -38,6 +38,15 @@
     "cta": "View My Work",
     "yearsExp": "years experience"
   },
+  "globalSearch": {
+    "title": "Site search",
+    "placeholder": "Search posts and projects...",
+    "noResults": "No matches",
+    "posts": "Posts",
+    "projects": "Projects",
+    "hint": "Ctrl+K or tap the search icon. Esc to close.",
+    "open": "Open site search"
+  },
   "blog": {
     "title": "Blog",
     "subtitle": "My thoughts and experiences in tech",
@@ -72,7 +81,17 @@
     "tryDifferent": "Try adjusting your search or filter criteria",
     "noResults": "No posts found",
     "checkBack": "Check back later for new content",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "searchPlaceholder": "Search articles...",
+    "tableOfContents": "On this page",
+    "newerPost": "Newer post",
+    "olderPost": "Older post",
+    "readLaterFilter": "Saved for later",
+    "readLaterAdd": "Save for later",
+    "readLaterRemove": "Remove from saved",
+    "readLaterEmpty": "No saved posts on this page",
+    "readLaterEmptyHint": "Try another page or turn off the filter to see all posts.",
+    "readLaterClearFilter": "Show all posts"
   },
   "portfolio": {
     "title": "Portfolio",
@@ -97,9 +116,11 @@
     "scriptProjects": "Scripts & Tools",
     "apiProjects": "API & Backend",
     "layout": "Layout",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "similarStackProjects": "Related by stack"
   },
   "admin": {
+    "backOffice": "Admin",
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
@@ -687,6 +708,7 @@
     "add": "Add",
     "comments": "Comments",
     "showMore": "Show More",
-    "showLess": "Show Less"
+    "showLess": "Show Less",
+    "backToTop": "Back to top"
   }
 }

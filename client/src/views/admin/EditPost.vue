@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen py-12 px-4">
     <div class="max-w-4xl mx-auto">
+      <AppBreadcrumb class="text-text-secondary" :items="editBreadcrumbItems" />
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-text-primary mb-2">
           {{ isEditing ? t('admin.editPost') : t('admin.createPost') }}
@@ -24,6 +25,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import AppBreadcrumb from '@/components/common/AppBreadcrumb.vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useBlogStore } from '@/store/blogStore'
@@ -43,6 +45,12 @@ const activityStore = useActivityStore()
 
 const isEditing = computed(() => !!route.params.id)
 const isLoading = ref(false)
+
+const editBreadcrumbItems = computed(() => [
+  { label: t('admin.backOffice'), to: '/admin' },
+  { label: t('admin.posts'), to: '/admin/posts' },
+  { label: isEditing.value ? t('admin.editPost') : t('admin.createPost') }
+])
 const currentPost = ref<Partial<BlogPost>>({
   title: '',
   content: '',

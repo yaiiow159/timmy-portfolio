@@ -38,6 +38,15 @@
     "cta": "查看我的作品",
     "yearsExp": "年經驗"
   },
+  "globalSearch": {
+    "title": "全站搜尋",
+    "placeholder": "搜尋文章與專案…",
+    "noResults": "沒有符合的結果",
+    "posts": "文章",
+    "projects": "專案",
+    "hint": "Ctrl+K 或點選搜尋圖示。Esc 關閉。",
+    "open": "開啟全站搜尋"
+  },
   "blog": {
     "title": "部落格",
     "subtitle": "我在科技領域的想法和經驗",
@@ -72,7 +81,17 @@
     "tryDifferent": "請嘗試調整搜尋條件",
     "noResults": "沒有找到文章",
     "checkBack": "請稍後再回來查看",
-    "viewAll": "查看全部"
+    "viewAll": "查看全部",
+    "searchPlaceholder": "搜尋文章…",
+    "tableOfContents": "本頁目錄",
+    "newerPost": "較新",
+    "olderPost": "較舊",
+    "readLaterFilter": "稍後讀",
+    "readLaterAdd": "加入稍後讀",
+    "readLaterRemove": "從稍後讀移除",
+    "readLaterEmpty": "此頁沒有在稍後讀中的文章",
+    "readLaterEmptyHint": "可換頁、關閉篩選，或從各篇文章卡片加入稍後讀。",
+    "readLaterClearFilter": "顯示全部文章"
   },
   "portfolio": {
     "title": "作品集",
@@ -97,7 +116,8 @@
     "desktopProjects": "桌面應用",
     "scriptProjects": "腳本與工具",
     "apiProjects": "API與後端",
-    "layout": "版面配置"
+    "layout": "版面配置",
+    "similarStackProjects": "相同技術堆疊的專案"
   },
   "resume": {
     "title": "履歷",
@@ -336,6 +356,7 @@
     }
   },
   "admin": {
+    "backOffice": "管理後台",
     "dashboard": "控制面板",
     "dashboardTitle": "控制面板總覽",
     "totalPosts": "文章總數",
@@ -603,7 +624,8 @@
     "errorMessage": "操作失敗，請稍後再試",
     "notFound": "找不到資源",
     "notFoundMessage": "抱歉，您要找的資源不存在或已被移除。",
-    "preview": "預覽"
+    "preview": "預覽",
+    "backToTop": "回到頂部"
   },
   "blogPost": {
     "readingTime": "閱讀時間",

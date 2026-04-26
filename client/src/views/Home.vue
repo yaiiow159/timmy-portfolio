@@ -153,7 +153,15 @@ watch(() => activeSkillCategory.value, () => {
           <div class="profile-section w-full flex justify-center mb-16">
             <div class="profile-picture-container">
               <div class="profile-picture-inner tech-card">
-                <img src="/profile.png" alt="Timmy's Profile" class="profile-picture" />
+                <img
+                  src="/profile.png"
+                  alt="Timmy's Profile"
+                  class="profile-picture"
+                  width="200"
+                  height="200"
+                  fetchpriority="high"
+                  decoding="async"
+                />
               </div>
               <div class="profile-decoration"></div>
               <div class="profile-particles">

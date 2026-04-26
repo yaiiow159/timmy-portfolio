@@ -1,5 +1,20 @@
 <template>
   <div class="min-h-screen w-full max-w-full min-w-0 overflow-x-hidden py-12 md:py-20 bg-gradient-to-b from-primary to-secondary tech-grid-bg">
+    <div
+      v-if="!isLoading && post"
+      class="blog-reading-progress pointer-events-none fixed left-0 right-0 z-[45] h-[3px] bg-text-secondary/15 top-14 sm:top-[60px]"
+      role="progressbar"
+      :aria-valuenow="Math.round(readingProgress)"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <div
+        class="h-full origin-left bg-gradient-to-r from-accent to-tech-purple"
+        :class="reduceMotion ? '' : 'transition-[width] duration-100 ease-out'"
+        :style="{ width: `${readingProgress}%` }"
+      />
+    </div>
+
     <div class="container mx-auto w-full max-w-full min-w-0 px-4 sm:px-6 md:px-8">
       <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
         <div class="tech-loading">
@@ -10,7 +25,11 @@
         <p class="mt-4 text-lg tech-text-secondary">{{ t('blog.loading') }}</p>
       </div>
 
-      <div v-else-if="post" class="max-w-4xl mx-auto">
+      <div v-else-if="post" class="mx-auto max-w-6xl">
+        <AppBreadcrumb :items="breadcrumbItems" />
+
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
+          <div class="min-w-0 max-w-4xl flex-1">
         <div class="blog-header mb-8">
           <button
             @click="router.push('/blog')" 
@@ -55,16 +74,68 @@
               class="h-auto w-full object-cover"
               loading="eager"
               decoding="async"
+              fetchpriority="high"
               @error="onCoverHeroError"
             />
           </div>
         </div>
         
-        <div class="blog-content tech-card p-4 sm:p-6 md:p-8 prose prose-lg max-w-none mb-12">
+        <div
+          ref="articleBodyRef"
+          class="blog-content tech-card p-4 sm:p-6 md:p-8 prose prose-lg max-w-none mb-8"
+        >
           <div v-html="renderedContent"></div>
         </div>
+
+        <div
+          v-if="prevNext.older || prevNext.newer"
+          class="mb-10 flex flex-col gap-3 sm:flex-row sm:items-stretch sm:justify-between"
+        >
+          <router-link
+            v-if="prevNext.older"
+            :to="`/blog/${prevNext.older.id}`"
+            class="tech-card order-2 flex flex-1 flex-col p-4 transition-transform hover:-translate-y-0.5 sm:order-1 sm:max-w-[48%]"
+          >
+            <span class="text-xs font-medium uppercase tracking-wide text-text-secondary">{{
+              t('blog.olderPost')
+            }}</span>
+            <span class="mt-1 line-clamp-2 font-medium text-text-primary">{{ prevNext.older.title }}</span>
+          </router-link>
+          <router-link
+            v-if="prevNext.newer"
+            :to="`/blog/${prevNext.newer.id}`"
+            class="tech-card order-1 flex flex-1 flex-col p-4 text-right transition-transform hover:-translate-y-0.5 sm:order-2 sm:max-w-[48%] sm:ml-auto"
+          >
+            <span class="text-xs font-medium uppercase tracking-wide text-text-secondary">{{
+              t('blog.newerPost')
+            }}</span>
+            <span class="mt-1 line-clamp-2 font-medium text-text-primary">{{ prevNext.newer.title }}</span>
+          </router-link>
+        </div>
+          </div>
+
+          <aside
+            v-if="toc.length > 0"
+            class="tech-card w-full flex-shrink-0 p-4 lg:sticky lg:top-24 lg:max-w-[15rem] lg:self-start"
+            aria-label="Table of contents"
+          >
+            <h2 class="mb-3 text-sm font-bold uppercase tracking-wide text-text-secondary">
+              {{ t('blog.tableOfContents') }}
+            </h2>
+            <ol class="space-y-2 text-sm">
+              <li v-for="item in toc" :key="item.id">
+                <a
+                  :href="`#${item.id}`"
+                  class="text-text-secondary hover:text-accent line-clamp-2 border-l-2 border-transparent pl-2 transition-colors hover:border-accent"
+                >
+                  {{ item.text }}
+                </a>
+              </li>
+            </ol>
+          </aside>
+        </div>
         
-        <div class="max-w-4xl mx-auto mt-12">
+        <div class="mx-auto mt-12 max-w-4xl">
           <h3 class="tech-title text-xl font-semibold mb-4">{{ t('blog.comments') }}</h3>
           
           <div class="tech-card p-6">
@@ -229,7 +300,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, reactive } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useBlogStore, type BlogPost } from '../store/blogStore'
@@ -240,6 +311,8 @@ import hljs from 'highlight.js'
 import { useNotificationStore } from '../store/notificationStore'
 import { blogService } from '../services/blogService'
 import { sanitizeBlogHtml } from '../utils/sanitizeHtml'
+import { renderMarkdownForBlog } from '../utils/blogMarkdown'
+import AppBreadcrumb from '../components/common/AppBreadcrumb.vue'
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
@@ -271,9 +344,56 @@ marked.setOptions({
 
 const relatedPosts = ref<BlogPost[]>([])
 
-onMounted(async () => {
-  const postId = route.params.id as string
+const articleBodyRef = ref<HTMLElement | null>(null)
+const readingProgress = ref(0)
+const reduceMotion = ref(false)
+const prevNext = ref<{
+  newer: { id: string; title: string } | null
+  older: { id: string; title: string } | null
+}>({ newer: null, older: null })
 
+const breadcrumbItems = computed(() => {
+  if (!post.value) {
+    return [] as { label: string; to?: string }[]
+  }
+  return [
+    { label: t('nav.home'), to: '/' },
+    { label: t('blog.title'), to: '/blog' },
+    { label: post.value.title }
+  ]
+})
+
+let readingProgressRafId: number | null = null
+
+function updateReadingProgress() {
+  const el = articleBodyRef.value
+  if (!el) {
+    readingProgress.value = 0
+    return
+  }
+  const top = el.getBoundingClientRect().top + window.scrollY
+  const h = el.offsetHeight
+  const winH = window.innerHeight
+  const end = top + h - winH
+  if (end <= top) {
+    readingProgress.value = 100
+    return
+  }
+  const p = ((window.scrollY - top) / (end - top)) * 100
+  readingProgress.value = Math.min(100, Math.max(0, p))
+}
+
+function scheduleReadingProgressUpdate() {
+  if (readingProgressRafId != null) {
+    return
+  }
+  readingProgressRafId = requestAnimationFrame(() => {
+    readingProgressRafId = null
+    updateReadingProgress()
+  })
+}
+
+async function loadPostByRouteId(postId: string) {
   try {
     const fetchedPost = await blogStore.fetchPostById(postId)
     post.value = fetchedPost
@@ -284,14 +404,58 @@ onMounted(async () => {
         console.error('Error loading related posts:', e)
         relatedPosts.value = []
       }
+      try {
+        prevNext.value = await blogService.getPrevNext(postId)
+      } catch {
+        prevNext.value = { newer: null, older: null }
+      }
     }
   } catch (error) {
     console.error('Error fetching post:', error)
     router.push('/blog')
   } finally {
     isLoading.value = false
+    await nextTick()
+    updateReadingProgress()
   }
+}
+
+onMounted(() => {
+  reduceMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.addEventListener('scroll', scheduleReadingProgressUpdate, { passive: true })
+  window.addEventListener('resize', scheduleReadingProgressUpdate, { passive: true })
 })
+
+watch(
+  () => route.params.id,
+  async (id) => {
+    if (typeof id !== 'string') {
+      return
+    }
+    isLoading.value = true
+    await loadPostByRouteId(id)
+  },
+  { immediate: true }
+)
+
+onUnmounted(() => {
+  if (readingProgressRafId != null) {
+    cancelAnimationFrame(readingProgressRafId)
+    readingProgressRafId = null
+  }
+  window.removeEventListener('scroll', scheduleReadingProgressUpdate)
+  window.removeEventListener('resize', scheduleReadingProgressUpdate)
+})
+
+watch(articleBodyRef, () => {
+  nextTick(() => updateReadingProgress())
+})
+watch(
+  () => post.value?.id,
+  () => {
+    nextTick(() => updateReadingProgress())
+  }
+)
 
 const coverHeroLoadFailed = ref(false)
 
@@ -346,20 +510,28 @@ function getRelatedCoverUrl(src: string) {
   return getStaticUrl(src)
 }
 
-const renderedContent = computed(() => {
-  if (!post.value) return ''
+const renderedBundle = computed(() => {
+  if (!post.value?.content) {
+    return { html: '', toc: [] as { id: string; text: string }[] }
+  }
+  const content = post.value.content
+  const isHtml = /<[a-zA-Z][^>]*>/.test(content)
   try {
-    const content = post.value.content
-    if (!content) return ''
-    const isHtml = /<[a-zA-Z][^>]*>/.test(content)
-    const raw = isHtml ? content : (marked(content) as string)
-    const normalized = normalizeCloudinaryUrlsInString(raw)
-    return sanitizeBlogHtml(normalized)
+    if (isHtml) {
+      const normalized = normalizeCloudinaryUrlsInString(content)
+      return { html: sanitizeBlogHtml(normalized), toc: [] }
+    }
+    const { html, toc } = renderMarkdownForBlog(content)
+    const normalized = normalizeCloudinaryUrlsInString(html)
+    return { html: sanitizeBlogHtml(normalized), toc }
   } catch (error) {
     console.error('Error rendering content:', error)
-    return '<p class="text-red-500">Error rendering content</p>'
+    return { html: '<p class="text-red-500">Error rendering content</p>', toc: [] }
   }
 })
+
+const renderedContent = computed(() => renderedBundle.value.html)
+const toc = computed(() => renderedBundle.value.toc)
 
 async function submitComment() {
   if (!post.value) return

@@ -37,6 +37,15 @@
     "cta": "作品を見る",
     "yearsExp": "年の経験"
   },
+  "globalSearch": {
+    "title": "サイト内検索",
+    "placeholder": "記事とプロジェクトを検索…",
+    "noResults": "該当なし",
+    "posts": "記事",
+    "projects": "プロジェクト",
+    "hint": "Ctrl+K または検索アイコン。Esc で閉じる。",
+    "open": "サイト内検索を開く"
+  },
   "blog": {
     "title": "ブログ",
     "subtitle": "テクノロジーに関する私の考えと経験",
@@ -71,7 +80,17 @@
     "tryDifferent": "検索条件を調整してみてください",
     "noResults": "記事が見つかりません",
     "checkBack": "また後ほどご確認ください",
-    "viewAll": "すべて表示"
+    "viewAll": "すべて表示",
+    "searchPlaceholder": "記事を検索…",
+    "tableOfContents": "目次",
+    "newerPost": "新しい記事",
+    "olderPost": "前の記事",
+    "readLaterFilter": "あとで読む",
+    "readLaterAdd": "あとで読むに追加",
+    "readLaterRemove": "あとで読むから外す",
+    "readLaterEmpty": "このページにあとで読むの記事はありません",
+    "readLaterEmptyHint": "他のページを見る、フィルターを解除する、カードから追加できます。",
+    "readLaterClearFilter": "すべての記事を表示"
   },
   "portfolio": {
     "title": "ポートフォリオ",
@@ -96,9 +115,11 @@
     "desktopProjects": "デスクトップアプリ",
     "scriptProjects": "スクリプトとツール",
     "apiProjects": "APIとバックエンド",
-    "layout": "レイアウト"
+    "layout": "レイアウト",
+    "similarStackProjects": "同じ技術のプロジェクト"
   },
   "admin": {
+    "backOffice": "管理画面",
     "add": "追加",
     "dashboard": "ダッシュボード",
     "dashboardTitle": "ダッシュボード概要",
@@ -708,6 +729,7 @@
     "sortBy": "並び順",
     "update": "更新",
     "preview": "プレビュー",
-    "uploading": "アップロード中..."
+    "uploading": "アップロード中...",
+    "backToTop": "トップに戻る"
   }
 }

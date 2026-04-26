@@ -9,6 +9,8 @@ import { handleError, ErrorContext } from '../utils/errorHandler'
 import { formatDescription } from '../utils/textFormatters'
 import { estimateReadMinutes } from '../utils/blogReadTime'
 import { useDebouncedWatch } from '../composables/useDebouncedWatch'
+import { useSearchHotkey } from '../composables/useSearchHotkey'
+import { useReadLater } from '../composables/useReadLater'
 import BlogCard from '../components/blog/BlogCard.vue'
 
 const { t, locale } = useI18n()
@@ -16,6 +18,19 @@ const { blogStore, loadList } = useBlogPostList()
 const { posts, pagination, isLoading } = storeToRefs(blogStore)
 
 const searchQuery = ref('')
+const blogSearchInputRef = ref<HTMLInputElement | null>(null)
+useSearchHotkey(blogSearchInputRef)
+
+const { ids: readLaterIds } = useReadLater()
+const readLaterFilterOnly = ref(false)
+
+const displayedPosts = computed(() => {
+  if (!readLaterFilterOnly.value) {
+    return posts.value
+  }
+  return posts.value.filter((p) => readLaterIds.value.includes(p.id))
+})
+
 const selectedCategory = ref('')
 const currentPage = ref(1)
 const postsPerPage = 6
@@ -148,16 +163,33 @@ function getImageUrl(imagePath: string | undefined): string {
                     </svg>
                   </div>
                   <input 
+                    ref="blogSearchInputRef"
                     :value="searchQuery"
                     @input="updateSearch(($event.target as HTMLInputElement).value)"
                     type="text" 
                     class="tech-input w-full rounded-xl py-3 pr-4 pl-12 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-300 shadow-lg"
-                    :placeholder="'Search articles...'"
+                    :placeholder="t('blog.searchPlaceholder')"
                   />
                 </div>
               </div>
               
               <div class="flex w-full flex-wrap items-center justify-start gap-2 sm:w-auto sm:justify-end">
+                <button
+                  type="button"
+                  class="tech-button rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300"
+                  :class="readLaterFilterOnly
+                    ? 'bg-gradient-to-r from-accent to-tech-purple text-white shadow-lg'
+                    : 'bg-secondary text-text-secondary hover:bg-accent/15'"
+                  @click="readLaterFilterOnly = !readLaterFilterOnly"
+                >
+                  <span class="inline-flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    {{ t('blog.readLaterFilter') }}
+                    <span v-if="readLaterIds.length" class="rounded-full bg-black/20 px-1.5 text-xs">({{ readLaterIds.length }})</span>
+                  </span>
+                </button>
                 <span class="mr-1 text-sm tech-text-secondary sm:mr-2">{{ t('portfolio.layout') }}:</span>
                 <div class="flex bg-secondary rounded-xl p-1">
                   <button
@@ -209,10 +241,10 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
           </div>
           
-          <div v-else-if="posts.length > 0">
+          <div v-else-if="displayedPosts.length > 0">
             <div v-if="layoutMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
               <BlogCard 
-                v-for="post in posts" 
+                v-for="post in displayedPosts" 
                 :key="post.id"
                 :post="post"
                 @tag-click="handleTagClick"
@@ -220,7 +252,7 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
             
             <div v-else-if="layoutMode === 'masonry'" class="columns-1 sm:columns-2 gap-6 md:gap-8 space-y-6 md:space-y-8">
-              <div v-for="post in posts" :key="post.id" class="break-inside-avoid">
+              <div v-for="post in displayedPosts" :key="post.id" class="break-inside-avoid">
                 <BlogCard 
                   :post="post"
                   @tag-click="handleTagClick"
@@ -230,7 +262,7 @@ function getImageUrl(imagePath: string | undefined): string {
             
             <div v-else-if="layoutMode === 'list'" class="space-y-6">
               <div 
-                v-for="post in posts" 
+                v-for="post in displayedPosts" 
                 :key="post.id"
                 class="blog-card tech-card overflow-hidden group hover:scale-[1.02] transition-all duration-300"
               >
@@ -318,6 +350,16 @@ function getImageUrl(imagePath: string | undefined): string {
             </div>
           </div>
           
+          <div v-else-if="posts.length > 0 && readLaterFilterOnly" class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            <h3 class="text-xl font-semibold text-text-primary mb-2">{{ t('blog.readLaterEmpty') }}</h3>
+            <p class="text-text-secondary mb-4">{{ t('blog.readLaterEmptyHint') }}</p>
+            <button type="button" class="tech-button" @click="readLaterFilterOnly = false">
+              {{ t('blog.readLaterClearFilter') }}
+            </button>
+          </div>
           <div v-else class="text-center py-12">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

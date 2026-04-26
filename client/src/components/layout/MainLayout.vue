@@ -1,14 +1,33 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './Navbar.vue'
 import Footer from './Footer.vue'
+import ScrollToTop from './ScrollToTop.vue'
+import GlobalSearchModal from '@/components/common/GlobalSearchModal.vue'
 import { useThemeStore } from '@/store/themeStore'
 import { useLanguageStore } from '@/store/languageStore'
+import { useGlobalSearch } from '@/composables/useGlobalSearch'
 
 const themeStore = useThemeStore()
 const languageStore = useLanguageStore()
 const route = useRoute()
+const { open: openGlobalSearch } = useGlobalSearch()
+
+function onKeyDownForGlobalSearch(e: KeyboardEvent) {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    const t = e.target
+    if (
+      t instanceof HTMLInputElement ||
+      t instanceof HTMLTextAreaElement ||
+      (t instanceof HTMLElement && t.isContentEditable)
+    ) {
+      return
+    }
+    e.preventDefault()
+    openGlobalSearch()
+  }
+}
 
 const themeClasses = computed(() => {
   return themeStore.isDarkMode 
@@ -25,6 +44,10 @@ const bgGradientClass = computed(() => {
 onMounted(() => {
   themeStore.initTheme()
   languageStore.initLanguage()
+  window.addEventListener('keydown', onKeyDownForGlobalSearch)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDownForGlobalSearch)
 })
 </script>
 
@@ -43,6 +66,10 @@ onMounted(() => {
     </main>
     
     <Footer />
+
+    <ScrollToTop />
+
+    <GlobalSearchModal />
   </div>
 </template>
 

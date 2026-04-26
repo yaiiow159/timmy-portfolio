@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '../store/authStore'
 
+// 各頁以動態 import 拆 chunk，首包僅與當前路由相關；若要再加細拆請改 vite「manualChunks」而非在此重複全同步載入
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',

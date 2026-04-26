@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { ref, onMounted, computed, onUnmounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import type { Project } from '../store/portfolioStore'
-import { projectService } from '../services/projectService'
+import { usePortfolioStore } from '../store/portfolioStore'
 import ProjectCard from '../components/portfolio/ProjectCard.vue'
+import { useSearchHotkey } from '../composables/useSearchHotkey'
+import { htmlToPlainText, projectMatchesSearchQuery } from '../utils/projectSearch'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const portfolioStore = usePortfolioStore()
+const { projects } = storeToRefs(portfolioStore)
 
 const isLoading = ref(true)
 // 防止 async fetch 結束後元件已離頁，isMounted 作為離頁守衛
@@ -14,7 +22,8 @@ const selectedCategory = ref('')
 const selectedProjectType = ref<'all' | 'work' | 'personal'>('all')
 const selectedPlatformType = ref<'all' | 'web' | 'mobile' | 'desktop' | 'script' | 'api'>('all')
 const searchQuery = ref('')
-const projects = ref<Project[]>([])
+const portfolioSearchInputRef = ref<HTMLInputElement | null>(null)
+useSearchHotkey(portfolioSearchInputRef)
 const showDetailsModal = ref(false)
 const selectedProject = ref<Project | null>(null)
 const detailsCarouselIndex = ref(0)
@@ -109,14 +118,21 @@ onMounted(async () => {
   isMounted.value = true
   try {
     isLoading.value = true
-    projects.value = await projectService.getAllProjects()
+    await portfolioStore.fetchProjects()
   } catch (error) {
     console.error('Error fetching projects:', error)
   } finally {
     isLoading.value = false
-
   }
+  tryOpenProjectFromQuery()
 })
+
+watch(
+  () => [route.query.open, projects.value.length] as const,
+  () => {
+    tryOpenProjectFromQuery()
+  }
+)
 
 onUnmounted(() => {
   isMounted.value = false
@@ -139,12 +155,8 @@ const filteredProjects = computed(() => {
   }
   
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(project => 
-      project.title.toLowerCase().includes(query) || 
-      project.description.toLowerCase().includes(query) ||
-      project.technologies.some(tech => tech.toLowerCase().includes(query))
-    )
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter((project) => projectMatchesSearchQuery(project, q))
   }
   
   if (selectedCategory.value) {
@@ -200,14 +212,51 @@ function updateSearch(value: string) {
 }
 
 function getProjectPlainDescription(description: string, maxLength?: number): string {
-  const plainText = (description || '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  if (!maxLength || plainText.length <= maxLength) return plainText
+  const plainText = htmlToPlainText(description)
+  if (!maxLength || plainText.length <= maxLength) {
+    return plainText
+  }
   return `${plainText.slice(0, maxLength)}...`
 }
+
+/** 從全站搜尋帶入 ?open= 時還原為詳情彈窗 */
+function tryOpenProjectFromQuery() {
+  const id = route.query.open
+  if (typeof id !== 'string' || !id) {
+    return
+  }
+  if (!projects.value.some((p) => p.id === id)) {
+    return
+  }
+  viewProjectDetails(id)
+  const next = { ...route.query } as Record<string, string | string[] | undefined>
+  delete next.open
+  void router.replace({ path: route.path, query: next })
+}
+
+const similarStackProjects = computed((): Project[] => {
+  const current = selectedProject.value
+  if (!current) {
+    return []
+  }
+  const tech = new Set(current.technologies)
+  return projects.value
+    .filter(
+      (p) =>
+        p.id !== current.id &&
+        p.technologies.some((t) => tech.has(t))
+    )
+    .map((p) => ({
+      p,
+      overlap: p.technologies.filter((t) => tech.has(t)).length
+    }))
+    .sort(
+      (a, b) =>
+        b.overlap - a.overlap || a.p.title.localeCompare(b.p.title, undefined, { sensitivity: 'base' })
+    )
+    .slice(0, 3)
+    .map((x) => x.p)
+})
 </script>
 
 <template>
@@ -306,6 +355,7 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
                 </svg>
               </div>
               <input 
+                ref="portfolioSearchInputRef"
                 :value="searchQuery"
                 @input="updateSearch(($event.target as HTMLInputElement).value)"
                 type="text" 
@@ -682,6 +732,25 @@ function getProjectPlainDescription(description: string, maxLength?: number): st
                 </svg>
               </button>
             </div>
+          </div>
+          
+          <div v-if="similarStackProjects.length" class="mb-10">
+            <h3 class="text-xl font-bold mb-4 text-text-primary flex items-center gap-2">
+              <span class="h-1 w-1 rounded-full bg-accent" />
+              {{ t('portfolio.similarStackProjects') }}
+            </h3>
+            <ul class="space-y-2">
+              <li v-for="p in similarStackProjects" :key="p.id">
+                <button
+                  type="button"
+                  class="w-full text-left rounded-lg border border-accent/20 bg-secondary/50 px-4 py-3 text-text-primary transition-colors hover:border-accent/50 hover:bg-accent/10"
+                  @click="viewProjectDetails(p.id)"
+                >
+                  <span class="font-medium">{{ p.title }}</span>
+                  <span class="ml-2 text-sm text-text-secondary">{{ p.technologies.slice(0, 4).join(' · ') }}</span>
+                </button>
+              </li>
+            </ul>
           </div>
           
           <div class="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:gap-4">
